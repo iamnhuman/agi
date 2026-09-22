@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$PROJECT_DIR"
+
+PYTHON="$PROJECT_DIR/.venv-instagram/bin/python"
+if [[ ! -x "$PYTHON" ]]; then
+  echo "Настраиваю локальный модуль Instagram…"
+  python3 -m venv .venv-instagram
+  "$PYTHON" -m pip install -r requirements-instagram.txt
+fi
+
+if [[ ! -f "$PROJECT_DIR/.local/instagram/account.json" && -t 0 ]]; then
+  echo
+  echo "Instagram ещё не подключён."
+  read -r -p "Импортировать активную сессию из Chrome сейчас? [Y/n] " answer
+  if [[ ! "$answer" =~ ^[Nn]$ ]]; then
+    "$PYTHON" scripts/instagram_session.py connect chrome || {
+      echo
+      echo "Не удалось импортировать cookies Chrome."
+      echo "Можно подключиться позже: npm run instagram:connect"
+    }
+  fi
+fi
+
+echo
+echo "Запускаю сайт. Чтобы остановить его, закройте терминал или нажмите Ctrl+C."
+exec npm start

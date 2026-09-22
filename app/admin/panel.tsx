@@ -1,23 +1,204 @@
 'use client';
-import {useEffect,useState} from 'react';
-import {Asterisk,ArrowLeft,Plus,Search,ArrowUpRight,Pencil,Trash2,Link2,LoaderCircle} from 'lucide-react';
+import {useEffect,useState,type CSSProperties} from 'react';
+import {siteUrl} from '@/client/config';
+import {Asterisk,ArrowLeft,Plus,Search,ArrowUpRight,Pencil,Trash2,Link2,LoaderCircle,RefreshCw} from 'lucide-react';
 import {Dialog,DialogContent,DialogTitle,DialogDescription} from '@/components/ui/dialog';
 import {AlertDialog,AlertDialogContent,AlertDialogHeader,AlertDialogTitle,AlertDialogDescription,AlertDialogFooter,AlertDialogCancel,AlertDialogAction} from '@/components/ui/alert-dialog';
 import {Select,SelectTrigger,SelectValue,SelectContent,SelectItem} from '@/components/ui/select';
-import type {Artist,Section} from '@/lib/types';
-const blank:Artist={id:'',name:'',url:'',section:'world',platform:'Instagram',description:'',image:'',tags:''};
+import type {Artist,ArtistRating,Section} from '@/lib/types';
+const blank:Artist={kind:'artist',rating:'A',id:'',name:'',url:'',section:'world',platform:'Instagram',description:'',image:'',tags:''};
+function completedProfileUrl(value:string){const input=value.trim(),username=input.replace(/^@/,'');return /^[a-zA-Z0-9._]+$/.test(username)?`https://www.instagram.com/${username}`:input;}
+function sizeFromImageUrl(src:string){const match=src.match(/[_-]s(\d+)x(\d+)(?:[_-]|$)/i);return match?`${match[1]} × ${match[2]}`:'';}
+function ArtworkPreview({src,label,fresh=false}:{src:string;label:string;fresh?:boolean}){
+ const [size,setSize]=useState(()=>sizeFromImageUrl(src));
+ useEffect(()=>setSize(sizeFromImageUrl(src)),[src]);
+ return <figure className={`artwork-preview${fresh?' artwork-preview--fresh':''}`}>
+ <div>{src?<img src={src} alt={label} referrerPolicy="no-referrer" onLoad={e=>setSize(`${e.currentTarget.naturalWidth} × ${e.currentTarget.naturalHeight}`)} onError={()=>setSize('Не удалось открыть')}/>:<span>Нет изображения</span>}</div>
+ <figcaption><strong>{label}</strong><span>{size||'Загрузка превью…'}</span></figcaption>
+ </figure>;
+}
 export default function Admin(){
- const [artists,setArtists]=useState<Artist[]>([]),[sections,setSections]=useState<Section[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState(''),[notice,setNotice]=useState(''),[q,setQ]=useState(''),[group,setGroup]=useState('all');
- const [draft,setDraft]=useState<Artist|null>(null),[link,setLink]=useState(''),[busy,setBusy]=useState(false),[formError,setFormError]=useState(''),[importNote,setImportNote]=useState(''),[newSection,setNewSection]=useState(false),[sectionName,setSectionName]=useState(''),[deleting,setDeleting]=useState<Artist|null>(null);
- async function load(){setLoading(true);setError('');try{const r=await fetch('/api/catalog');const d:any=await r.json();if(!r.ok)throw Error(d.error);setArtists(d.artists);setSections(d.sections);}catch(e){setError((e as Error).message);}finally{setLoading(false);}}
+ const [columns,setColumns]=useState<number>(()=>{try{const saved=Number(localStorage.getItem('iizm-admin-columns'));return [1,3,5,7].includes(saved)?saved:5;}catch{return 5;}});
+ const [artworkSize,setArtworkSize]=useState(()=>{try{return localStorage.getItem('iizm-admin-artwork')==='full'?'full':'small';}catch{return 'small';}});
+ function changeArtwork(value:string){setArtworkSize(value);try{localStorage.setItem('iizm-admin-artwork',value);}catch{}}
+ function changeColumns(value:number){setColumns(value);try{localStorage.setItem('iizm-admin-columns',String(value));}catch{}}
+
+ const [artists,setArtists]=useState<Artist[]>([]),[sections,setSections]=useState<Section[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState(''),[notice,setNotice]=useState(''),[q,setQ]=useState(''),[group,setGroup]=useState('all'),[kind,setKind]=useState('all');
+ const [draft,setDraft]=useState<Artist|null>(null),[link,setLink]=useState(''),[busy,setBusy]=useState(false),[formError,setFormError]=useState(''),[importNote,setImportNote]=useState(''),[deleting,setDeleting]=useState<Artist|null>(null),[artworkBefore,setArtworkBefore]=useState('');
+ async function load(){setLoading(true);setError('');try{const r=await fetch('/api/catalog');const d:any=await r.json();if(!r.ok)throw Error(d.error);setArtists(d.artists);setSections(d.sections);const editId=new URLSearchParams(location.search).get("edit");if(editId){const item=d.artists.find((a:Artist)=>a.id===editId);if(item)start(item);const url=new URL(location.href);url.searchParams.delete("edit");history.replaceState(null,"",url);}}catch(e){setError((e as Error).message);}finally{setLoading(false);}}
  useEffect(()=>{load();},[]);
  async function mutate(body:object){const r=await fetch('/api/catalog',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const d:any=await r.json();if(!r.ok)throw Error(d.error);return d;}
- function start(a?:Artist){setDraft(a?{...a}:{...blank,section:group==='all'?'world':group});setLink(a?.url||'');setFormError('');setImportNote('');}
- async function importLink(){setBusy(true);setFormError('');setImportNote('');try{const r=await fetch('/api/import',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:link})});const d:any=await r.json();if(!r.ok)throw Error(d.error);setDraft(prev=>({...prev!,...d.artist}));setImportNote(d.notice);}catch(e){setFormError((e as Error).message);}finally{setBusy(false);}}
- async function save(e:React.FormEvent){e.preventDefault();setBusy(true);setFormError('');try{const d=await mutate({action:'save',artist:draft});setArtists(prev=>prev.some(a=>a.id===d.artist.id)?prev.map(a=>a.id===d.artist.id?d.artist:a):[d.artist,...prev]);setDraft(null);setNotice('Карточка сохранена и появилась в атласе.');}catch(e){setFormError((e as Error).message);}finally{setBusy(false);}}
- const filtered=artists.filter(a=>(group==='all'||group===a.section)&&(a.name+' '+a.url+' '+a.tags).toLowerCase().includes(q.toLowerCase()));
- return <><header className="topbar"><a className="brand" href="/"><Asterisk/>иизм<span>КУРАТОРСКАЯ</span></a><a href="/" className="admin-link"><ArrowLeft size={16}/> В атлас</a></header><main className="admin-main"><div className="admin-heading"><div><div className="eyebrow">ВАША КОЛЛЕКЦИЯ</div><h1>Кураторская<span>.</span></h1><p>Находите новых авторов. Дополняйте атлас.</p></div><button className="primary-btn" onClick={()=>start()}><Plus size={18}/> Добавить артиста</button></div><div className="admin-stats"><div><strong>{artists.length}</strong><span>артистов в коллекции</span></div><div><strong>{sections.length}</strong><span>раздела</span></div><button onClick={()=>{setNewSection(true);setFormError('');}}><Plus size={18}/> Новый раздел</button></div>{notice&&<p className="notice" role="status">{notice}</p>}{error&&<div className="error" role="alert">{error} <button onClick={load}>Повторить</button></div>}<div className="admin-tools"><label className="input-search"><Search size={17}/><input aria-label="Поиск артиста" placeholder="Имя, ссылка или тег…" value={q} onChange={e=>setQ(e.target.value)}/></label><Select value={group} onValueChange={setGroup}><SelectTrigger aria-label="Раздел"><SelectValue/></SelectTrigger><SelectContent><SelectItem value="all">Все разделы</SelectItem>{sections.map(s=><SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent></Select></div><div className="admin-rows">{loading?<p className="empty">Загружаем коллекцию…</p>:filtered.map((a,i)=><div className="admin-row" key={a.id}><span className="row-number">{String(i+1).padStart(3,'0')}</span><div className={'mini-art art-'+i%8}><Asterisk size={26}/></div><div className="row-name"><strong>{a.name}</strong><a href={a.url} target="_blank" rel="noreferrer">{a.platform} <ArrowUpRight size={12}/></a></div><span className="section-chip">{sections.find(s=>s.id===a.section)?.name}</span><button aria-label={'Редактировать '+a.name} onClick={()=>start(a)}><Pencil size={17}/></button><button aria-label={'Удалить '+a.name} onClick={()=>setDeleting(a)}><Trash2 size={17}/></button></div>)}{!loading&&!filtered.length&&!error&&<p className="empty">Нет артистов по этому запросу.</p>}</div></main>
- <Dialog open={!!draft} onOpenChange={open=>{if(!open&&!busy)setDraft(null);}}><DialogContent className="editor-dialog"><DialogTitle>{draft?.id?'Редактировать артиста':'Новый артист'}</DialogTitle><DialogDescription>Вставьте ссылку на Instagram или Telegram — начнём с неё.</DialogDescription><div className="import-box"><label htmlFor="import-link"><Link2 size={15}/> Ссылка на профиль или пост</label><div><input id="import-link" type="url" value={link} placeholder="https://www.instagram.com/…" onChange={e=>{setLink(e.target.value);if(!draft?.id)setDraft(prev=>({...prev!,url:e.target.value}));}} disabled={busy}/><button type="button" className="primary-btn" onClick={importLink} disabled={busy||!link.trim()}>{busy?<LoaderCircle className="spin" size={18}/>:'Заполнить'}</button></div></div>{importNote&&<p className="notice" role="status">{importNote}</p>}{draft&&<form onSubmit={save} className="artist-form"><div className="form-pair"><label>Имя артиста<input required maxLength={120} value={draft.name} onChange={e=>setDraft({...draft,name:e.target.value})}/></label><label>Раздел<Select value={draft.section} onValueChange={section=>setDraft({...draft,section})}><SelectTrigger><SelectValue/></SelectTrigger><SelectContent>{sections.map(s=><SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent></Select></label></div><label>Ссылка карточки<input required type="url" value={draft.url} onChange={e=>setDraft({...draft,url:e.target.value})}/></label><label>Описание<textarea rows={3} maxLength={1500} placeholder="Что вы хотите рассказать об авторе?" value={draft.description} onChange={e=>setDraft({...draft,description:e.target.value})}/></label><label>Обложка <span className="optional">· ссылка на изображение, необязательно</span><input type="url" placeholder="https://…" value={draft.image} onChange={e=>setDraft({...draft,image:e.target.value})}/></label><label>Теги <span className="optional">· через запятую</span><input maxLength={250} placeholder="Сюрреализм, видеоарт…" value={draft.tags} onChange={e=>setDraft({...draft,tags:e.target.value})}/></label>{formError&&<p className="error" role="alert">{formError}</p>}<div className="form-actions"><button className="secondary-btn" type="button" disabled={busy} onClick={()=>setDraft(null)}>Отмена</button><button className="primary-btn" disabled={busy} type="submit">{busy?'Подождите…':'Сохранить карточку'} <ArrowUpRight size={17}/></button></div></form>}</DialogContent></Dialog>
- <Dialog open={newSection} onOpenChange={open=>{if(!busy)setNewSection(open);}}><DialogContent className="editor-dialog"><DialogTitle>Новый раздел</DialogTitle><DialogDescription>Раздел появится в атласе и в списке при добавлении артиста.</DialogDescription><form className="artist-form" onSubmit={async e=>{e.preventDefault();setBusy(true);setFormError('');try{const d=await mutate({action:'section',name:sectionName});setSections(p=>[...p,d.section]);setSectionName('');setNewSection(false);setNotice('Раздел создан. Теперь можно добавить в него артистов.');}catch(e){setFormError((e as Error).message);}finally{setBusy(false);}}}><label>Название<input required maxLength={60} value={sectionName} onChange={e=>setSectionName(e.target.value)}/></label>{formError&&<p className="error">{formError}</p>}<button className="primary-btn" disabled={busy}>Создать раздел</button></form></DialogContent></Dialog>
- <AlertDialog open={!!deleting} onOpenChange={open=>{if(!open&&!busy)setDeleting(null);}}><AlertDialogContent className="editor-dialog"><AlertDialogHeader><AlertDialogTitle>Удалить {deleting?.name}?</AlertDialogTitle><AlertDialogDescription>Карточка исчезнет из каталога. При необходимости её можно добавить снова по ссылке.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel disabled={busy}>Отмена</AlertDialogCancel><AlertDialogAction disabled={busy} onClick={async e=>{e.preventDefault();setBusy(true);try{await mutate({action:'delete',id:deleting?.id});setArtists(p=>p.filter(a=>a.id!==deleting?.id));setDeleting(null);setNotice('Карточка удалена.');}catch(e){setError((e as Error).message);setDeleting(null);}finally{setBusy(false);}}}>Удалить</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog></>;
+ function start(a?:Artist){setDraft(a?{...a,kind:a.kind||'artist',rating:a.rating||'A'}:{...blank,kind:kind==='media'||kind==='collective'?kind:'artist',section:group==='all'?'world':group});setLink(a?.url||'');setArtworkBefore('');setFormError('');setImportNote('');}
+ async function uploadArtwork(file:File){setFormError('');setImportNote('');if(file.size>50*1024*1024){setFormError('Файл должен быть не больше 50 МБ.');return;}const previous=draft?.image||'';setBusy(true);try{const r=await fetch('/api/avatar-upload',{method:'POST',headers:{'Content-Type':file.type},body:file});const d=await r.json();if(!r.ok)throw Error(d.error);setArtworkBefore(previous);setDraft(prev=>({...prev!,image:d.image}));setImportNote(`Обложка ${file.name} (${(file.size/1024/1024).toFixed(1)} МБ) загружена. Сохраните карточку.`);}catch(e){setFormError((e as Error).message);}finally{setBusy(false);}}
+ async function downloadArtwork(){if(!draft?.image)return;const previous=draft.image;setBusy(true);setFormError('');try{const r=await fetch('/api/avatar-from-url',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:draft.image})});const d=await r.json();if(!r.ok)throw Error(d.error);setArtworkBefore(previous);setDraft(prev=>({...prev!,image:d.image}));setImportNote('Обложка скачана по ссылке и сохранена локально. Сохраните карточку.');}catch(e){setFormError((e as Error).message);}finally{setBusy(false);}}
+ async function refreshArtwork(){if(!draft?.url)return;const previous=draft.image;setBusy(true);setFormError('');setImportNote('');try{const r=await fetch('/api/import',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:draft.url})});const d:any=await r.json();if(!r.ok)throw Error(d.error);if((d.profileAvatar||d.hdAvatar||d.artist?.platform==='Telegram')&&d.artist.image&&d.imageSavedLocally){setArtworkBefore(previous);setDraft(prev=>({...prev!,image:d.artist.image}));setImportNote(d.artist.platform==='Telegram'?'Аватарка Telegram найдена и сохранена локально. Проверьте новое превью и сохраните карточку.':d.hdAvatar&&d.avatarWidth?`Найдена настоящая HD-аватарка ${d.avatarWidth} × ${d.avatarHeight}. Сохраните карточку.`:d.avatarWidth?`Instagram подтвердил аватарку, но отдаёт её только ${d.avatarWidth} × ${d.avatarHeight}. Сохраните карточку, если она лучше текущей.`:'HD-аватарка профиля найдена и сохранена локально. Сохраните карточку.');}else if(d.imageNotice){setFormError(d.imageNotice);}else{setImportNote(`${d.artist?.platform||'Площадка'} не отдала доступную аватарку. Текущее фото оставлено без изменений.`);}}catch(e){setFormError((e as Error).message);}finally{setBusy(false);}}
+ async function importLink(refresh=false){setBusy(true);setFormError('');setImportNote('');try{const source=refresh?draft?.url:completedProfileUrl(link);const r=await fetch('/api/import',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:source})});const d:any=await r.json();if(!r.ok)throw Error(d.error);if(!refresh)setLink(d.artist.url);setDraft(prev=>refresh?{...prev!,platform:d.artist.platform,...((d.metadataLoaded||d.artist.platform==='Instagram')&&d.artist.name?{name:d.artist.name}:{}),...(d.artist.description?{description:d.artist.description}:{}),...(d.artist.image&&(!prev?.image||!d.lowResolution)?{image:d.artist.image}:{})}:{...prev!,...d.artist});if(d.imageNotice&&!d.hdAvatar)setFormError(d.imageNotice);else setImportNote(d.hdAvatar&&d.imageSavedLocally?'HD-аватарка профиля найдена и сохранена локально. Проверьте карточку перед сохранением.':d.imageSavedLocally?'Обложка найдена и сохранена локально. Проверьте карточку перед сохранением.':d.lowResolution?"Instagram отдал только уменьшенную аватарку. Можно загрузить файл вручную.":refresh?d.metadataLoaded?"Доступные данные обновлены. Проверьте их и сохраните карточку. Поля без новых данных оставлены без изменений.":"Площадка не отдала данные аккаунта. Существующие поля сохранены.":d.notice);}catch(e){setFormError((e as Error).message);}finally{setBusy(false);}}
+ async function save(e:React.FormEvent){e.preventDefault();setBusy(true);setFormError('');try{const expectedRating=draft?.rating||'A';const d=await mutate({action:'save',artist:draft});if(d.artist.rating!==expectedRating)throw Error('Сервер не применил тег рейтинга. Перезапустите локальный сайт и повторите сохранение.');setArtists(prev=>prev.some(a=>a.id===d.artist.id)?prev.map(a=>a.id===d.artist.id?d.artist:a):[d.artist,...prev]);setDraft(null);setNotice(`Карточка сохранена с тегом ${d.artist.rating}.`);}catch(e){setFormError((e as Error).message);}finally{setBusy(false);}}
+ const filtered=artists.filter(a=>(group==='all'||group===a.section)&&(kind==='all'||(a.kind||'artist')===kind)&&(a.name+' '+a.url+' '+a.tags).toLowerCase().includes(q.toLowerCase()));
+ return <>
+<header className="topbar">
+<a className="brand" href={siteUrl}>
+<Asterisk/>иизм<span>КУРАТОРСКАЯ</span>
+</a>
+<a href="#videos" className="admin-link">Видео ↗</a>
+<a href={siteUrl} className="admin-link">
+<ArrowLeft size={16}/> В атлас</a>
+</header>
+<main className={`admin-main${columns===1?'':' admin-main--grid'}`}>
+<div className="admin-heading">
+<div>
+<div className="eyebrow">ВАША КОЛЛЕКЦИЯ</div>
+<h1>Кураторская<span>.</span>
+</h1>
+<p>Изменения сохраняются локально и сразу появляются на сайте.</p>
+<div className="collection-count"><strong>{artists.length}</strong><span>записей в коллекции</span></div>
+</div>
+<button className="primary-btn" onClick={()=>start()}>
+<Plus size={18}/> Добавить запись</button>
+</div>{notice&&<p className="notice" role="status">{notice}</p>}{error&&<div className="error" role="alert">{error} <button onClick={load}>Повторить</button>
+</div>}<div className="admin-tools">
+<label className="input-search">
+<Search size={17}/>
+<input aria-label="Поиск записи" placeholder="Имя, ссылка или тег…" value={q} onChange={e=>setQ(e.target.value)}/>
+</label>
+<div className="admin-view-controls">
+<div className="density-switch" role="group" aria-label="Количество записей в ряд">{[1,3,5,7].map(n=>
+<button key={n} type="button" aria-pressed={columns===n} aria-label={n===1?'Список':`${n} в ряд`} onClick={()=>changeColumns(n)}>{n===1?'Список':n}</button>)}</div>
+<Select value={artworkSize} onValueChange={changeArtwork} disabled={columns===1}>
+<SelectTrigger aria-label="Размер артворка">
+<SelectValue/>
+</SelectTrigger>
+<SelectContent>
+<SelectItem value="small">Артворк: уменьшенный</SelectItem>
+<SelectItem value="full">Артворк: на всю ширину</SelectItem>
+</SelectContent>
+</Select>
+<Select value={kind} onValueChange={setKind}>
+<SelectTrigger aria-label="Тип записей">
+<SelectValue/>
+</SelectTrigger>
+<SelectContent>
+<SelectItem value="all">Все типы</SelectItem>
+<SelectItem value="artist">Артисты</SelectItem>
+<SelectItem value="media">Медиа</SelectItem>
+<SelectItem value="collective">Объединения</SelectItem>
+</SelectContent>
+</Select>
+<Select value={group} onValueChange={setGroup}>
+<SelectTrigger aria-label="География">
+<SelectValue/>
+</SelectTrigger>
+<SelectContent>
+<SelectItem value="all">Вся география</SelectItem>{sections.map(s=>
+<SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
+</Select>
+</div>
+</div>
+<div className={`admin-rows${columns===1?'':' admin-grid'}`} data-artwork={artworkSize} data-columns={columns} style={{'--admin-columns':columns} as CSSProperties}>{loading?<p className="empty">Загружаем коллекцию…</p>:filtered.map((a,i)=>
+<div className="admin-row" data-rating={a.rating||'A'} key={a.id}>
+<span className="row-number">{String(i+1).padStart(3,'0')}</span>
+<div className={'mini-art art-'+i%8}>
+<div className="missing-avatar" role="img" aria-label="Аватарка отсутствует">
+<span aria-hidden="true">×</span>
+</div>{a.image&&<img src={a.image} alt={a.name} loading="lazy" referrerPolicy="no-referrer" onError={e=>{e.currentTarget.style.display='none';}}/>}{(a.kind||'artist')!=='artist'&&<span className={`entry-kind entry-kind--artwork${a.kind==='collective'?' entry-kind--collective':''}`}>{a.kind==='collective'?'Объединение':'Медиа'}</span>}</div>
+<div className="row-name">
+<strong title={a.name}>{a.name}</strong>
+<div className="row-secondary">{(a.kind||'artist')!=='artist'&&<span className={`entry-kind entry-kind--inline${a.kind==='collective'?' entry-kind--collective':''}`}>{a.kind==='collective'?'Объединение':'Медиа'}</span>}<a href={a.url} target="_blank" rel="noreferrer">{a.platform} <ArrowUpRight size={12}/>
+</a>
+</div>
+</div>
+<div className="admin-card-footer">
+<div className="admin-tags">
+<span className="section-chip country-tag">{sections.find(s=>s.id===a.section)?.name}</span>
+<span className={`rating-tag rating-${(a.rating||'A').toLowerCase()}`}>{a.rating||'A'}</span>
+</div>
+<div className="admin-card-actions">
+<button aria-label={'Редактировать '+a.name} onClick={()=>start(a)}>
+<Pencil size={17}/>
+</button>
+<button aria-label={'Удалить '+a.name} onClick={()=>setDeleting(a)}>
+<Trash2 size={17}/>
+</button>
+</div>
+</div>
+</div>)}{!loading&&!filtered.length&&!error&&<p className="empty">Нет записей по этому запросу.</p>}</div>
+</main>
+ <Dialog open={!!draft} onOpenChange={open=>{if(!open&&!busy)setDraft(null);}}>
+<DialogContent className="editor-dialog">
+<DialogTitle>{draft?.id?'Редактировать запись':'Новая запись'}</DialogTitle>
+<DialogDescription>Вставьте ссылку на Instagram или Telegram — начнём с неё.</DialogDescription>{draft?.id&&<button type="button" className="secondary-btn" onClick={()=>importLink(true)} disabled={busy||!draft.url.trim()} aria-label="refresh — обновить данные аккаунта">{busy?<LoaderCircle className="spin" size={16}/>:null} {busy?"Сканирование…":"refresh"}</button>}<div className="import-box">
+<label htmlFor="import-link">
+<Link2 size={15}/> Ссылка на профиль или пост</label>
+<div>
+<input id="import-link" type="text" inputMode="url" value={link} placeholder="ник или https://www.instagram.com/…" onChange={e=>{const value=e.target.value;setLink(value);if(!draft?.id)setDraft(prev=>({...prev!,url:completedProfileUrl(value)}));}} onBlur={()=>{const url=completedProfileUrl(link);setLink(url);if(!draft?.id)setDraft(prev=>({...prev!,url}));}} disabled={busy}/>
+<button type="button" className="primary-btn" onClick={()=>importLink()} disabled={busy||!link.trim()}>{busy?<LoaderCircle className="spin" size={18}/>:'Заполнить'}</button>
+</div>
+</div>{importNote&&<p className="notice" role="status">{importNote}</p>}{draft&&<form onSubmit={save} className="artist-form">
+<label>Тип записи<Select value={draft.kind||'artist'} onValueChange={kind=>setDraft({...draft,kind:kind as Artist['kind']})}>
+<SelectTrigger aria-label="Тип записи">
+<SelectValue/>
+</SelectTrigger>
+<SelectContent>
+<SelectItem value="artist">Артист</SelectItem>
+<SelectItem value="media">Медиа</SelectItem>
+<SelectItem value="collective">Объединение</SelectItem>
+</SelectContent>
+</Select>
+</label>
+<div className="form-pair">
+<label>Имя / название<input required maxLength={120} value={draft.name} onChange={e=>setDraft({...draft,name:e.target.value})}/>
+</label>
+<label>География<Select value={draft.section} onValueChange={section=>setDraft({...draft,section})}>
+<SelectTrigger>
+<SelectValue/>
+</SelectTrigger>
+<SelectContent>{sections.map(s=>
+<SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
+</Select>
+</label>
+</div>
+<fieldset className="rating-options">
+<legend>Тег рейтинга</legend>
+<div>{(['A','AA','AAA'] as ArtistRating[]).map(r=>
+<label key={r} className={`rating-option rating-${r.toLowerCase()}`}>
+<input type="radio" name="rating" value={r} checked={(draft.rating||'A')===r} onChange={()=>setDraft({...draft,rating:r})}/>
+<span>{r}</span>
+</label>)}</div>
+</fieldset>
+<label>Ссылка карточки<input required type="url" value={draft.url} onChange={e=>setDraft({...draft,url:e.target.value})}/>
+</label>
+<div className="artwork-field">
+<label>Обложка <span className="optional">· ссылка, HTML или локальный файл до 50 МБ</span>
+<input type="text" placeholder="https://…" value={draft.image} onChange={e=>{const value=e.target.value;const match=value.match(/<img\b[^>]*\bsrc\s*=\s*(["'])(.*?)\1/i);setArtworkBefore('');setDraft({...draft,image:(match?match[2]:value).replace(/&amp;/g,'&')});}}/>
+</label>
+{draft.image&&<div className={`artwork-preview-row${artworkBefore?' artwork-preview-row--compare':''}`}>
+{artworkBefore&&<ArtworkPreview src={artworkBefore} label="Было"/>}<ArtworkPreview src={draft.image} label={artworkBefore?'Новая обложка':'Превью обложки'} fresh={!!artworkBefore}/>
+</div>}
+<div className="artwork-actions">
+<label className="secondary-btn artwork-upload">{busy?'Загрузка…':'Загрузить файл'}<input type="file" accept="image/jpeg,image/png,image/webp" disabled={busy} onChange={e=>{const file=e.target.files?.[0];if(file)uploadArtwork(file);e.currentTarget.value='';}}/>
+</label>
+<button type="button" className="secondary-btn artwork-refresh" disabled={busy||!draft.url.trim()} onClick={refreshArtwork}>{busy?<LoaderCircle className="spin" size={16}/>:<RefreshCw size={16}/>} Улучшить фото</button>
+<button type="button" className="secondary-btn" disabled={busy||!draft.image.startsWith('https://')} onClick={downloadArtwork}>Скачать по ссылке</button>
+</div>
+</div>
+{formError&&<p className="error" role="alert">{formError}</p>}<div className="form-actions">
+<button className="secondary-btn" type="button" disabled={busy} onClick={()=>setDraft(null)}>Отмена</button>
+<button className="primary-btn" disabled={busy} type="submit">{busy?'Подождите…':'Сохранить карточку'} <ArrowUpRight size={17}/>
+</button>
+</div>
+</form>}</DialogContent>
+</Dialog>
+ <AlertDialog open={!!deleting} onOpenChange={open=>{if(!open&&!busy)setDeleting(null);}}>
+<AlertDialogContent className="editor-dialog">
+<AlertDialogHeader>
+<AlertDialogTitle>Удалить {deleting?.name}?</AlertDialogTitle>
+<AlertDialogDescription>Карточка исчезнет из каталога. При необходимости её можно добавить снова по ссылке.</AlertDialogDescription>
+</AlertDialogHeader>
+<AlertDialogFooter>
+<AlertDialogCancel disabled={busy}>Отмена</AlertDialogCancel>
+<AlertDialogAction disabled={busy} onClick={async e=>{e.preventDefault();setBusy(true);try{await mutate({action:'delete',id:deleting?.id});setArtists(p=>p.filter(a=>a.id!==deleting?.id));setDeleting(null);setNotice('Карточка удалена.');}catch(e){setError((e as Error).message);setDeleting(null);}finally{setBusy(false);}}}>Удалить</AlertDialogAction>
+</AlertDialogFooter>
+</AlertDialogContent>
+</AlertDialog>
+</>;
 }

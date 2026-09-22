@@ -44,5 +44,9 @@ next-env.d.ts
 /.codex/
 /outputs/
 /work/
+/.venv-instagram/
+/.local/instagram/
+/.local-instagram-profile/
+__pycache__/
 
 *.tsbuildinfo

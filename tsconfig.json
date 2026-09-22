@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
+    "target": "ES2022",
     "lib": [
       "dom",
       "dom.iterable",
@@ -17,11 +17,6 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
     "paths": {
       "@/*": [
         "./*"
@@ -29,19 +24,24 @@
     },
     "types": [
       "node",
-      "@cloudflare/workers-types"
+      "vite/client"
     ]
   },
   "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts",
-    "**/*.mts"
+    "client/**/*.ts",
+    "client/**/*.tsx",
+    "app/atlas.tsx",
+    "app/artist-map.tsx",
+    "app/admin/panel.tsx",
+    "components/**/*.tsx",
+    "hooks/**/*.ts",
+    "lib/types.ts",
+    "lib/utils.ts",
+    "vite.config.ts",
+    "app/videos.tsx"
   ],
   "exclude": [
     "node_modules",
-    "examples"
+    "dist"
   ]
 }
