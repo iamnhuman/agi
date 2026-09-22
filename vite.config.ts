@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 import {fileURLToPath} from 'node:url';
 export default defineConfig(({mode})=>({
   base:'./',
+  define:mode==='pages'?{'process.env.NODE_ENV':JSON.stringify('production')}:{},
   plugins:[react()],
   resolve:{alias:{'@':fileURLToPath(new URL('.',import.meta.url))}},
   server:{host:'127.0.0.1',allowedHosts:['localhost'],watch:{usePolling:true}},
