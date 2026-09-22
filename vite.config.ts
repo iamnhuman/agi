@@ -6,5 +6,5 @@ export default defineConfig(({mode})=>({
   plugins:[react()],
   resolve:{alias:{'@':fileURLToPath(new URL('.',import.meta.url))}},
   server:{host:'127.0.0.1',allowedHosts:['localhost'],watch:{usePolling:true}},
-  build:{outDir:mode==='pages'?'dist/pages':'dist/local',emptyOutDir:true,rollupOptions:{input:mode==='pages'?['index.html']:['index.html','admin.html']}},
+  build:{outDir:mode==='pages'?'dist/pages':'dist/local',emptyOutDir:true,rollupOptions:{input:mode==='pages'?['site.html']:['site.html','admin.html']}},
 }));

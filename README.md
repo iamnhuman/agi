@@ -37,13 +37,13 @@ npm start
 
 GitHub Pages размещает статический сайт. **Каталог работает на Pages без авторизации**, а **редактирование и импорт работают локально на порту 3334**. В публичной Pages-сборке ссылка на админку скрыта; никакие токены GitHub в браузере не нужны.
 
-1. Загрузите этот проект в свой GitHub-репозиторий, ветка `main`.
-2. В репозитории откройте **Settings → Pages → Source → GitHub Actions**.
-3. Workflow `.github/workflows/pages.yml` проверит проект, соберёт каталог и опубликует его. Адрес появится в **Actions → Publish artist atlas → deploy**.
-4. После редактирования в локальной админке сохраните и отправьте изменённый `data/catalog.json` в GitHub. Workflow опубликует обновления автоматически.
+GitHub Pages в этом репозитории публикует корень ветки `main`. Команда `npm run build:pages` собирает сайт и обновляет там `index.html`, `assets/`, `catalog.json` и `.nojekyll`. Исходный HTML для локальной разработки хранится отдельно в `site.html`.
+
+После редактирования в локальной админке пересоберите и отправьте каталог вместе с созданными статическими файлами:
 
 ```sh
-git add data/catalog.json
+npm run build:pages
+git add data/catalog.json public/avatars index.html assets catalog.json favicon.svg .nojekyll
 git commit -m "Update artist catalog"
 git push
 ```
@@ -56,7 +56,7 @@ git push
 npm run build:pages
 ```
 
-Готовый каталог будет в `dist/pages/`. Относительные пути позволяют разместить его и в корне домена, и по адресу `https://username.github.io/repository/`. В эту сборку не входят сервер админки и страница редактирования.
+Готовая отдельная сборка также будет в `dist/pages/`. Относительные пути позволяют разместить её и в корне домена, и по адресу `https://username.github.io/repository/`. В эту сборку не входят сервер админки и страница редактирования.
 
 Документация GitHub Pages: https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages
 
@@ -76,6 +76,7 @@ npm run build:pages
 - `data/catalog.json` — все артисты и разделы.
 - `dist/local/` — сборка для двух локальных адресов.
 - `dist/pages/` — статическая сборка GitHub Pages.
+- `index.html`, `assets/`, `catalog.json` — опубликованная копия в корне репозитория.
 
 Оба локальных сервера слушают только `127.0.0.1`, а запись разрешена только с адреса админки. Пароль при локальном запуске не нужен. Не используйте этот локальный сервер как публичную админку через туннели: для такого размещения потребуются отдельная авторизация и серверный хостинг.
 

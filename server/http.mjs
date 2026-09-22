@@ -92,9 +92,9 @@ export async function startServers({catalogFile,distDir,sitePort=3333,adminPort=
         }
         if (!['GET','HEAD'].includes(req.method)) return json(res,405,{error:'Метод не поддерживается.'});
         if (url.pathname === '/' || url.pathname === '/index.html') {
-          const entry = kind === 'admin' ? 'admin.html' : 'index.html';
+          const entry = kind === 'admin' ? 'admin.html' : dev ? 'site.html' : 'index.html';
           let html = await readFile(resolve(dev ? '.' : distDir,entry),'utf8');
-          if (dev) html = await vite.transformIndexHtml(kind === 'admin' ? '/admin.html' : '/', html);
+          if (dev) html = await vite.transformIndexHtml(kind === 'admin' ? '/admin.html' : '/site.html', html);
           const config = {siteUrl:`http://localhost:${actual.site}`,adminUrl:`http://localhost:${actual.admin}`};
           html = html.replace('</head>',`<script>window.__ATLAS_CONFIG__=${JSON.stringify(config)}</script></head>`);
           res.writeHead(200,{'Content-Type':mime['.html'],'Cache-Control':'no-store'});
