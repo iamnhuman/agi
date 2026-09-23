@@ -7,7 +7,7 @@ const kindLabels={artist:'Артисты',media:'Медиа',collective:'Объ�
 type EntryKind=keyof typeof kindLabels;
 const entryKind=(artist:Artist):EntryKind=>artist.kind==='media'||artist.kind==='collective'?artist.kind:'artist';
 
-export default function ArtistMap({artists,sections,onSelect}:{artists:Artist[];sections:Section[];onSelect:(a:Artist)=>void}){
+export default function ArtistMap({artists,sections}:{artists:Artist[];sections:Section[]}){
  const [zoom,setZoom]=useState(1),[pan,setPan]=useState({x:0,y:0});
  const drag=useRef<{x:number;y:number;px:number;py:number}|null>(null),moved=useRef(false);
  const viewport=useRef<HTMLDivElement>(null),svg=useRef<SVGSVGElement>(null),view=useRef({zoom,pan});
@@ -40,6 +40,6 @@ export default function ArtistMap({artists,sections,onSelect}:{artists:Artist[];
  {kinds.map((kind,index)=><g className="map-kind" key={kind}><text x={index*columnWidth+28} y="104">{kindLabels[kind]}</text>{index>0&&<line x1={index*columnWidth} y1="75" x2={index*columnWidth} y2={height-25}/>}</g>)}
  {nodes.map(({artist,x,y,cx,cy})=><line key={'line'+artist.id} x1={cx} y1={cy} x2={x} y2={y} stroke={artist.section==='world'?'#8dba5533':'#a18abe33'}/>)}
  {groups.map(group=><g key={`${group.kind}-${group.section.id}`}><circle cx={group.cx} cy={group.cy} r="31" fill="#17200f" stroke="#93b866"/><text x={group.cx} y={group.cy+5} textAnchor="middle" fill="#d5e8bc" fontSize="14">{group.section.name.slice(0,18)}</text><text className="map-group-count" x={group.cx} y={group.cy+54} textAnchor="middle">{group.members.length} {group.kind==='artist'?'АРТИСТОВ':group.kind==='media'?'МЕДИА':'ОБЪЕДИНЕНИЙ'}</text></g>)}
- {nodes.map(({artist,x,y},index)=><g data-node="true" className="map-node" key={artist.id} role="button" tabIndex={0} aria-label={artist.name} onClick={()=>onSelect(artist)} onKeyDown={event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();onSelect(artist);}}}><circle cx={x} cy={y} r="16" fill="transparent"/><circle cx={x} cy={y} r={index%7===0?7:4} fill={artist.section==='world'?'#c9e999':'#bca4d5'}/><text x={x+11} y={y+4} fill="#cbd3bf" fontSize="11">{artist.name}</text></g>)}
+ {nodes.map(({artist,x,y},index)=><a data-node="true" className="map-node" key={artist.id} href={artist.url} target="_blank" rel="noopener noreferrer" aria-label={`Открыть источник: ${artist.name}`}><circle cx={x} cy={y} r="16" fill="transparent"/><circle cx={x} cy={y} r={index%7===0?7:4} fill={artist.section==='world'?'#c9e999':'#bca4d5'}/><text x={x+11} y={y+4} fill="#cbd3bf" fontSize="11">{artist.name}</text></a>)}
  </g></svg><div className="map-controls"><button aria-label="Приблизить" onClick={()=>setZoom(value=>Math.min(3,value+.25))}><Plus size={18}/></button><span>{Math.round(zoom*100)}%</span><button aria-label="Отдалить" onClick={()=>setZoom(value=>Math.max(.5,value-.25))}><Minus size={18}/></button><button aria-label="Сбросить карту" onClick={()=>{setZoom(1);setPan({x:0,y:0});}}><RotateCcw size={16}/></button></div><p className="map-caption">Тактическая карта ИИ-сцены: артисты, медиа и объединения по секторам</p></div>;
 }

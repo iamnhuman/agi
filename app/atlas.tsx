@@ -2,20 +2,24 @@
 import {useState,useEffect,useRef,type PointerEvent,type CSSProperties} from 'react';
 import {catalogUrl,adminUrl,showLocalAdmin} from '@/client/config';
 import ArtistMap from './artist-map';
-import {Dialog,DialogContent,DialogTitle,DialogDescription} from '@/components/ui/dialog';
 import {defaultSections,type Artist,type Section} from '@/lib/types';
 import {ArrowUpRight, Search, Grid2X2, List, Network, Layers3, ArrowRight, Pencil, Radio, UsersRound, ZoomIn, ZoomOut} from 'lucide-react';
 import CommandDeck from '@/client/command-deck';
 
 const glitchGlyphs=['█','▓','▒','░','╳','╱','╲','┼','┆','║','◆','◇','△','▽','◉','※','×','+','=','/','\\','0','1','И','З','М'];
 const glitchColumns=Array.from({length:21},(_,i)=>Array.from({length:14+(i*7)%14},(_,j)=>glitchGlyphs[(i*13+j*7+(j*j)%11)%glitchGlyphs.length]).join('\n'));
+const zalgoMarks=['\u0301','\u0308','\u0327','\u0338','\u0342'];
+function mutateSignal(columns:string[]){return columns.map(column=>{const symbols=column.split('');for(let i=0;i<Math.max(2,Math.floor(symbols.length/8));i++){const offset=Math.floor(Math.random()*symbols.length);if(symbols[offset]!=='\n')symbols[offset]=glitchGlyphs[Math.floor(Math.random()*glitchGlyphs.length)];}return symbols.join('');});}
+function zalgoSignal(tick:number){return [...'СИГНАЛ ПОВРЕЖДЁН'].map((letter,index)=>letter===' '?' ':(tick+index*3)%9===0?glitchGlyphs[(tick+index)%glitchGlyphs.length]:letter+((tick+index*5)%6===0?zalgoMarks[(tick+index)%zalgoMarks.length]:'')).join('');}
 
 export default function Atlas({initial}:{initial:Artist[]}){
-const [data,setData]=useState(initial),[sections,setSections]=useState<Section[]>(defaultSections),[error,setError]=useState(''),[selected,setSelected]=useState<Artist|null>(null);
+const [data,setData]=useState(initial),[sections,setSections]=useState<Section[]>(defaultSections),[error,setError]=useState('');
 async function refresh(){try{const r=await fetch(catalogUrl,{cache:'no-store'});const d:any=await r.json();if(!r.ok)throw Error(d.error);setData(d.artists);setSections(d.sections);setError('');}catch{setError('Связь с архивом потеряна. Показаны последние доступные досье.');}}
 useEffect(()=>{refresh();const onFocus=()=>refresh();window.addEventListener('focus',onFocus);return ()=>window.removeEventListener('focus',onFocus);},[]);
 const [section,setSection]=useState('all'),[q,setQ]=useState(''),[view,setView]=useState('grid'),[kind,setKind]=useState('all');
 const [signalOpen,setSignalOpen]=useState(false);
+const [signalColumns,setSignalColumns]=useState(glitchColumns),[signalTick,setSignalTick]=useState(0);
+useEffect(()=>{if(!signalOpen)return;setSignalColumns(mutateSignal);const timer=window.setInterval(()=>{setSignalColumns(mutateSignal);setSignalTick(tick=>tick+1);},110);return()=>window.clearInterval(timer);},[signalOpen]);
 const deckRef=useRef<HTMLDivElement|null>(null);
 const [deckZoom,setDeckZoom]=useState(1);
 const deckDrag=useRef<{pointerId:number;startX:number;scrollLeft:number;active:boolean}|null>(null);
@@ -66,21 +70,21 @@ return <>
 </span>
 <div className="catalog-type-radios" role="radiogroup" aria-label="Тип записей">{[['all','Все'],['artist','Артисты'],['media','Медиа'],['collective','Объединения']].map(([id,label])=><label key={id} className={kind===id?'is-active':''}><input type="radio" name="catalog-kind" value={id} checked={kind===id} onChange={()=>setKind(id)}/><span>{label}</span></label>)}</div>
 </div>
-</div>{view==='map'?<ArtistMap artists={artists} sections={sections} onSelect={setSelected}/>:<>{view==='deck'&&<div className="deck-toolbar"><span>КОЛОДА · колесо / перетягивание · Ctrl/⌘ + колесо — зум</span><div className="deck-zoom-controls" role="group" aria-label="Масштаб 3D-колоды"><label htmlFor="deck-zoom">ЗУМ</label><button type="button" aria-label="Уменьшить масштаб 3D-колоды" disabled={deckZoom<=.65} onClick={()=>changeDeckZoom(-.1)}><ZoomOut size={18}/></button><input id="deck-zoom" type="range" min="65" max="150" step="5" value={Math.round(deckZoom*100)} onChange={event=>setDeckZoom(Number(event.target.value)/100)} aria-label="Масштаб 3D-колоды"/><output htmlFor="deck-zoom" aria-live="polite">{Math.round(deckZoom*100)}%</output><button type="button" aria-label="Увеличить масштаб 3D-колоды" disabled={deckZoom>=1.5} onClick={()=>changeDeckZoom(.1)}><ZoomIn size={18}/></button></div></div>}<div ref={deckRef} className={view==='list'?'artist-list':view==='deck'?'artist-grid artist-deck':'artist-grid'} data-size={view==='grid'?cardSize:view==='list'?listSize:undefined} style={view==='deck'?{'--deck-zoom':deckZoom} as React.CSSProperties:undefined} aria-label={view==='deck'?'Горизонтальная 3D-колода досье':undefined} tabIndex={view==='deck'?0:undefined} onPointerDown={view==='deck'?startDeckDrag:undefined} onPointerMove={view==='deck'?moveDeckDrag:undefined} onPointerUp={view==='deck'?stopDeckDrag:undefined} onPointerCancel={view==='deck'?stopDeckDrag:undefined} onClickCapture={view==='deck'?event=>{if(suppressDeckClick.current){event.preventDefault();event.stopPropagation();suppressDeckClick.current=false;}}:undefined} onDragStart={view==='deck'?event=>event.preventDefault():undefined} onKeyDown={view==='deck'?event=>{if(event.key==='+'||event.key==='='){event.preventDefault();changeDeckZoom(.1);}else if(event.key==='-'){event.preventDefault();changeDeckZoom(-.1);}}:undefined}>{artists.map((a,i)=>
+</div>{view==='map'?<ArtistMap artists={artists} sections={sections}/>:<>{view==='deck'&&<div className="deck-toolbar"><span>КОЛОДА · колесо / перетягивание · Ctrl/⌘ + колесо — зум</span><div className="deck-zoom-controls" role="group" aria-label="Масштаб 3D-колоды"><label htmlFor="deck-zoom">ЗУМ</label><button type="button" aria-label="Уменьшить масштаб 3D-колоды" disabled={deckZoom<=.65} onClick={()=>changeDeckZoom(-.1)}><ZoomOut size={18}/></button><input id="deck-zoom" type="range" min="65" max="150" step="5" value={Math.round(deckZoom*100)} onChange={event=>setDeckZoom(Number(event.target.value)/100)} aria-label="Масштаб 3D-колоды"/><output htmlFor="deck-zoom" aria-live="polite">{Math.round(deckZoom*100)}%</output><button type="button" aria-label="Увеличить масштаб 3D-колоды" disabled={deckZoom>=1.5} onClick={()=>changeDeckZoom(.1)}><ZoomIn size={18}/></button></div></div>}<div ref={deckRef} className={view==='list'?'artist-list':view==='deck'?'artist-grid artist-deck':'artist-grid'} data-size={view==='grid'?cardSize:view==='list'?listSize:undefined} style={view==='deck'?{'--deck-zoom':deckZoom} as React.CSSProperties:undefined} aria-label={view==='deck'?'Горизонтальная 3D-колода досье':undefined} tabIndex={view==='deck'?0:undefined} onPointerDown={view==='deck'?startDeckDrag:undefined} onPointerMove={view==='deck'?moveDeckDrag:undefined} onPointerUp={view==='deck'?stopDeckDrag:undefined} onPointerCancel={view==='deck'?stopDeckDrag:undefined} onClickCapture={view==='deck'?event=>{if(suppressDeckClick.current){event.preventDefault();event.stopPropagation();suppressDeckClick.current=false;}}:undefined} onDragStart={view==='deck'?event=>event.preventDefault():undefined} onKeyDown={view==='deck'?event=>{if(event.key==='+'||event.key==='='){event.preventDefault();changeDeckZoom(.1);}else if(event.key==='-'){event.preventDefault();changeDeckZoom(-.1);}}:undefined}>{artists.map((a,i)=>
 <article className="artist-card" data-rating={a.rating||'A'} data-kind={a.kind||'artist'} data-section={a.section} key={a.id}>
-<button onClick={()=>setSelected(a)} aria-label={"Подробнее: "+a.name} className={'art art-'+i%8}>
+<a href={a.url} target="_blank" rel="noopener noreferrer" aria-label={"Открыть источник: "+a.name} className={'art art-'+i%8}>
 <span className="art-index">{String(i+1).padStart(3,'0')}</span>
 <div className="missing-avatar" role="img" aria-label="Аватарка отсутствует">
 <span aria-hidden="true">×</span>
 </div>{a.image&&<img src={a.image} alt={a.name} loading="lazy" referrerPolicy="no-referrer" onError={e=>{e.currentTarget.style.display="none";}}/>}{a.kind==='collective'?<span className="record-type record-type--avatar"><UsersRound size={13} aria-hidden="true"/> Объединение</span>:a.kind==='media'?<span className="record-type record-type--avatar"><Radio size={13} aria-hidden="true"/> Медиа</span>:null}<span className="art-badges">
 <span className={`rating-tag rating-${(a.rating||'A').toLowerCase()}`}>{a.rating||'A'}</span>
 </span>
-</button>
+</a>
 <div className="card-info">
 {(a.section==='world'||a.section==='runet')&&<img className="region-watermark" src={a.section==='world'?'./badges/region-en-eagle-cutout.png':'./badges/region-ru-emblem-cutout.png'} alt="" aria-hidden="true" loading="lazy" decoding="async"/>}
 <div>
 <h2>
-<button className="artist-name" title={a.name} onClick={()=>setSelected(a)}>{a.name}</button>
+<a className="artist-name" title={a.name} href={a.url} target="_blank" rel="noopener noreferrer">{a.name}</a>
 </h2><p>
 <a className="artist-social" href={a.url} target="_blank" rel="noreferrer">{a.platform} <ArrowUpRight size={14}/>
 </a>
@@ -90,18 +94,7 @@ return <>
 </main>
 <footer>
 <span>иизм © 2026 · АРХИВ ИИ-СЦЕНЫ</span>
-<div className="manifesto" data-open={signalOpen} onPointerLeave={event=>{if(event.pointerType==='mouse')setSignalOpen(false);}} onBlurCapture={event=>{if(!event.currentTarget.contains(event.relatedTarget as Node))setSignalOpen(false);}}><div id="toyota-transmission" className="manifesto-transmission" aria-hidden={!signalOpen}><div className="manifesto-spires">{glitchColumns.map((column,i)=><pre key={i} style={{'--column':i} as CSSProperties}>{column}</pre>)}</div><div className="manifesto-rupture"><span>МЫ — НЕ ИМЕНА</span><span>01 / СИГНАЛ ПОВРЕЖДЁН / 01101</span></div><span className="manifesto-signal">█▓▒░ ╳ ╱╲ ┼ ※ ◉ / МЫ НЕ ИМЕНА / МЫ СИГНАЛЫ / 01001101 / ※ ┼ ╲╱ ╳ ░▒▓█</span></div><button type="button" className="toyota-mark" aria-label="Toyota: показать сигнал" aria-controls="toyota-transmission" aria-expanded={signalOpen} onPointerEnter={event=>{if(event.pointerType==='mouse')setSignalOpen(true);}} onKeyDown={event=>{if(event.key==='Escape')setSignalOpen(false);}} onClick={()=>{if(window.matchMedia('(hover: none)').matches)setSignalOpen(open=>!open);else setSignalOpen(true);}}><svg viewBox="0 0 240 160" aria-hidden="true"><ellipse cx="120" cy="70" rx="106" ry="61"/><ellipse cx="120" cy="55" rx="56" ry="22"/><ellipse cx="120" cy="64" rx="27" ry="53"/></svg><span>TOYOTA</span></button></div>{showLocalAdmin&&<a href={adminUrl}>Войти в штаб <ArrowRight size={16}/>
+<div className="manifesto" data-open={signalOpen} onPointerLeave={event=>{if(event.pointerType==='mouse')setSignalOpen(false);}} onBlurCapture={event=>{if(!event.currentTarget.contains(event.relatedTarget as Node))setSignalOpen(false);}}><div id="toyota-transmission" className="manifesto-transmission" aria-hidden={!signalOpen}><div className="manifesto-spires">{signalColumns.map((column,i)=><pre key={i} style={{'--column':i} as CSSProperties}>{column}</pre>)}</div><span className="manifesto-zalgo" aria-hidden="true">{zalgoSignal(signalTick)}</span></div><button type="button" className="toyota-mark" aria-label="Toyota: показать сигнал" aria-controls="toyota-transmission" aria-expanded={signalOpen} onPointerEnter={event=>{if(event.pointerType==='mouse')setSignalOpen(true);}} onKeyDown={event=>{if(event.key==='Escape')setSignalOpen(false);}} onClick={()=>{if(window.matchMedia('(hover: none)').matches)setSignalOpen(open=>!open);else setSignalOpen(true);}}><svg viewBox="0 0 240 160" aria-hidden="true"><ellipse cx="120" cy="70" rx="106" ry="61"/><ellipse cx="120" cy="55" rx="56" ry="22"/><ellipse cx="120" cy="64" rx="27" ry="53"/></svg><span>TOYOTA</span></button></div>{showLocalAdmin&&<a href={adminUrl}>Войти в штаб <ArrowRight size={16}/>
 </a>}</footer>
-<Dialog open={!!selected} onOpenChange={open=>{if(!open)setSelected(null);}}>
-<DialogContent className="editor-dialog artist-detail">
-<DialogTitle>{selected?.name}</DialogTitle>
-<DialogDescription>{sections.find(s=>s.id===selected?.section)?.name} · {selected?.kind==='collective'?'Объединение':selected?.kind==='media'?'Медиа':'Артист'} · {selected?.platform}</DialogDescription>
-<div className="detail-badges">
-<span className={`rating-tag rating-${(selected?.rating||'A').toLowerCase()}`}>{selected?.rating||'A'}</span>
-</div>{selected?.image&&<img src={selected.image} alt={selected.name} referrerPolicy="no-referrer" onError={e=>{e.currentTarget.style.display='none';}}/>}{selected?.tags&&<div className="tag-list">{selected.tags.split(',').filter(Boolean).map((t,i)=>
-<span key={i}>{t.trim()}</span>)}</div>}<a href={selected?.url} target="_blank" rel="noreferrer" className="primary-btn">Открыть источник · {selected?.platform} <ArrowUpRight size={18}/>
-</a>
-</DialogContent>
-</Dialog>
 </>;
 }

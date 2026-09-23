@@ -2015,3 +2015,40 @@ button:disabled,[aria-disabled="true"],[data-disabled],input:disabled,textarea:d
   .admin-tools .admin-view-controls{justify-content:flex-start}
   .admin-filter-set{width:100%}
 }
+
+/* The Toyota transmission floats upward from the centered mark; it never takes layout space. */
+footer{overflow:visible}
+footer .manifesto,footer .manifesto[data-open="true"]{overflow:visible;contain:none}
+.manifesto .toyota-mark{top:50%;bottom:auto;transform:translate(-50%,-50%)}
+.manifesto-transmission,.manifesto[data-open="true"] .manifesto-transmission{top:auto;right:auto;bottom:calc(50% + 66px);left:50%;width:min(1100px,100%);height:104px;overflow:visible;transform:translateX(-50%)}
+.manifesto-transmission::before{display:none}
+.manifesto-transmission .manifesto-spires{inset:0 0 20px;justify-content:space-between;align-items:flex-start;overflow:hidden;mask-image:linear-gradient(to bottom,transparent,#000 15%,#000 72%,transparent)}
+.manifesto-transmission .manifesto-spires pre{flex:0 1 auto;min-width:0;font-size:clamp(9px,.9vw,14px);line-height:1.03}
+.manifesto-zalgo{position:absolute;z-index:3;right:0;bottom:0;left:0;display:block;min-height:1.2em;margin:0;color:#fff0ad;font:900 clamp(16px,3vw,36px)/1.1 Menlo,Consolas,monospace;letter-spacing:.06em;text-align:center;white-space:nowrap;text-shadow:2px 2px #ba2730,-1px -1px #53b0b8,0 0 22px #ef343866;opacity:0;filter:blur(5px);pointer-events:none}
+.manifesto[data-open="true"] .manifesto-zalgo{animation:toyota-zalgo-arrive .7s steps(5,end) .2s both,toyota-zalgo-shiver 1.8s steps(1,end) .9s infinite}
+@keyframes toyota-zalgo-arrive{0%{opacity:0;filter:blur(8px);translate:0 14px}45%{opacity:.7}100%{opacity:1;filter:blur(0);translate:0 0}}
+@keyframes toyota-zalgo-shiver{0%,85%,100%{translate:0 0}86%{translate:2px -1px}88%{translate:-2px 1px}90%{translate:0 0}}
+@media(max-width:600px){.manifesto .toyota-mark{bottom:auto}.manifesto-transmission,.manifesto[data-open="true"] .manifesto-transmission{bottom:calc(50% + 59px);height:95px}.manifesto-zalgo{font-size:clamp(13px,4vw,22px);letter-spacing:0}}
+@media(prefers-reduced-motion:reduce){.manifesto[data-open="true"] .manifesto-zalgo{animation:toyota-zalgo-arrive .7s steps(5,end) .2s both!important}}
+
+/* Dossier badges share one scale. Type stays top-left; dense cards keep the index clear below. */
+.admin-grid .row-number--list,.admin-rows:not(.admin-grid) .row-number--art{display:none}
+.artist-grid .art-index,.artist-grid .art-badges .rating-tag,.artist-grid .record-type--avatar,
+.admin-grid .row-number--art,.admin-grid .mini-art .rating-tag,.admin-grid .record-type--avatar{
+  box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;
+  height:30px;min-height:30px;margin:0;padding:0 10px;border-radius:6px;
+  font:700 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.06em;white-space:nowrap;
+}
+.artist-grid .record-type--avatar,.admin-grid .record-type--avatar{
+  top:10px;right:auto;bottom:auto;left:10px;gap:6px;
+  max-width:calc(100% - 20px);overflow:hidden;text-overflow:ellipsis;
+}
+.artist-grid .record-type--avatar svg,.admin-grid .record-type--avatar svg{flex:none;width:14px;height:14px}
+.artist-grid .artist-card:is([data-kind="collective"],[data-kind="media"]) .art-index,
+.admin-grid .admin-row:is([data-kind="collective"],[data-kind="media"]) .row-number--art{
+  top:auto;right:10px;bottom:10px;
+}
+.admin-grid .row-number--art{z-index:4;top:10px;right:10px;min-width:44px}
+.admin-grid .row-number--art::before{content:none}
+.artist-list .record-type--avatar{top:5px;right:auto;bottom:auto;left:5px;box-sizing:border-box;height:21px;min-height:21px;max-width:calc(100% - 10px);padding:0 5px;border-radius:5px;font-size:9px;overflow:hidden;text-overflow:ellipsis}

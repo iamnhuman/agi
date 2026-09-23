@@ -24,7 +24,11 @@ if (pages) {
   await writeFile(`${output}/catalog.json`,JSON.stringify(catalog,null,2)+'\n');
   await writeFile('dist/pages/.nojekyll','');
   // This repository uses Pages from main/root. Embed the complete app in one HTML file.
-  const rootHtml = html.replaceAll('./avatars/','./public/avatars/');
+  const rootHtml = html
+    .replaceAll('./avatars/','./public/avatars/')
+    .replaceAll('./badges/','./public/badges/')
+    .replaceAll('./radar-world-red.webp','./public/radar-world-red.webp')
+    .replaceAll('../cursor-','./public/cursor-');
   await writeFile('index.html',rootHtml);
   await copyFile(`${output}/favicon.svg`,'favicon.svg');
   const rootCatalog = structuredClone(catalog);

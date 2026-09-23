@@ -80,8 +80,9 @@ export default function Admin(){
 </div>
 <div className={`admin-rows${columns===1?'':' admin-grid'}`} data-artwork="full" data-columns={columns} style={{'--admin-columns':columns} as CSSProperties}>{loading?<p className="empty">Загружаем коллекцию…</p>:filtered.map((a,i)=>
 <div className="admin-row" data-rating={a.rating||'A'} data-kind={a.kind||'artist'} data-section={a.section} key={a.id}>
-<span className="row-number">{String(i+1).padStart(3,'0')}</span>
+<span className="row-number row-number--list">{String(i+1).padStart(3,'0')}</span>
 <div className={'mini-art art-'+i%8}>
+<span className="row-number row-number--art">{String(i+1).padStart(3,'0')}</span>
 <div className="missing-avatar" role="img" aria-label="Аватарка отсутствует">
 <span aria-hidden="true">×</span>
 </div>{a.image&&<img src={a.image} alt={a.name} loading="lazy" referrerPolicy="no-referrer" onError={e=>{e.currentTarget.style.display='none';}}/>}{a.kind==='collective'?<span className="record-type record-type--avatar"><UsersRound size={13} aria-hidden="true"/> Объединение</span>:a.kind==='media'?<span className="record-type record-type--avatar"><Radio size={13} aria-hidden="true"/> Медиа</span>:null}<span className="art-badges"><span className={`rating-tag rating-${(a.rating||'A').toLowerCase()}`}>{a.rating||'A'}</span></span></div>
