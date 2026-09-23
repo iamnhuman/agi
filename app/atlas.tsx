@@ -74,7 +74,7 @@ return <>
 <div className="catalog-type-controls">
 <span className="catalog-result-count"><span className="catalog-result-number">{artists.length}</span> ДОСЬЕ <span className="muted">/ В БАЗЕ</span>
 </span>
-<div className="catalog-type-radios" role="radiogroup" aria-label="Тип записей">{[['all','Все'],['artist','Артисты'],['media','Медиа'],['collective','Объединения']].map(([id,label])=><label key={id} className={kind===id?'is-active':''}><input type="radio" name="catalog-kind" value={id} checked={kind===id} onChange={()=>setKind(id)}/><span>{label}</span></label>)}</div>
+<div className="catalog-type-radios" role="radiogroup" aria-label="Тип записей">{[['all','Все'],['artist','Артисты'],['media','Медиа'],['collective','Гэнги']].map(([id,label])=><label key={id} className={kind===id?'is-active':''}><input type="radio" name="catalog-kind" value={id} checked={kind===id} onChange={()=>setKind(id)}/><span>{label}</span></label>)}</div>
 </div>
 </div>{view==='map'?<ArtistMap artists={artists} sections={sections}/>:<>{view==='deck'&&<div className="deck-toolbar"><span>КОЛОДА · колесо / перетягивание · Ctrl/⌘ + колесо — зум</span><div className="deck-zoom-controls" role="group" aria-label="Масштаб 3D-колоды"><label htmlFor="deck-zoom">ЗУМ</label><button type="button" aria-label="Уменьшить масштаб 3D-колоды" disabled={deckZoom<=.65} onClick={()=>changeDeckZoom(-.1)}><ZoomOut size={18}/></button><input id="deck-zoom" type="range" min="65" max="150" step="5" value={Math.round(deckZoom*100)} onChange={event=>setDeckZoom(Number(event.target.value)/100)} aria-label="Масштаб 3D-колоды"/><output htmlFor="deck-zoom" aria-live="polite">{Math.round(deckZoom*100)}%</output><button type="button" aria-label="Увеличить масштаб 3D-колоды" disabled={deckZoom>=1.5} onClick={()=>changeDeckZoom(.1)}><ZoomIn size={18}/></button></div></div>}<div ref={deckRef} className={view==='list'?'artist-list':view==='deck'?'artist-grid artist-deck':'artist-grid'} data-size={view==='grid'?cardSize:view==='list'?listSize:undefined} style={view==='deck'?{'--deck-zoom':deckZoom} as React.CSSProperties:undefined} aria-label={view==='deck'?'Горизонтальная 3D-колода досье':undefined} tabIndex={view==='deck'?0:undefined} onPointerDown={view==='deck'?startDeckDrag:undefined} onPointerMove={view==='deck'?moveDeckDrag:undefined} onPointerUp={view==='deck'?stopDeckDrag:undefined} onPointerCancel={view==='deck'?stopDeckDrag:undefined} onClickCapture={view==='deck'?event=>{if(suppressDeckClick.current){event.preventDefault();event.stopPropagation();suppressDeckClick.current=false;}}:undefined} onDragStart={view==='deck'?event=>event.preventDefault():undefined} onKeyDown={view==='deck'?event=>{if(event.key==='+'||event.key==='='){event.preventDefault();changeDeckZoom(.1);}else if(event.key==='-'){event.preventDefault();changeDeckZoom(-.1);}}:undefined}>{artists.map((a,i)=>
 <article className="artist-card" data-rating={a.rating||'A'} data-kind={a.kind||'artist'} data-section={a.section} key={a.id}>
@@ -82,7 +82,7 @@ return <>
 <span className="art-index">{String(i+1).padStart(3,'0')}</span>
 <div className="missing-avatar" role="img" aria-label="Аватарка отсутствует">
 <span aria-hidden="true">×</span>
-</div>{a.image&&<img src={a.image} alt={a.name} loading="lazy" referrerPolicy="no-referrer" onError={e=>{e.currentTarget.style.display="none";}}/>}{a.kind==='collective'?<span className="record-type record-type--avatar"><UsersRound size={13} aria-hidden="true"/> Объединение</span>:a.kind==='media'?<span className="record-type record-type--avatar"><Radio size={13} aria-hidden="true"/> Медиа</span>:null}<span className="art-badges">
+</div>{a.image&&<img src={a.image} alt={a.name} loading="lazy" referrerPolicy="no-referrer" onError={e=>{e.currentTarget.style.display="none";}}/>}{a.kind==='collective'?<span className="record-type record-type--avatar"><UsersRound size={13} aria-hidden="true"/> Гэнг</span>:a.kind==='media'?<span className="record-type record-type--avatar"><Radio size={13} aria-hidden="true"/> Медиа</span>:null}<span className="art-badges">
 <span className={`rating-tag rating-${(a.rating||'A').toLowerCase()}`}>{a.rating||'A'}</span>
 </span>
 </a>
@@ -94,7 +94,7 @@ return <>
 </h2><p>
 <a className="artist-social" href={a.url} target="_blank" rel="noreferrer">{a.platform} <ArrowUpRight size={14}/>
 </a>
-{a.kind==='collective'?<span className="list-kind-tag"><UsersRound size={11} aria-hidden="true"/>Объединение</span>:a.kind==='media'?<span className="list-kind-tag"><Radio size={11} aria-hidden="true"/>Медиа</span>:null}
+{a.kind==='collective'?<span className="list-kind-tag"><UsersRound size={11} aria-hidden="true"/>Гэнг</span>:a.kind==='media'?<span className="list-kind-tag"><Radio size={11} aria-hidden="true"/>Медиа</span>:null}
 </p>
 </div>{showLocalAdmin&&<a className="card-edit" title="Редактировать" aria-label={"Редактировать "+a.name} href={adminUrl+"/?edit="+encodeURIComponent(a.id)+"#catalog"}><Pencil size={15}/></a>}</div>
 </article>)}</div></>}{!artists.length&&<p className="empty">Сигнал не обнаружен. Измените запрос или фильтр.</p>}</section>

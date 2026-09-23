@@ -1297,18 +1297,6 @@ footer .manifesto{
 /* Record type is independent of geography, platform and A/AA/AAA rating. */
 .artist-card[data-kind="collective"],.admin-row[data-kind="collective"]{--kind-accent:#60d5e8}
 .artist-card[data-kind="media"],.admin-row[data-kind="media"]{--kind-accent:#ff7770}
-.artist-grid .artist-card:is([data-kind="collective"],[data-kind="media"])::before,
-.admin-grid .admin-row:is([data-kind="collective"],[data-kind="media"])::before{
-  background:linear-gradient(90deg,var(--kind-accent) 0 38%,#555b60 38% 100%);
-}
-.artist-grid .artist-card:is([data-kind="collective"],[data-kind="media"]) .card-info,
-.admin-grid .admin-row:is([data-kind="collective"],[data-kind="media"]) .row-name{
-  border-top:2px solid var(--kind-accent);
-  background:radial-gradient(ellipse at 0 0,color-mix(in srgb,var(--kind-accent) 15%,transparent),transparent 65%),
-    linear-gradient(145deg,#1d2024,#101215 72%);
-}
-.artist-grid .artist-card:is([data-kind="collective"],[data-kind="media"]) .card-info::before,
-.admin-grid .admin-row:is([data-kind="collective"],[data-kind="media"]) .row-name::before{background:var(--kind-accent)}
 .record-type{
   display:flex;align-items:center;gap:7px;min-width:0;margin:0 0 10px;
   color:var(--kind-accent);font:700 10px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -1320,14 +1308,10 @@ footer .manifesto{
 .admin-grid .admin-row:is([data-kind="collective"],[data-kind="media"]) .entry-kind--artwork{
   border-color:var(--kind-accent);color:#f4f5f1;background:#101317e8;
 }
-.artist-grid .artist-card:is([data-kind="collective"],[data-kind="media"]) .card-info{min-height:134px}
-.admin-grid .admin-row:is([data-kind="collective"],[data-kind="media"]) .row-name{min-height:126px}
-.admin-grid[data-artwork="small"] .admin-row:is([data-kind="collective"],[data-kind="media"]) .row-name{min-height:128px;padding-top:50px}
 .admin-grid[data-artwork="small"] .record-type{display:none}
 .artist-list .record-type{margin-bottom:4px;font-size:9px}
 @media(max-width:700px){
   .record-type{font-size:9px;letter-spacing:.07em}
-  .artist-grid .artist-card:is([data-kind="collective"],[data-kind="media"]) .card-info{min-height:124px}
 }
 
 /* Main-menu cabinet: one CRT display and a separate physical control column. */
@@ -2097,4 +2081,30 @@ footer{height:216px;min-height:216px;margin-top:28px}
   .artist-list[data-size] .card-info h2{margin:0 0 5px;font-size:13px;line-height:1.25}
   .artist-list[data-size] .artist-card:has(.card-edit) .card-info h2{padding-right:29px}
   .artist-list[data-size] .card-edit{top:11px;right:0;transform:none}
+}
+
+/* Command dossiers: the rank drives the entire chassis; record type colors only its badge. */
+.artist-grid .artist-card[data-rating],.admin-grid .admin-row[data-rating]{
+  border:1px solid color-mix(in srgb,var(--card-accent) 52%,#535b60);
+  background:#0c0f12;
+  box-shadow:inset 0 1px #ffffff3b,inset 0 0 0 2px #080a0d,0 14px 30px #000b,0 0 18px var(--card-halo);
+}
+.artist-grid .artist-card[data-rating]::before,.admin-grid .admin-row[data-rating]::before{
+  display:block;content:"";position:absolute;z-index:5;top:0;right:0;left:0;height:4px;
+  background:linear-gradient(90deg,#b6bdc1 0 8%,#30383c 8% 12%,var(--card-accent) 12% 68%,#31393e 68% 100%);
+  box-shadow:0 1px #080a0c,0 0 10px var(--card-halo);
+  pointer-events:none;
+}
+.artist-grid .artist-card[data-kind][data-rating] .card-info,.admin-grid .admin-row[data-kind][data-rating] .row-name{
+  position:relative;
+  border-top:1px solid color-mix(in srgb,var(--card-accent) 48%,#666d70);
+  background:
+    radial-gradient(ellipse at 100% 0,color-mix(in srgb,var(--card-accent) 16%,transparent),transparent 62%),
+    repeating-linear-gradient(0deg,transparent 0 5px,#ffffff05 5px 6px),
+    linear-gradient(140deg,color-mix(in srgb,var(--card-panel) 56%,#171b1e),color-mix(in srgb,var(--card-panel-deep) 68%,#0b0e11) 76%);
+}
+.artist-grid .artist-card[data-kind][data-rating] .card-info::before,.admin-grid .admin-row[data-kind][data-rating] .row-name::before{
+  display:block;content:"";position:absolute;top:0;bottom:0;left:0;width:3px;
+  background:linear-gradient(180deg,var(--card-accent),color-mix(in srgb,var(--card-accent) 30%,transparent));
+  opacity:.8;pointer-events:none;
 }

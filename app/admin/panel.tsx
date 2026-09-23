@@ -70,7 +70,7 @@ export default function Admin(){
 </div>
 <fieldset className="admin-filter-set" aria-label="Тип записей">
 <label><input type="checkbox" checked={kinds.length===0} onChange={()=>setKinds([])}/><span>Все типы</span></label>
-{([['artist','Артисты'],['media','Медиа'],['collective','Объединения']] as const).map(([value,label])=><label key={value}><input type="checkbox" checked={kinds.includes(value)} onChange={()=>toggleKind(value)}/><span>{label}</span></label>)}
+{([['artist','Артисты'],['media','Медиа'],['collective','Гэнги']] as const).map(([value,label])=><label key={value}><input type="checkbox" checked={kinds.includes(value)} onChange={()=>toggleKind(value)}/><span>{label}</span></label>)}
 </fieldset>
 <fieldset className="admin-filter-set" aria-label="География">
 <label><input type="checkbox" checked={groups.length===0} onChange={()=>setGroups([])}/><span>Вся география</span></label>
@@ -85,7 +85,7 @@ export default function Admin(){
 <span className="row-number row-number--art">{String(i+1).padStart(3,'0')}</span>
 <div className="missing-avatar" role="img" aria-label="Аватарка отсутствует">
 <span aria-hidden="true">×</span>
-</div>{a.image&&<img src={a.image} alt={a.name} loading="lazy" referrerPolicy="no-referrer" onError={e=>{e.currentTarget.style.display='none';}}/>}{a.kind==='collective'?<span className="record-type record-type--avatar"><UsersRound size={13} aria-hidden="true"/> Объединение</span>:a.kind==='media'?<span className="record-type record-type--avatar"><Radio size={13} aria-hidden="true"/> Медиа</span>:null}<span className="art-badges"><span className={`rating-tag rating-${(a.rating||'A').toLowerCase()}`}>{a.rating||'A'}</span></span></div>
+</div>{a.image&&<img src={a.image} alt={a.name} loading="lazy" referrerPolicy="no-referrer" onError={e=>{e.currentTarget.style.display='none';}}/>}{a.kind==='collective'?<span className="record-type record-type--avatar"><UsersRound size={13} aria-hidden="true"/> Гэнг</span>:a.kind==='media'?<span className="record-type record-type--avatar"><Radio size={13} aria-hidden="true"/> Медиа</span>:null}<span className="art-badges"><span className={`rating-tag rating-${(a.rating||'A').toLowerCase()}`}>{a.rating||'A'}</span></span></div>
 <div className="row-name">
 {(a.section==='world'||a.section==='runet')&&<img className="region-watermark" src={a.section==='world'?'./badges/region-en-eagle-cutout.png':'./badges/region-ru-emblem-cutout.png'} alt="" aria-hidden="true" loading="lazy" decoding="async"/>}
 <strong title={a.name}>{a.name}</strong>
@@ -126,7 +126,7 @@ export default function Admin(){
 <SelectContent>
 <SelectItem value="artist">Артист</SelectItem>
 <SelectItem value="media">Медиа</SelectItem>
-<SelectItem value="collective">Объединение</SelectItem>
+<SelectItem value="collective">Гэнг</SelectItem>
 </SelectContent>
 </Select>
 </label>

@@ -75,7 +75,7 @@ export function createCatalogStore(file) {
           if (u.protocol !== 'https:' || u.username || u.password || image.length > 4000) throw new Error('Для изображения нужна HTTPS-ссылка.');
         }
         const kind = a.kind ?? original?.kind ?? 'artist';
-        if (!['artist','media','collective'].includes(kind)) throw new Error('Выберите тип: артист, медиа или объединение.');
+        if (!['artist','media','collective'].includes(kind)) throw new Error('Выберите тип: артист, медиа или гэнг.');
         const rating = a.rating === 'CRINGE' ? 'A' : a.rating ?? (original?.rating === 'CRINGE' ? 'A' : original?.rating) ?? 'A';
         if (!['A','AA','AAA','AAA+'].includes(rating)) throw new Error('Выберите тег A, AA, AAA или AAA+.');
         const artist = {id, kind, rating, name, url: link.url, platform: link.platform, section: a.section, image, description: String(a.description || '').slice(0,1500), tags: String(a.tags || '').slice(0,250)};
