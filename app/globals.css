@@ -2069,6 +2069,10 @@ footer .manifesto,footer .manifesto[data-open="true"]{overflow:visible;contain:n
 .artist-list .card-info p{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px}
 .artist-list .list-kind-tag{display:inline-flex;align-items:center;gap:4px;max-width:100%;min-height:20px;padding:2px 5px;border:1px solid var(--kind-accent);border-radius:4px;background:#0c0f12;color:#f4f2e9;font:700 9px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.03em;white-space:nowrap}
 .artist-list .list-kind-tag svg{flex:none}
+.artist-list[data-size="sm"] .card-info{padding-right:0}
+.artist-list[data-size="sm"] .artist-card:has(.card-edit) .card-info h2{padding-right:29px}
+.artist-list[data-size="sm"] .card-edit{top:11px;transform:none}
+.artist-list[data-size="sm"] .artist-card[data-kind="collective"] .list-kind-tag svg{display:none}
 
 /* Keep the page scrollbar in its own gutter instead of painting over panel chrome. */
 html{scrollbar-gutter:stable}
