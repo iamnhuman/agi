@@ -94,6 +94,10 @@ test('two anonymous local URLs; public port read-only; writes reject foreign ori
   assert.equal(wrongHost,403);
   const saved=await post(app.adminUrl);assert.equal(saved.status,200);
   const {artist}=await saved.json();
+  const rated=await fetch(app.adminUrl+'/api/catalog',{method:'POST',headers:{origin:app.adminUrl,'content-type':'application/json'},body:JSON.stringify({action:'save',artist:{...artist,rating:'AAA+'}})});
+  assert.equal(rated.status,200);
+  assert.equal((await rated.json()).artist.rating,'AAA+');
+  assert.equal((await (await fetch(app.adminUrl+'/api/catalog')).json()).artists.find(a=>a.id===artist.id).rating,'AAA+');
   assert.ok((await (await fetch(app.siteUrl+'/api/catalog')).json()).artists.some(a=>a.id===artist.id));
   assert.equal((await fetch(app.adminUrl+'/api/catalog',{method:'POST',headers:{origin:app.adminUrl,'content-type':'application/json'},body:JSON.stringify({long:'x'.repeat(25000)})})).status,413);
 });
