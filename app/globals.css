@@ -2090,3 +2090,16 @@ footer{height:216px;min-height:216px;margin-top:28px}
 @media(max-width:900px){footer{height:205px;min-height:205px}.manifesto .toyota-mark{bottom:auto}}
 @media(max-width:600px){footer{height:190px;min-height:190px}.manifesto-transmission,.manifesto[data-open="true"] .manifesto-transmission{bottom:calc(50% + 48px);height:310px}.manifesto-zalgo{font-size:clamp(20px,5vw,32px)}}
 @media(prefers-reduced-motion:reduce){.manifesto-zalgo span:nth-child(2),.manifesto-zalgo span:nth-child(3){animation:none}}
+
+/* Mobile has one useful card/list density, so don't offer inert size choices. */
+@media(max-width:580px){
+  .catalog-density{display:none}
+  .catalog-view-controls{justify-content:flex-end}
+  .artist-list[data-size]{grid-template-columns:minmax(0,1fr)}
+  .artist-list[data-size] .artist-card{position:relative;gap:10px;padding:11px 0}
+  .artist-list[data-size] .artist-card>.art{width:64px;height:64px;flex:0 0 64px}
+  .artist-list[data-size] .card-info{display:block;flex:1;min-width:0;padding:0}
+  .artist-list[data-size] .card-info h2{margin:0 0 5px;font-size:13px;line-height:1.25}
+  .artist-list[data-size] .artist-card:has(.card-edit) .card-info h2{padding-right:29px}
+  .artist-list[data-size] .card-edit{top:11px;right:0;transform:none}
+}
