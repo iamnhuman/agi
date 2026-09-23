@@ -883,13 +883,16 @@ h1 em,.big-count sup,.video-heading h1 span,.admin-heading h1 span{color:#f0ed00
   border:1px solid #ff6568;border-radius:50%;background:#da171d;box-shadow:0 0 10px #ff242a;
 }
 .timeline-layout--horizontal .video-date{
-  position:absolute;z-index:2;top:18px;left:18px;display:flex;align-items:center;gap:6px;
-  max-width:calc(100% - 36px);padding:6px 9px;border:1px solid #747a7e;border-radius:4px;
-  background:#090b0de8;box-shadow:inset 0 1px #ffffff25,0 4px 12px #0008;backdrop-filter:blur(8px);
+  position:absolute;z-index:6;top:10px;right:10px;left:auto;display:flex;align-items:center;gap:4px;
+  max-width:calc(100% - 20px);padding:4px 6px;border:1px solid #91979a;border-radius:3px;
+  background:#090b0df0;box-shadow:inset 0 1px #ffffff40,0 3px 9px #000c;backdrop-filter:blur(8px);transform:translateZ(32px);
 }
-.timeline-layout--horizontal .video-date time{color:#f0ef00;font:600 11px ui-monospace,monospace;white-space:nowrap}
+.video-date-compact{display:none}
+.timeline-layout--horizontal .video-date .video-date-compact{display:inline}
+.timeline-layout--horizontal .video-date .video-date-full{display:none}
+.timeline-layout--horizontal .video-date time{color:#f0ef00;font:700 10px ui-monospace,monospace;white-space:nowrap}
 .timeline-layout--horizontal .video-date small{display:none}
-.timeline-layout--horizontal .video-date .source-number{display:inline;margin:0;color:#ced2d2;font:10px ui-monospace,monospace}
+.timeline-layout--horizontal .video-date .source-number{display:inline;margin:0;color:#ced2d2;font:9px ui-monospace,monospace;white-space:nowrap}
 .timeline-layout--horizontal .video-thumb{
   display:block;position:relative;flex:0 0 auto;width:100%;height:auto;aspect-ratio:16/9;margin:0;
   overflow:hidden;border:1px solid #737a7f;border-radius:4px;background:radial-gradient(ellipse,#2a3927,#0b0e0b 70%);
