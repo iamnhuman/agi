@@ -1297,10 +1297,6 @@ footer .manifesto{
 /* Record type is independent of geography, platform and A/AA/AAA rating. */
 .artist-card[data-kind="collective"],.admin-row[data-kind="collective"]{--kind-accent:#60d5e8}
 .artist-card[data-kind="media"],.admin-row[data-kind="media"]{--kind-accent:#ff7770}
-.artist-grid .artist-card:is([data-kind="collective"],[data-kind="media"]),
-.admin-grid .admin-row:is([data-kind="collective"],[data-kind="media"]){
-  border-color:color-mix(in srgb,var(--kind-accent) 38%,#50545a);
-}
 .artist-grid .artist-card:is([data-kind="collective"],[data-kind="media"])::before,
 .admin-grid .admin-row:is([data-kind="collective"],[data-kind="media"])::before{
   background:linear-gradient(90deg,var(--kind-accent) 0 38%,#555b60 38% 100%);
@@ -1328,7 +1324,6 @@ footer .manifesto{
 .admin-grid .admin-row:is([data-kind="collective"],[data-kind="media"]) .row-name{min-height:126px}
 .admin-grid[data-artwork="small"] .admin-row:is([data-kind="collective"],[data-kind="media"]) .row-name{min-height:128px;padding-top:50px}
 .admin-grid[data-artwork="small"] .record-type{display:none}
-.admin-grid[data-artwork="small"] .admin-row:is([data-kind="collective"],[data-kind="media"]) .row-name strong{color:var(--kind-accent)}
 .artist-list .record-type{margin-bottom:4px;font-size:9px}
 @media(max-width:700px){
   .record-type{font-size:9px;letter-spacing:.07em}
