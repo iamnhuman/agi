@@ -7,7 +7,7 @@ import {ArrowUpRight, Search, Grid2X2, List, Network, Layers3, ArrowRight, Penci
 import CommandDeck from '@/client/command-deck';
 
 const glitchGlyphs=['█','▓','▒','░','╳','╱','╲','┼','┆','║','◆','◇','△','▽','◉','※','×','+','=','/','\\','0','1','И','З','М'];
-const glitchColumns=Array.from({length:21},(_,i)=>Array.from({length:14+(i*7)%14},(_,j)=>glitchGlyphs[(i*13+j*7+(j*j)%11)%glitchGlyphs.length]).join('\n'));
+const glitchColumns=Array.from({length:21},(_,i)=>Array.from({length:28+(i*7)%14},(_,j)=>glitchGlyphs[(i*13+j*7+(j*j)%11)%glitchGlyphs.length]).join('\n'));
 const zalgoMarks=['\u0301','\u0308','\u0327','\u0338','\u0342'];
 function mutateSignal(columns:string[]){return columns.map(column=>{const symbols=column.split('');for(let i=0;i<Math.max(2,Math.floor(symbols.length/8));i++){const offset=Math.floor(Math.random()*symbols.length);if(symbols[offset]!=='\n')symbols[offset]=glitchGlyphs[Math.floor(Math.random()*glitchGlyphs.length)];}return symbols.join('');});}
 function zalgoSignal(tick:number){return [...'СИГНАЛ ПОВРЕЖДЁН'].map((letter,index)=>letter===' '?' ':(tick+index*3)%9===0?glitchGlyphs[(tick+index)%glitchGlyphs.length]:letter+((tick+index*5)%6===0?zalgoMarks[(tick+index)%zalgoMarks.length]:'')).join('');}

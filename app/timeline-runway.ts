@@ -1,5 +1,5 @@
 /** Decorative, scroll-reactive backdrop. The interactive video cards stay in the DOM. */
-export function drawTimelineRunway(canvas:HTMLCanvasElement,scrollLeft:number){
+export function drawTimelineRunway(canvas:HTMLCanvasElement,scrollLeft:number,railPosition?:number){
  const bounds=canvas.getBoundingClientRect();
  const width=bounds.width,height=bounds.height;
  if(!width||!height)return;
@@ -55,7 +55,7 @@ export function drawTimelineRunway(canvas:HTMLCanvasElement,scrollLeft:number){
   context.stroke();
  }
 
- const railY=height*.79;
+ const railY=railPosition===undefined?height*.79:Math.max(horizon+24,Math.min(height-24,railPosition));
  const rail=context.createLinearGradient(0,railY,0,railY+18);
  rail.addColorStop(0,'rgba(255, 239, 71, .55)');
  rail.addColorStop(.18,'rgba(210, 27, 34, .64)');

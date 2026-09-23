@@ -7,8 +7,8 @@ import {drawTimelineRunway} from './timeline-runway';
 import type {Video} from '@/lib/types';
 const blank:Video={id:'',name:'',url:'',platform:'',videoId:'',reference:false,title:'',publishedAt:'',dateSource:'unknown',dateUrl:'',image:'',description:'',alternateUrls:[],sourceOrder:0};
 export default function Videos({admin=false}:{admin?:boolean}){
- const [videos,setVideos]=useState<Video[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState(''),[q,setQ]=useState(''),[order,setOrder]=useState('source'),[orientation,setOrientation]=useState<'vertical'|'horizontal'>('vertical'),[draft,setDraft]=useState<Video|null>(null),[selected,setSelected]=useState<Video|null>(null),[deleting,setDeleting]=useState<Video|null>(null),[busy,setBusy]=useState(false),[formError,setFormError]=useState('');
- const [sceneZoom,setSceneZoom]=useState(1);
+ const [videos,setVideos]=useState<Video[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState(''),[q,setQ]=useState(''),[order,setOrder]=useState('source'),[orientation,setOrientation]=useState<'vertical'|'horizontal'>('horizontal'),[draft,setDraft]=useState<Video|null>(null),[selected,setSelected]=useState<Video|null>(null),[deleting,setDeleting]=useState<Video|null>(null),[busy,setBusy]=useState(false),[formError,setFormError]=useState('');
+ const [sceneZoom,setSceneZoom]=useState(.65);
  const timelineViewport=useRef<HTMLDivElement>(null),timelineCanvas=useRef<HTMLCanvasElement>(null);
  const drag=useRef<{pointerId:number;startX:number;scrollLeft:number;active:boolean}|null>(null);
  const suppressDragClick=useRef(false);
@@ -26,7 +26,14 @@ export default function Videos({admin=false}:{admin?:boolean}){
   const viewport=timelineViewport.current,canvas=timelineCanvas.current;
   if(!viewport||!canvas)return;
   let frame=0;
-  const paint=()=>{frame=0;drawTimelineRunway(canvas,viewport.scrollLeft);};
+  const paint=()=>{
+   frame=0;
+   const cards=viewport.querySelector<HTMLElement>('.timeline-items');
+   const firstCard=cards?.querySelector<HTMLElement>('.video-card');
+   const cardMargin=firstCard?parseFloat(getComputedStyle(firstCard).marginBottom)||0:0;
+   const railY=cards?cards.getBoundingClientRect().bottom-canvas.getBoundingClientRect().top-cardMargin+10:undefined;
+   drawTimelineRunway(canvas,viewport.scrollLeft,railY);
+  };
   const schedulePaint=()=>{if(!frame)frame=requestAnimationFrame(paint);};
   const onWheel=(event:WheelEvent)=>{
    if(event.ctrlKey||event.metaKey){
@@ -46,11 +53,12 @@ export default function Videos({admin=false}:{admin?:boolean}){
   };
   const observer=new ResizeObserver(schedulePaint);
   observer.observe(viewport);
+  viewport.querySelectorAll('.timeline-items').forEach(items=>observer.observe(items));
   viewport.addEventListener('wheel',onWheel,{passive:false});
   viewport.addEventListener('scroll',schedulePaint,{passive:true});
   schedulePaint();
   return()=>{observer.disconnect();viewport.removeEventListener('wheel',onWheel);viewport.removeEventListener('scroll',schedulePaint);if(frame)cancelAnimationFrame(frame);};
- },[orientation,loading,order,filtered.length]);
+ },[orientation,loading,order,filtered.length,sceneZoom]);
  useEffect(()=>{
   if(orientation!=='horizontal'||loading||!timelineViewport.current)return;
   const viewport=timelineViewport.current;
