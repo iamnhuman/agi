@@ -2069,3 +2069,20 @@ footer .manifesto,footer .manifesto[data-open="true"]{overflow:visible;contain:n
 .artist-list .card-info p{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px}
 .artist-list .list-kind-tag{display:inline-flex;align-items:center;gap:4px;max-width:100%;min-height:20px;padding:2px 5px;border:1px solid var(--kind-accent);border-radius:4px;background:#0c0f12;color:#f4f2e9;font:700 9px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.03em;white-space:nowrap}
 .artist-list .list-kind-tag svg{flex:none}
+
+/* Keep the page scrollbar in its own gutter instead of painting over panel chrome. */
+html{scrollbar-gutter:stable}
+
+/* Compact Toyota panel: the code rises into the preceding section, while the mark stays centered. */
+footer{height:216px;min-height:216px;margin-top:28px}
+.manifesto-transmission,.manifesto[data-open="true"] .manifesto-transmission{bottom:calc(50% + 57px);height:390px}
+.manifesto-zalgo{bottom:0;left:50%;right:auto;width:min(96vw,1100px);min-height:1.5em;transform:translateX(-50%);font-family:Impact,'Arial Black',sans-serif;font-size:clamp(24px,3.5vw,56px);letter-spacing:.025em;overflow:visible}
+.manifesto-zalgo span{position:absolute;top:0;left:0;width:100%;white-space:nowrap}
+.manifesto-zalgo span:first-child{z-index:3;color:#fff0b3;text-shadow:3px 2px #a62230,-2px -1px #63cad0,0 0 20px #eb312b99}
+.manifesto-zalgo span:nth-child(2){z-index:2;color:#f14e53;opacity:.5;transform:translate(-3px,-4px) skewX(-7deg);mix-blend-mode:screen;animation:toyota-zalgo-ghost-a .36s steps(3,end) infinite alternate}
+.manifesto-zalgo span:nth-child(3){z-index:1;color:#75d0d2;opacity:.42;transform:translate(4px,3px) skewX(5deg);mix-blend-mode:screen;animation:toyota-zalgo-ghost-b .29s steps(2,end) infinite alternate}
+@keyframes toyota-zalgo-ghost-a{to{transform:translate(4px,1px) skewX(4deg);opacity:.22}}
+@keyframes toyota-zalgo-ghost-b{to{transform:translate(-5px,-2px) skewX(-6deg);opacity:.58}}
+@media(max-width:900px){footer{height:205px;min-height:205px}.manifesto .toyota-mark{bottom:auto}}
+@media(max-width:600px){footer{height:190px;min-height:190px}.manifesto-transmission,.manifesto[data-open="true"] .manifesto-transmission{bottom:calc(50% + 48px);height:310px}.manifesto-zalgo{font-size:clamp(20px,5vw,32px)}}
+@media(prefers-reduced-motion:reduce){.manifesto-zalgo span:nth-child(2),.manifesto-zalgo span:nth-child(3){animation:none}}
