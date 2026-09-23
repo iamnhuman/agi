@@ -15,7 +15,7 @@ export function validateCatalog(data) {
   for (const a of data.artists) {
     if (!a || ['id','name','url','section','platform','description','image','tags'].some(k => typeof a[k] !== 'string') || artists.has(a.id) || !ids.has(a.section)) throw new Error('Некорректная карточка в каталоге.');
     if (a.kind !== undefined && !['artist','media','collective'].includes(a.kind)) throw new Error('Неизвестный тип записи.');
-    if (a.rating !== undefined && !['A','AA','AAA'].includes(a.rating)) throw new Error('Неизвестный рейтинг записи.');
+    if (a.rating !== undefined && !['A','AA','AAA','AAA+','CRINGE'].includes(a.rating)) throw new Error('Неизвестный рейтинг записи.');
     parseArtistLink(a.url);
     artists.add(a.id);
   }
@@ -27,7 +27,11 @@ export function validateCatalog(data) {
 
 export function createCatalogStore(file) {
   let queue = Promise.resolve();
-  async function read() { return validateCatalog(JSON.parse(await readFile(file, 'utf8'))); }
+  async function read() {
+    const catalog = validateCatalog(JSON.parse(await readFile(file, 'utf8')));
+    for (const artist of catalog.artists) if (artist.rating === 'CRINGE') artist.rating = 'A';
+    return catalog;
+  }
   function mutate(input) {
     const result = queue.then(async () => {
       const catalog = await read();
@@ -72,8 +76,8 @@ export function createCatalogStore(file) {
         }
         const kind = a.kind ?? original?.kind ?? 'artist';
         if (!['artist','media','collective'].includes(kind)) throw new Error('Выберите тип: артист, медиа или объединение.');
-        const rating = a.rating ?? original?.rating ?? 'A';
-        if (!['A','AA','AAA'].includes(rating)) throw new Error('Выберите тег A, AA или AAA.');
+        const rating = a.rating === 'CRINGE' ? 'A' : a.rating ?? (original?.rating === 'CRINGE' ? 'A' : original?.rating) ?? 'A';
+        if (!['A','AA','AAA','AAA+'].includes(rating)) throw new Error('Выберите тег A, AA, AAA или AAA+.');
         const artist = {id, kind, rating, name, url: link.url, platform: link.platform, section: a.section, image, description: String(a.description || '').slice(0,1500), tags: String(a.tags || '').slice(0,250)};
         const at = catalog.artists.findIndex(x => x.id === id);
         if (at >= 0) catalog.artists[at] = artist; else catalog.artists.unshift(artist);

@@ -54,6 +54,10 @@ test('durable edits, fixed geography, duplicate checks and concurrent saves',asy
   assert.equal((await store.read()).artists[0].image,edited.image);
   await store.mutate({action:'save',artist:{...edited,rating:'AAA'}});
   assert.equal((await store.read()).artists[0].rating,'AAA');
+  await store.mutate({action:'save',artist:{...edited,rating:'AAA+'}});
+  assert.equal((await store.read()).artists[0].rating,'AAA+');
+  await store.mutate({action:'save',artist:{...edited,rating:'CRINGE'}});
+  assert.equal((await store.read()).artists[0].rating,'A');
   await assert.rejects(store.mutate({action:'save',artist:{...edited,rating:'B'}}),/тег A/);
   await store.mutate({action:'save',artist:{...edited,image:'./avatars/upload-0123456789abcdef.webp'}});
   assert.equal((await store.read()).artists[0].image,'./avatars/upload-0123456789abcdef.webp');

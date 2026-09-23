@@ -2,7 +2,8 @@
 export function parseArtistLink(raw) {
   const input=String(raw).trim();
   const username=input.replace(/^@/,'');
-  const completed=/^[a-zA-Z0-9._]+$/.test(username)?`https://www.instagram.com/${username}`:input;
+  const hostOnly=/^(?:www\.)?(?:instagram\.com|t\.me|telegram\.me)(?=\/|[?#]|$)/i.test(input);
+  const completed=/^[a-zA-Z0-9._]+$/.test(username)?`https://www.instagram.com/${username}`:hostOnly?`https://${input}`:input;
   let url;
   try { url = new URL(completed); } catch { throw new Error('Вставьте ник Instagram или полную ссылку.'); }
   if (!['https:', 'http:'].includes(url.protocol) || url.username || url.password || url.port) throw new Error('Некорректная ссылка.');
