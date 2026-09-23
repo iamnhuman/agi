@@ -88,6 +88,7 @@ return <>
 </h2><p>
 <a className="artist-social" href={a.url} target="_blank" rel="noreferrer">{a.platform} <ArrowUpRight size={14}/>
 </a>
+{a.kind==='collective'?<span className="list-kind-tag"><UsersRound size={11} aria-hidden="true"/>Объединение</span>:a.kind==='media'?<span className="list-kind-tag"><Radio size={11} aria-hidden="true"/>Медиа</span>:null}
 </p>
 </div>{showLocalAdmin&&<a className="card-edit" title="Редактировать" aria-label={"Редактировать "+a.name} href={adminUrl+"/?edit="+encodeURIComponent(a.id)+"#catalog"}><Pencil size={15}/></a>}</div>
 </article>)}</div></>}{!artists.length&&<p className="empty">Сигнал не обнаружен. Измените запрос или фильтр.</p>}</section>

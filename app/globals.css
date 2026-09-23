@@ -2062,3 +2062,10 @@ footer .manifesto,footer .manifesto[data-open="true"]{overflow:visible;contain:n
 .admin-grid .row-number--art{z-index:4;top:10px;right:10px;min-width:44px}
 .admin-grid .row-number--art::before{content:none}
 .artist-list .record-type--avatar{top:5px;right:auto;bottom:auto;left:5px;box-sizing:border-box;height:21px;min-height:21px;max-width:calc(100% - 10px);padding:0 5px;border-radius:5px;font-size:9px;overflow:hidden;text-overflow:ellipsis}
+.list-kind-tag{display:none}
+.artist-list .record-type--avatar{display:none}
+.artist-list .art-badges .rating-tag{height:22px;min-height:22px;min-width:0;padding:0 5px;border-radius:4px;font-size:9px}
+.artist-list .art-badges .rating-tag::before{width:4px;height:4px;margin-right:4px}
+.artist-list .card-info p{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px}
+.artist-list .list-kind-tag{display:inline-flex;align-items:center;gap:4px;max-width:100%;min-height:20px;padding:2px 5px;border:1px solid var(--kind-accent);border-radius:4px;background:#0c0f12;color:#f4f2e9;font:700 9px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.03em;white-space:nowrap}
+.artist-list .list-kind-tag svg{flex:none}
