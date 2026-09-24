@@ -2169,3 +2169,10 @@ footer{height:216px;min-height:216px;margin-top:28px}
 .manifesto-zalgo .zalgo-glyph:nth-child(7){width:.42em}
 .manifesto-zalgo>.zalgo-layer:first-child{text-shadow:3px 2px #a62230,-2px -1px #63cad0,0 0 16px #eb312b88}
 @media(max-width:600px){.manifesto-zalgo{font-size:clamp(24px,7vw,42px);letter-spacing:-.04em}}
+
+/* Rank tags use the same compact radio treatment as record type filters. */
+.catalog-type-controls{flex-wrap:wrap}
+.catalog-tag-filter{display:flex;align-items:center;gap:8px;max-width:100%;min-width:0}
+.catalog-tag-filter>span{color:#aeb6b6;font:700 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.09em}
+.catalog-tag-filter .catalog-type-radios{min-width:0}
+@media(max-width:700px){.catalog-tag-filter{width:100%}.catalog-tag-filter .catalog-type-radios{flex:1 1 auto}}
