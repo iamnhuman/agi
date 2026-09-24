@@ -3,7 +3,7 @@ import {useState,useEffect,useRef,type PointerEvent,type CSSProperties} from 're
 import {catalogUrl,adminUrl,showLocalAdmin} from '@/client/config';
 import ArtistMap from './artist-map';
 import {defaultSections,type Artist,type Section} from '@/lib/types';
-import {ArrowUpRight, Search, Grid2X2, List, Network, Layers3, ArrowRight, Pencil, Radio, UsersRound, ZoomIn, ZoomOut} from 'lucide-react';
+import {ArrowUpRight, Search, Grid2X2, List, Network, Layers3, Pencil, Radio, UsersRound, ZoomIn, ZoomOut} from 'lucide-react';
 import CommandDeck from '@/client/command-deck';
 
 const glitchGlyphs=['0','1','|','/','\\','+','-','=','<','>','*','#','%','@','X','И','З','М'];
@@ -100,8 +100,6 @@ return <>
 </article>)}</div></>}{!artists.length&&<p className="empty">Сигнал не обнаружен. Измените запрос или фильтр.</p>}</section>
 </main>
 <footer>
-<span>иизм © 2026 · АРХИВ ИИ-СЦЕНЫ</span>
-<div className="manifesto" data-open={signalOpen} onPointerLeave={event=>{if(event.pointerType==='mouse')setSignalOpen(false);}} onBlurCapture={event=>{if(!event.currentTarget.contains(event.relatedTarget as Node))setSignalOpen(false);}}><div id="toyota-transmission" className="manifesto-transmission" aria-hidden={!signalOpen}><div className="manifesto-spires">{signalColumns.map((column,i)=><pre key={i} style={{'--column':i} as CSSProperties}>{column}</pre>)}</div><div className="manifesto-zalgo" aria-hidden="true"><span className="zalgo-layer">{zalgoSignal(signalTick)}</span><span className="zalgo-layer">{zalgoSignal(signalTick+3,1)}</span><span className="zalgo-layer">{zalgoSignal(signalTick+7,2)}</span></div></div><button type="button" className="toyota-mark" aria-label="Toyota: показать сигнал" aria-controls="toyota-transmission" aria-expanded={signalOpen} onPointerEnter={event=>{if(event.pointerType==='mouse')setSignalOpen(true);}} onKeyDown={event=>{if(event.key==='Escape')setSignalOpen(false);}} onClick={()=>{if(window.matchMedia('(hover: none)').matches)setSignalOpen(open=>!open);else setSignalOpen(true);}}><svg viewBox="0 0 240 160" aria-hidden="true"><ellipse cx="120" cy="70" rx="106" ry="61"/><ellipse cx="120" cy="55" rx="56" ry="22"/><ellipse cx="120" cy="64" rx="27" ry="53"/></svg><span>TOYOTA</span></button></div>{showLocalAdmin&&<a href={adminUrl}>Войти в штаб <ArrowRight size={16}/>
-</a>}</footer>
+<div className="manifesto" data-open={signalOpen} onPointerLeave={event=>{if(event.pointerType==='mouse')setSignalOpen(false);}} onBlurCapture={event=>{if(!event.currentTarget.contains(event.relatedTarget as Node))setSignalOpen(false);}}><div id="toyota-transmission" className="manifesto-transmission" aria-hidden={!signalOpen}><div className="manifesto-spires">{signalColumns.map((column,i)=><pre key={i} style={{'--column':i} as CSSProperties}>{column}</pre>)}</div><div className="manifesto-zalgo" aria-hidden="true"><span className="zalgo-layer">{zalgoSignal(signalTick)}</span><span className="zalgo-layer">{zalgoSignal(signalTick+3,1)}</span><span className="zalgo-layer">{zalgoSignal(signalTick+7,2)}</span></div></div><button type="button" className="toyota-mark" aria-label="Toyota: показать сигнал" aria-controls="toyota-transmission" aria-expanded={signalOpen} onPointerEnter={event=>{if(event.pointerType==='mouse')setSignalOpen(true);}} onKeyDown={event=>{if(event.key==='Escape')setSignalOpen(false);}} onClick={()=>{if(window.matchMedia('(hover: none)').matches)setSignalOpen(open=>!open);else setSignalOpen(true);}}><svg viewBox="0 0 240 160" aria-hidden="true"><ellipse cx="120" cy="70" rx="106" ry="61"/><ellipse cx="120" cy="55" rx="56" ry="22"/><ellipse cx="120" cy="64" rx="27" ry="53"/></svg><span>TOYOTA</span></button></div></footer>
 </>;
 }
