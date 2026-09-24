@@ -3,30 +3,42 @@ import {useState,useEffect,useRef,type PointerEvent,type CSSProperties} from 're
 import {catalogUrl,adminUrl,showLocalAdmin} from '@/client/config';
 import ArtistMap from './artist-map';
 import {defaultSections,type Artist,type Section} from '@/lib/types';
-import {ArrowUpRight, Search, Grid2X2, List, Network, Layers3, Pencil, Radio, UsersRound, ZoomIn, ZoomOut} from 'lucide-react';
+import {ArrowUpRight, Search, Grid2X2, List, Network, Layers3, Pencil, Radio, UsersRound, ZoomIn, ZoomOut, Shuffle, ListOrdered} from 'lucide-react';
 import CommandDeck from '@/client/command-deck';
 
-const glitchGlyphs=['電','機','信','号','光','影','未','来','空','夢','人','工','界','零','壊','警','報','乱','終','始','炎','月','星','龍','真','偽','視','覚','網','路','時','間','東','京','異','常','0','1','|','/','\\','+','-','=','<','>','*','#','%','@',':',';','[',']','{','}','X'];
-const titleGlitchGlyphs=['電','機','信','号','光','影','未','来','空','夢','人','工','界','零','壊','警','報','乱','終','始','炎','月','星','龍','真','偽','視','覚','網','路','時','間','東','京','異','常','シ','ス','テ','ム','破','損','検','出'];
-const glitchColumns=Array.from({length:48},(_,i)=>Array.from({length:28+(i*7)%14},(_,j)=>glitchGlyphs[(i*13+j*7+(j*j)%11)%glitchGlyphs.length]).join('\n'));
-function mutateSignal(columns:string[]){return columns.map(column=>{const symbols=column.split('');for(let i=0;i<Math.max(2,Math.floor(symbols.length/5));i++){const offset=Math.floor(Math.random()*symbols.length);if(symbols[offset]!=='\n')symbols[offset]=glitchGlyphs[Math.floor(Math.random()*glitchGlyphs.length)];}return symbols.join('');});}
-function zalgoSignal(tick:number,layer=0){return Array.from('システム信号が破損しました',(letter,index)=>{
+const glitchGlyphs=Array.from('電機信号光影未来空夢人工界零壊警報乱終始炎月星龍真偽視覚網路時間東京異常𒀀𒁹𒂗𒆠𒄿𒅗𒊩𒀭𒈗𒌋𒇻𒉿𒂍𒊒𒁲𒆳𒄑𒉌𒌓𒃻0１|/\\+-=<>*#%@;[]{}ᚠᚷᛉᛟ⟡⌬⟁⧖');
+const titleGlitchGlyphs=Array.from('電機信号光影未来空夢人工界零壊警報乱終始炎月星龍真偽視覚網路時間東京異常システム破損検出');
+const cuneiformGlyphs=Array.from('𒀀𒁹𒂗𒆠𒄿𒅗𒊩𒀭𒈗𒌋𒇻𒉿𒂍𒊒𒁲𒆳𒄑𒉌𒌓𒃻');
+const signalCorruptionGlyphs=[...titleGlitchGlyphs,...cuneiformGlyphs,...Array.from('ᚠᚷᛉᛟ⟡⌬⟁⧖⍟⊗∆')];
+// The number of columns stays fixed; only their text changes while the signal is open.
+function glitchColumns(tick:number){return Array.from({length:48},(_,i)=>Array.from({length:54+(i*7)%13},(_,j)=>{
+  const phase=Math.floor((tick+i*3+j*5)/4);
+  const first=glitchGlyphs[(i*13+j*7+(j*j)%11+phase*11)%glitchGlyphs.length];
+  const second=(i*3+j*5)%3===0?glitchGlyphs[(i*5+j*11+phase*7+17)%glitchGlyphs.length]:'';
+  return first+second;
+}).join('\n'));}
+function orderHash(value:string,seed:number){let hash=2166136261^seed;for(let i=0;i<value.length;i++)hash=Math.imul(hash^value.charCodeAt(i),16777619);return hash>>>0;}
+function zalgoSignal(tick:number,layer=0){return Array.from('信号が破損しました',(letter,index)=>{
   const seed=tick*11+index*17+layer*23;
-  const broken=seed%(layer===0?9:3)===0;
-  const jump=seed%(layer===0?3:2)===0;
-  const x=jump?((seed%9)-4)*(layer===0?2:5):0;
-  const y=jump?(((seed+index)%7)-3)*(layer===0?1:4):0;
-  return <span key={index} className="zalgo-glyph" style={{transform:`translate(${x}px,${y}px)`}}>{broken?titleGlitchGlyphs[seed%titleGlitchGlyphs.length]:letter}</span>;
+  const broken=seed%(layer===0?8:4)===0;
+  const jump=seed%(layer===0?3:4)===0;
+  const x=jump?((seed%13)-6)*(layer===0?1:1.5):0;
+  const y=jump?(((seed+index)%9)-4)*(layer===0?.5:1):0;
+  const glyph=broken?(layer===0?titleGlitchGlyphs[seed%titleGlitchGlyphs.length]:signalCorruptionGlyphs[seed%signalCorruptionGlyphs.length]):letter;
+  return <span key={index} className="zalgo-glyph" style={{transform:`translate(${x}px,${y}px)`}}>{glyph}</span>;
 });}
+
+function ToyotaFooter(){
+ const [signalOpen,setSignalOpen]=useState(false),[signalTick,setSignalTick]=useState(0);
+ useEffect(()=>{if(!signalOpen)return;const timer=window.setInterval(()=>{if(document.visibilityState==='visible')setSignalTick(tick=>(tick+1)%4096);},180);return()=>window.clearInterval(timer);},[signalOpen]);
+ return <footer><div className="manifesto" data-open={signalOpen} onPointerLeave={event=>{if(event.pointerType==='mouse')setSignalOpen(false);}} onBlurCapture={event=>{if(!event.currentTarget.contains(event.relatedTarget as Node))setSignalOpen(false);}}><div id="toyota-transmission" className="manifesto-transmission" aria-hidden={!signalOpen}><div className="manifesto-spires">{glitchColumns(signalTick).map((column,i)=><pre key={i} style={{'--column':i} as CSSProperties}>{column}</pre>)}</div><div className="manifesto-zalgo" aria-hidden="true"><span className="zalgo-layer">{zalgoSignal(Math.floor(signalTick/3))}</span><span className="zalgo-layer">{zalgoSignal(Math.floor(signalTick/3)+3,1)}</span><span className="zalgo-layer">{zalgoSignal(Math.floor(signalTick/3)+7,2)}</span></div></div><button type="button" className="toyota-mark" aria-label="Toyota: показать сигнал" aria-controls="toyota-transmission" aria-expanded={signalOpen} onPointerEnter={event=>{if(event.pointerType==='mouse')setSignalOpen(true);}} onKeyDown={event=>{if(event.key==='Escape')setSignalOpen(false);}} onClick={()=>{if(window.matchMedia('(hover: none)').matches)setSignalOpen(open=>!open);else setSignalOpen(true);}}><svg viewBox="0 0 240 160" aria-hidden="true"><ellipse cx="120" cy="70" rx="106" ry="61"/><ellipse cx="120" cy="55" rx="56" ry="22"/><ellipse cx="120" cy="64" rx="27" ry="53"/></svg><span>TOYOTA</span></button></div></footer>;
+}
 
 export default function Atlas({initial}:{initial:Artist[]}){
 const [data,setData]=useState(initial),[sections,setSections]=useState<Section[]>(defaultSections),[error,setError]=useState('');
 async function refresh(){try{const r=await fetch(catalogUrl,{cache:'no-store'});const d:any=await r.json();if(!r.ok)throw Error(d.error);setData(d.artists);setSections(d.sections);setError('');}catch{setError('Связь с архивом потеряна. Показаны последние доступные досье.');}}
 useEffect(()=>{refresh();const onFocus=()=>refresh();window.addEventListener('focus',onFocus);return ()=>window.removeEventListener('focus',onFocus);},[]);
-const [section,setSection]=useState('all'),[q,setQ]=useState(''),[view,setView]=useState('grid'),[kind,setKind]=useState('all'),[rating,setRating]=useState('all');
-const [signalOpen,setSignalOpen]=useState(false);
-const [signalColumns,setSignalColumns]=useState(glitchColumns),[signalTick,setSignalTick]=useState(0);
-useEffect(()=>{if(!signalOpen)return;setSignalColumns(mutateSignal);const timer=window.setInterval(()=>{setSignalColumns(mutateSignal);setSignalTick(tick=>tick+1);},55);return()=>window.clearInterval(timer);},[signalOpen]);
+const [section,setSection]=useState('all'),[q,setQ]=useState(''),[view,setView]=useState('grid'),[kind,setKind]=useState('all'),[rating,setRating]=useState('all'),[sortMode,setSortMode]=useState<'posting'|'random'>('posting'),[shuffleSeed,setShuffleSeed]=useState(0);
 const deckRef=useRef<HTMLDivElement|null>(null);
 const [deckZoom,setDeckZoom]=useState(1);
 const deckDrag=useRef<{pointerId:number;startX:number;scrollLeft:number;active:boolean}|null>(null);
@@ -48,7 +60,9 @@ function stopDeckDrag(event:PointerEvent<HTMLDivElement>){const drag=deckDrag.cu
 const [cardSize,setCardSize]=useState<'sm'|'md'|'lg'>('sm');
 const [listSize,setListSize]=useState<'sm'|'md'|'lg'>('sm');
 function changeView(next:string){if(next===view)return;setView(next);setCardSize('sm');setListSize('sm');}
-const artists=data.filter(a=>(section==='all'||a.section===section)&&(kind==='all'||(a.kind||'artist')===kind)&&(rating==='all'||(a.rating||'A').toUpperCase()===rating)&&(a.name+' '+a.tags+' '+a.description).toLowerCase().includes(q.toLowerCase()));
+const matchingArtists=data.filter(a=>(section==='all'||a.section===section)&&(kind==='all'||(a.kind||'artist')===kind)&&(rating==='all'||(a.rating||'A').toUpperCase()===rating)&&(a.name+' '+a.tags+' '+a.description).toLowerCase().includes(q.toLowerCase()));
+const sourceOrder=new Map(data.map((artist,index)=>[artist.id,index]));
+const artists=[...matchingArtists].sort((a,b)=>sortMode==='posting'?(sourceOrder.get(a.id)!-sourceOrder.get(b.id)!):(orderHash(a.id,shuffleSeed)-orderHash(b.id,shuffleSeed)));
 useEffect(()=>{const context=(document as any).modelContext;if(!context?.registerTool)return;const lifecycle=new AbortController();try{Promise.resolve(context.registerTool({name:'filter_artists',description:'Filter the visible artist catalog by name or section.',inputSchema:{type:'object',properties:{query:{type:'string'},section:{type:'string'},kind:{type:'string',enum:['all','artist','media','collective']}},additionalProperties:false},annotations:{readOnlyHint:true},execute(input:any){if(!input||typeof input!=='object'||input.query!==undefined&&typeof input.query!=='string'||input.section!==undefined&&!['all',...sections.map(s=>s.id)].includes(input.section))throw Error('Invalid filter');if(input.kind!==undefined&&!['all','artist','media','collective'].includes(input.kind))throw Error('Invalid kind');setKind(input.kind||'all');setQ(input.query||'');setSection(input.section||'all');return {count:data.filter(a=>(!input.section||input.section==='all'||a.section===input.section)&&(!input.kind||input.kind==='all'||(a.kind||'artist')===input.kind)&&(a.name+' '+a.tags+' '+a.description).toLowerCase().includes((input.query||'').toLowerCase())).length};}},{signal:lifecycle.signal})).catch(()=>{});}catch{}return ()=>lifecycle.abort();},[data,sections]);
 return <>
 <CommandDeck mode="catalog" total={data.length}/>
@@ -62,7 +76,7 @@ return <>
 <span>Размер</span>{(['sm','md','lg'] as const).map(value=><button key={value} type="button" aria-label={`Размер карточек: ${value.toUpperCase()}`} aria-pressed={cardSize===value} onClick={()=>setCardSize(value)}>{value.toUpperCase()}</button>)}
 </div>}{view==='list'&&<div className="catalog-density" role="group" aria-label="Размер элементов списка">
 <span>Размер</span>{(['sm','md','lg'] as const).map(value=><button key={value} type="button" aria-label={`Размер списка ${value.toUpperCase()}`} aria-pressed={listSize===value} onClick={()=>setListSize(value)}>{value.toUpperCase()}</button>)}
-</div>}<div className="view-switch">{[[Grid2X2,'grid','Карточки-досье'],[List,'list','Реестр'],[Network,'map','Тактическая карта'],[Layers3,'deck','Трёхмерная колода']].map(([Icon,id,label]:any)=>
+</div>}<div className="catalog-sort-switch"><span>СОРТИРОВКА</span><div className="catalog-sort-options" role="radiogroup" aria-label="Порядок отображения"><label className={sortMode==='random'?'active':''} title="Случайный порядок" onClick={()=>{if(sortMode==='random')setShuffleSeed(Math.floor(Math.random()*0xffffffff));}}><input type="radio" name="catalog-sort" value="random" checked={sortMode==='random'} onChange={()=>{setSortMode('random');setShuffleSeed(Math.floor(Math.random()*0xffffffff));}}/><Shuffle size={18}/><span className="sr-only">Случайный порядок</span></label><label className={sortMode==='posting'?'active':''} title="Порядок публикации"><input type="radio" name="catalog-sort" value="posting" checked={sortMode==='posting'} onChange={()=>setSortMode('posting')}/><ListOrdered size={18}/><span className="sr-only">Порядок публикации</span></label></div></div><div className="view-switch">{[[Grid2X2,'grid','Карточки-досье'],[List,'list','Реестр'],[Network,'map','Тактическая карта'],[Layers3,'deck','Трёхмерная колода']].map(([Icon,id,label]:any)=>
 <button key={id} aria-label={label} className={view===id?'active':''} onClick={()=>changeView(id)}>
 <Icon size={18}/>
 </button>)}</div></div>
@@ -103,7 +117,6 @@ return <>
 {showLocalAdmin&&<a className="card-edit" title="Редактировать" aria-label={"Редактировать "+a.name} href={adminUrl+"/?edit="+encodeURIComponent(a.id)+"#catalog"}><Pencil size={15}/></a>}
 </article>)}</div></>}{!artists.length&&<p className="empty">Сигнал не обнаружен. Измените запрос или фильтр.</p>}</section>
 </main>
-<footer>
-<div className="manifesto" data-open={signalOpen} onPointerLeave={event=>{if(event.pointerType==='mouse')setSignalOpen(false);}} onBlurCapture={event=>{if(!event.currentTarget.contains(event.relatedTarget as Node))setSignalOpen(false);}}><div id="toyota-transmission" className="manifesto-transmission" aria-hidden={!signalOpen}><div className="manifesto-spires">{signalColumns.map((column,i)=><pre key={i} style={{'--column':i} as CSSProperties}>{column}</pre>)}</div><div className="manifesto-zalgo" aria-hidden="true"><span className="zalgo-layer">{zalgoSignal(signalTick)}</span><span className="zalgo-layer">{zalgoSignal(signalTick+3,1)}</span><span className="zalgo-layer">{zalgoSignal(signalTick+7,2)}</span></div></div><button type="button" className="toyota-mark" aria-label="Toyota: показать сигнал" aria-controls="toyota-transmission" aria-expanded={signalOpen} onPointerEnter={event=>{if(event.pointerType==='mouse')setSignalOpen(true);}} onKeyDown={event=>{if(event.key==='Escape')setSignalOpen(false);}} onClick={()=>{if(window.matchMedia('(hover: none)').matches)setSignalOpen(open=>!open);else setSignalOpen(true);}}><svg viewBox="0 0 240 160" aria-hidden="true"><ellipse cx="120" cy="70" rx="106" ry="61"/><ellipse cx="120" cy="55" rx="56" ry="22"/><ellipse cx="120" cy="64" rx="27" ry="53"/></svg><span>TOYOTA</span></button></div></footer>
+<ToyotaFooter/>
 </>;
 }

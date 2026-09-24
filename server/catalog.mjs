@@ -45,7 +45,7 @@ export function createCatalogStore(file) {
         if(list.some(x=>x.id!==v.id&&(link.videoId?x.videoId===link.videoId:x.url===link.url)))throw Error('Видео уже есть в коллекции.');
         const image=String(v.image||'');if(image&&!image.startsWith('https://'))throw Error('Превью должно быть HTTPS-ссылкой.');
         const sourceDate=v.dateSource==='source'&&v.dateUrl===link.fetchUrl;
-        const video={...old,...link,id:old?.id||randomUUID(),name:String(v.name).trim().slice(0,160),title:String(v.title||'').slice(0,250),publishedAt:v.publishedAt,dateSource:v.publishedAt?(sourceDate?'source':'manual'):'unknown',dateUrl:sourceDate?v.dateUrl:'',image:image.slice(0,4000),description:String(v.description||'').slice(0,1500),alternateUrls:old?.alternateUrls||[],sourceOrder:old?.sourceOrder??list.length};
+        const video={...old,...link,id:old?.id||randomUUID(),name:String(v.name).trim().slice(0,160),title:String(v.title||'').slice(0,250),publishedAt:v.publishedAt,dateSource:v.publishedAt?(sourceDate?'source':'manual'):'unknown',dateUrl:sourceDate?v.dateUrl:'',image:image.slice(0,4000),description:String(v.description||'').slice(0,1500),isVideo:typeof v.isVideo==='boolean'?v.isVideo:Boolean(link.videoId||/^(?:video|clip)-?\d+_\d+$/.test(new URL(link.url).pathname.split('/').filter(Boolean)[0]||'')||new URL(link.url).pathname.split('/').filter(Boolean)[0]==='reel'),alternateUrls:old?.alternateUrls||[],sourceOrder:old?.sourceOrder??list.length};
         catalog.videos=old?list.map(x=>x.id===old.id?video:x):[...list,video];response={video};
       }else if(input.action==='video-delete'){
         if(!(catalog.videos||[]).some(v=>v.id===input.id))throw Error('Видео не найдено.');

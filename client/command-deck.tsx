@@ -27,7 +27,7 @@ export default function CommandDeck({mode,total}:{mode:'catalog'|'videos';total?
    </div>
    <nav className="command-menu" aria-label="Разделы сайта">
     <a className={!videos?'is-active':''} aria-label="ИИ-артисты и медиа" aria-current={!videos?'page':undefined} href="#catalog"><span>01</span> АРТИСТЫ И МЕДИА <ArrowUpRight size={15}/></a>
-    <a className={videos?'is-active':''} aria-label="Творчество с ИИ" aria-current={videos?'page':undefined} href="#videos"><span>02</span> ТВОРЧЕСТВО С ИИ <ArrowUpRight size={15}/></a>
+    <a className={videos?'is-active':''} aria-label="ИИ в творчестве" aria-current={videos?'page':undefined} href="#videos"><span>02</span> ИИ В ТВОРЧЕСТВЕ <ArrowUpRight size={15}/></a>
     {showLocalAdmin&&<a href={adminUrl} aria-label="Кураторский штаб" className="command-menu-admin"><span>03</span> КУРАТОРСКАЯ <ArrowUpRight size={15}/></a>}
    </nav>
    <div className="command-console-readout">

@@ -4,4 +4,4 @@ export type Artist={kind?:EntryKind;rating?:ArtistRating;id:string;name:string;u
 export type Section={id:string;name:string};
 export const defaultSections:Section[]=[{id:'world',name:'Мир'},{id:'runet',name:'Рунет'}];
 
-export type Video={id:string;name:string;url:string;platform:string;videoId:string;reference:boolean;title:string;publishedAt:string;dateSource:string;dateUrl:string;image:string;description:string;alternateUrls:string[];sourceOrder:number};
+export type Video={id:string;name:string;url:string;platform:string;videoId:string;reference:boolean;isVideo?:boolean;title:string;publishedAt:string;dateSource:string;dateUrl:string;image:string;description:string;alternateUrls:string[];sourceOrder:number};

@@ -1,6 +1,282 @@
 {
   "artists": [
     {
+      "id": "5b02c513-60e5-451b-8969-5b9d1fe39f26",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "egamberdiev.sh",
+      "url": "https://www.instagram.com/egamberdiev.sh",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-b101b8528de074a8.jpg",
+      "description": "468K Followers, 97 Following, 119 Posts - See Instagram photos and videos from eg&#xf8; (@egamberdiev.sh)",
+      "tags": ""
+    },
+    {
+      "id": "765bb899-bd73-4c54-9c35-a41bf1223abb",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "ambient.rot",
+      "url": "https://www.instagram.com/ambient.rot",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-927bd67a12581cb5.jpg",
+      "description": "17K Followers, 17K Following, 121 Posts - See Instagram photos and videos from Ambient Rot (@ambient.rot)",
+      "tags": ""
+    },
+    {
+      "id": "5b45dc31-16ea-43a3-8a42-6bdc66caa7ec",
+      "kind": "artist",
+      "rating": "A",
+      "name": "bagdelete",
+      "url": "https://www.instagram.com/bagdelete",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-d2dab905dd8e36b0.jpg",
+      "description": "77K Followers, 532 Following, 399 Posts - See Instagram photos and videos from noper (@bagdelete)",
+      "tags": ""
+    },
+    {
+      "id": "54311393-84b1-433f-9e36-617d83db5320",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "andreaciulu",
+      "url": "https://www.instagram.com/andreaciulu",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-4bae324ed171e521.jpg",
+      "description": "13K Followers, 1,102 Following, 2,031 Posts - See Instagram photos and videos from Andrea Ciulu (@andreaciulu)",
+      "tags": ""
+    },
+    {
+      "id": "604de252-e179-4e08-8109-1aa16f5273c2",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "astraolyaa",
+      "url": "https://www.instagram.com/astraolyaa",
+      "platform": "Instagram",
+      "section": "runet",
+      "image": "./public/avatars/upload-2a07fad1976d1344.jpg",
+      "description": "272K Followers, 15 Following, 1,641 Posts - See Instagram photos and videos from &#x41e;&#x43b;&#x44f; &#x410;&#x441;&#x442;&#x440;&#x430; | &#x421;&#x41e; &#x41c;&#x41d;&#x41e;&#x419; &#x41e;&#x421;&#x412;&#x41e;&#x418;&#x428;&#x42c; &#x41d;&#x415;&#x419;&#x420;&#x41e;&#x421;&#x415;&#x422;&#x418; | &#x418;&#x418; (@astraolyaa)",
+      "tags": ""
+    },
+    {
+      "id": "27af1169-5ee7-43fe-a3eb-466479b22d57",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "mv_digitartz",
+      "url": "https://www.instagram.com/mv_digitartz",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-6febd1368d072393.jpg",
+      "description": "219K Followers, 361 Following, 456 Posts - See Instagram photos and videos from MV_Digitartz I Ai Artist (@mv_digitartz)",
+      "tags": ""
+    },
+    {
+      "id": "9889f8fa-5b1c-404d-b0f1-45cf081ed247",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "davidsheldrick",
+      "url": "https://www.instagram.com/davidsheldrick",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-c93ccf1b2739af9a.jpg",
+      "description": "17K Followers, 3,713 Following, 856 Posts - See Instagram photos and videos from David Sheldrick (@davidsheldrick)",
+      "tags": ""
+    },
+    {
+      "id": "7c0f04fb-a5f7-49d9-9f5b-05d4daa412e8",
+      "kind": "collective",
+      "rating": "AA",
+      "name": "seedstudio.ai",
+      "url": "https://www.instagram.com/seedstudio.ai",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-63d0f04aefa6dd27.jpg",
+      "description": "914 Followers, 23 Following, 17 Posts - See Instagram photos and videos from &#x1d5e6;&#x1d5d8;&#x1d5d8;&#x1d5d7; (@seedstudio.ai)",
+      "tags": ""
+    },
+    {
+      "id": "d739ba0f-e8cb-472f-8e92-774ac94745a1",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "an_improbable_future",
+      "url": "https://www.instagram.com/an_improbable_future",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-ce92a81f908034cc.jpg",
+      "description": "467K Followers, 1,359 Following, 2,015 Posts - See Instagram photos and videos from An Improbable Future (@an_improbable_future)",
+      "tags": ""
+    },
+    {
+      "id": "7c5cfaef-bc31-4930-bf85-9e8d50983c80",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "ai_inspector_daily",
+      "url": "https://www.instagram.com/ai_inspector_daily",
+      "platform": "Instagram",
+      "section": "runet",
+      "image": "./public/avatars/upload-2851a285048b3143.jpg",
+      "description": "134K Followers, 55 Following, 126 Posts - See Instagram photos and videos from &#x41d;&#x438;&#x43a;&#x438;&#x442;&#x430; &#x42f;&#x43a;&#x438;&#x43d; | &#x422;&#x432;&#x43e;&#x439; AI-&#x43d;&#x430;&#x441;&#x442;&#x430;&#x432;&#x43d;&#x438;&#x43a; (@ai_inspector_daily)",
+      "tags": ""
+    },
+    {
+      "id": "8b185e67-8bee-4eb8-a0d0-86b5959c92bf",
+      "kind": "artist",
+      "rating": "A",
+      "name": "cantina",
+      "url": "https://www.instagram.com/cantina",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-df07d049e0ce881d.jpg",
+      "description": "189K Followers, 364 Following, 353 Posts - See Instagram photos and videos from  (@cantina)",
+      "tags": ""
+    },
+    {
+      "id": "ef60f348-8322-4a7e-afa7-404cf2ba6ca6",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "erik_gen_ai",
+      "url": "https://www.instagram.com/erik_gen_ai",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-5691d561499587f6.jpg",
+      "description": "35K Followers, 1,647 Following, 643 Posts - See Instagram photos and videos from Erik Gen (@erik_gen_ai)",
+      "tags": ""
+    },
+    {
+      "id": "fb80dd1c-0eb2-4a77-8c0a-2908950fc3e9",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "arikuschnir",
+      "url": "https://www.instagram.com/arikuschnir",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-b414b0b9ee059b25.jpg",
+      "description": "69K Followers, 1,490 Following, 200 Posts - See Instagram photos and videos from Ari Kuschnir (@arikuschnir)",
+      "tags": ""
+    },
+    {
+      "id": "b7450de9-5a65-4b4b-bbf3-e5e14ac2776c",
+      "kind": "collective",
+      "rating": "AA",
+      "name": "phantomx.ai",
+      "url": "https://www.instagram.com/phantomx.ai",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-6628e35834edf9ce.jpg",
+      "description": "16K Followers, 99 Following, 83 Posts - See Instagram photos and videos from PhantomX.ai || AI Creative Studio (@phantomx.ai)",
+      "tags": ""
+    },
+    {
+      "id": "c67a0947-ea8b-47f0-a814-5755213c40cd",
+      "kind": "artist",
+      "rating": "AAA",
+      "name": "shoomov",
+      "url": "https://www.instagram.com/shoomov",
+      "platform": "Instagram",
+      "section": "runet",
+      "image": "./public/avatars/upload-d4d8a2b7d4376ce0.jpg",
+      "description": "2,661 Followers, 1,854 Following, 296 Posts - See Instagram photos and videos from Denis Shoomov (@shoomov)",
+      "tags": ""
+    },
+    {
+      "id": "d54b08bd-a324-4571-a05f-cc69796212ef",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "neuro_archives",
+      "url": "https://www.instagram.com/neuro_archives",
+      "platform": "Instagram",
+      "section": "runet",
+      "image": "./public/avatars/upload-3ce6092813b1dff2.jpg",
+      "description": "262K Followers, 187 Following, 397 Posts - See Instagram photos and videos from Neuro Archives (@neuro_archives)",
+      "tags": ""
+    },
+    {
+      "id": "28ad909c-f976-4905-a9f9-999971143815",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "cesxcommercial",
+      "url": "https://www.instagram.com/cesxcommercial",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-8b065cca4620b89c.jpg",
+      "description": "300K Followers, 11K Following, 1,815 Posts - See Instagram photos and videos from Ces (@cesxcommercial)",
+      "tags": ""
+    },
+    {
+      "id": "9ded158e-6076-43de-b92e-8d77bb36e3f8",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "yourfreshdesign",
+      "url": "https://www.instagram.com/yourfreshdesign",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-864f36d015c8cc60.jpg",
+      "description": "11K Followers, 217 Following, 181 Posts - See Instagram photos and videos from FRESH | Design & Motion & AI (@yourfreshdesign)",
+      "tags": ""
+    },
+    {
+      "id": "0f2c7375-d723-4199-b229-cbb9cf5be71d",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "charmbusters",
+      "url": "https://www.instagram.com/charmbusters",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-ea1b789f955f50ab.jpg",
+      "description": "629K Followers, 7,400 Following, 413 Posts - See Instagram photos and videos from Stjepan Covic (@charmbusters)",
+      "tags": ""
+    },
+    {
+      "id": "068fcca2-970a-4836-b210-6064cbc9e00c",
+      "kind": "media",
+      "rating": "A",
+      "name": "4ch_ai",
+      "url": "https://www.instagram.com/4ch_ai",
+      "platform": "Instagram",
+      "section": "runet",
+      "image": "./public/avatars/upload-b789a0d3dd024aeb.jpg",
+      "description": "2M Followers, 4 Following, 156 Posts - See Instagram photos and videos from 4CH + AI = (@4ch_ai)",
+      "tags": ""
+    },
+    {
+      "id": "486a0fcd-6274-410a-92fa-849aba82640c",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "juliapolskayaa",
+      "url": "https://www.instagram.com/juliapolskayaa",
+      "platform": "Instagram",
+      "section": "runet",
+      "image": "./public/avatars/upload-9570105b914b6ef5.jpg",
+      "description": "123K Followers, 205 Following, 578 Posts - See Instagram photos and videos from &#x42e;&#x41b;&#x418;&#x42f; &#x41f;&#x41e;&#x41b;&#x42c;&#x421;&#x41a;&#x410;&#x42f; / CREATOR / AI-&#x420;&#x415;&#x416;&#x418;&#x421;&#x421;&#x415;&#x420;&#x1f3ac; (@juliapolskayaa)",
+      "tags": ""
+    },
+    {
+      "id": "7040fae4-e4cd-463e-aa7b-f741e51eb3f4",
+      "kind": "artist",
+      "rating": "AAA",
+      "name": "shestak",
+      "url": "https://www.instagram.com/shestak.mov",
+      "platform": "Instagram",
+      "section": "runet",
+      "image": "./public/avatars/upload-08067ed99b22e4b4.jpg",
+      "description": "27K Followers, 200 Following, 375 Posts - See Instagram photos and videos from Shestak Nikolay | Riga &#x1f1f1;&#x1f1fb; (@shestak.mov)",
+      "tags": ""
+    },
+    {
+      "id": "0fd1eee3-bacd-4d4d-a704-734877b32573",
+      "kind": "collective",
+      "rating": "A",
+      "name": "promthubstudio",
+      "url": "https://www.instagram.com/promthubstudio",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-b658f2b1d03b5c02.jpg",
+      "description": "6,485 Followers, 0 Following, 67 Posts - See Instagram photos and videos from PromtHub | AI-&#x441;&#x442;&#x443;&#x434;&#x438;&#x44f; (@promthubstudio)",
+      "tags": ""
+    },
+    {
       "id": "7a54c553-711f-4d8c-8291-87a694bc2086",
       "kind": "artist",
       "rating": "A",
@@ -39,7 +315,7 @@
     {
       "id": "14a1217d-54e6-4940-866f-d52ee8bd473d",
       "kind": "artist",
-      "rating": "AA",
+      "rating": "AAA",
       "name": "leravolgare",
       "url": "https://www.instagram.com/leravolgare",
       "platform": "Instagram",
@@ -51,7 +327,7 @@
     {
       "id": "bfe796a5-a91a-4655-8f0f-66bd8746f5f4",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "slurp.tv",
       "url": "https://www.instagram.com/slurp.tv",
       "platform": "Instagram",
@@ -63,7 +339,7 @@
     {
       "id": "0d9f10cb-5b2c-4808-952e-76883142e7dd",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "miami.1996",
       "url": "https://www.instagram.com/miami.1996",
       "platform": "Instagram",
@@ -75,7 +351,7 @@
     {
       "id": "87fee611-38a2-4587-861d-293858a17b2b",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AAA",
       "name": "prettydios",
       "url": "https://www.instagram.com/prettydios",
       "platform": "Instagram",
@@ -111,7 +387,7 @@
     {
       "id": "7a314e8b-ddfc-46e4-88ca-354d8b786e1b",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "ai.with.glock",
       "url": "https://www.instagram.com/ai.with.glock",
       "platform": "Instagram",
@@ -123,7 +399,7 @@
     {
       "id": "b4c3d825-2063-41eb-a610-bd267076be7c",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "alchemissa",
       "url": "https://www.instagram.com/alchemissa",
       "platform": "Instagram",
@@ -135,7 +411,7 @@
     {
       "id": "787dc518-5c11-4bf5-aadb-20c70c7df504",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "mr.denis.ignatov",
       "url": "https://www.instagram.com/mr.denis.ignatov",
       "platform": "Instagram",
@@ -147,7 +423,7 @@
     {
       "id": "4e4cd122-5481-46f0-abdb-e4a239e3145d",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "marcin.rubinkowski",
       "url": "https://www.instagram.com/marcin.rubinkowski",
       "platform": "Instagram",
@@ -159,7 +435,7 @@
     {
       "id": "a5e2ffc3-b511-436d-94b8-21db7104a5ea",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "a.paintedsound",
       "url": "https://www.instagram.com/a.paintedsound",
       "platform": "Instagram",
@@ -171,7 +447,7 @@
     {
       "id": "09412e44-fe17-48b4-96fc-e87008eefe7b",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "0nastiia",
       "url": "https://www.instagram.com/0nastiia",
       "platform": "Instagram",
@@ -183,7 +459,7 @@
     {
       "id": "9474922a-9e0b-4da5-900d-a71c403c52a8",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "mertzv2",
       "url": "https://www.instagram.com/mertzv2",
       "platform": "Instagram",
@@ -219,7 +495,7 @@
     {
       "id": "5e75a557-f33f-4b29-8444-16b2d48c61de",
       "kind": "artist",
-      "rating": "AA",
+      "rating": "AAA",
       "name": "hntrdi",
       "url": "https://www.instagram.com/hntrdi",
       "platform": "Instagram",
@@ -230,8 +506,8 @@
     },
     {
       "id": "574d3a31-2bfa-40ac-adf8-a7098c9fa82f",
-      "kind": "artist",
-      "rating": "AA",
+      "kind": "collective",
+      "rating": "AAA",
       "name": "dopustim_zerno",
       "url": "https://www.instagram.com/dopustim_zerno",
       "platform": "Instagram",
@@ -243,7 +519,7 @@
     {
       "id": "71cb050d-9381-495c-a6e2-71761f6132d2",
       "kind": "artist",
-      "rating": "AA",
+      "rating": "AAA",
       "name": "ota.visual",
       "url": "https://www.instagram.com/ota.visual",
       "platform": "Instagram",
@@ -255,7 +531,7 @@
     {
       "id": "13587be5-2a6f-452d-b190-57e239bf99e7",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "unkleluc",
       "url": "https://www.instagram.com/unkleluc",
       "platform": "Instagram",
@@ -291,7 +567,7 @@
     {
       "id": "ef1df809-2357-4961-8e26-826249806c43",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "cd-rom",
       "url": "https://t.me/cdrommm",
       "platform": "Telegram",
@@ -303,7 +579,7 @@
     {
       "id": "8067f102-a19e-409c-83a2-1c43ba19309c",
       "kind": "collective",
-      "rating": "A",
+      "rating": "AAA",
       "name": "Березовый промпт",
       "url": "https://t.me/berezaprompt",
       "platform": "Telegram",
@@ -327,7 +603,7 @@
     {
       "id": "2c9ba39b-3129-48ef-81b1-9b15ad4e4ffe",
       "kind": "artist",
-      "rating": "AA",
+      "rating": "AAA",
       "name": "loved_orleer",
       "url": "https://www.instagram.com/loved_orleer",
       "platform": "Instagram",
@@ -363,7 +639,7 @@
     {
       "id": "99f774e2-3902-4591-8a88-8f35a42f4e9e",
       "kind": "collective",
-      "rating": "AAA",
+      "rating": "AAA+",
       "name": "slop.shop",
       "url": "https://www.instagram.com/slop.shop",
       "platform": "Instagram",
@@ -375,7 +651,7 @@
     {
       "id": "cec2917c-732e-4501-9b2e-d6bcb0d6e77a",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "sam_i_universe",
       "url": "https://www.instagram.com/sam_i_universe",
       "platform": "Instagram",
@@ -387,7 +663,7 @@
     {
       "id": "6a4cd494-dc4f-4972-bf9f-cce6c5e90e67",
       "kind": "artist",
-      "rating": "AA",
+      "rating": "AAA",
       "name": "a.i.solation_",
       "url": "https://www.instagram.com/a.i.solation_",
       "platform": "Instagram",
@@ -399,7 +675,7 @@
     {
       "id": "3be9e090-446a-4a05-ad1b-062c8bc7c05c",
       "kind": "artist",
-      "rating": "AA",
+      "rating": "AAA",
       "name": "_mrnsk.ai",
       "url": "https://www.instagram.com/_mrnsk.ai",
       "platform": "Instagram",
@@ -411,7 +687,7 @@
     {
       "id": "3151d6c9-b145-4b48-9c76-b87110a5e3c0",
       "kind": "artist",
-      "rating": "AA",
+      "rating": "AAA",
       "name": "_ai__ro_",
       "url": "https://www.instagram.com/_ai__ro_",
       "platform": "Instagram",
@@ -435,7 +711,7 @@
     {
       "id": "6bfa633a-5887-4b67-9610-74cc0fa75e62",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "boldtron",
       "url": "https://www.instagram.com/boldtron",
       "platform": "Instagram",
@@ -447,7 +723,7 @@
     {
       "id": "79e8b038-d7dc-4000-8dfc-330e376fd582",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "nickoollai",
       "url": "https://t.me/nickoollai",
       "platform": "Telegram",
@@ -459,7 +735,7 @@
     {
       "id": "292dd0de-4d8c-4e0e-a1a5-5b5e1d03f4aa",
       "kind": "media",
-      "rating": "AAA",
+      "rating": "AAA+",
       "name": "fakewhale_xyz",
       "url": "https://www.instagram.com/fakewhale_xyz",
       "platform": "Instagram",
@@ -483,7 +759,7 @@
     {
       "id": "e25ff4a7-ea82-46e4-8b09-316e4c73ee86",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AAA",
       "name": "muniraalkharaz",
       "url": "https://www.instagram.com/muniraalkharaz",
       "platform": "Instagram",
@@ -495,7 +771,7 @@
     {
       "id": "4ae344c5-efee-4460-86f3-4fb07878f3e3",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "izanamiconceptart",
       "url": "https://www.instagram.com/izanamiconceptart",
       "platform": "Instagram",
@@ -507,6 +783,7 @@
     {
       "id": "427529d2-0655-4f0d-ac84-2df38bcff176",
       "kind": "artist",
+      "rating": "AA",
       "name": "gulmannn",
       "url": "https://www.instagram.com/gulmannn",
       "platform": "Instagram",
@@ -518,7 +795,7 @@
     {
       "id": "16a82bf1-2b68-4e9d-bd3c-4e4c1f525800",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "__scerbo__",
       "url": "https://www.instagram.com/__scerbo__",
       "platform": "Instagram",
@@ -530,7 +807,7 @@
     {
       "id": "5011fc60-741b-446e-a533-a784cbdab0cf",
       "kind": "media",
-      "rating": "AAA",
+      "rating": "AAA+",
       "name": "clanker.mag",
       "url": "https://www.instagram.com/clanker.mag",
       "platform": "Instagram",
@@ -542,7 +819,7 @@
     {
       "id": "8fb37e37-6f00-4852-a71b-463f3a8ab122",
       "kind": "media",
-      "rating": "AAA",
+      "rating": "AAA+",
       "name": "Generative Gallery",
       "url": "https://t.me/generativegallery",
       "platform": "Telegram",
@@ -554,7 +831,7 @@
     {
       "id": "seed-0",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AAA+",
       "name": "figalink",
       "url": "https://www.instagram.com/figa.link",
       "platform": "Instagram",
@@ -566,7 +843,7 @@
     {
       "id": "seed-1",
       "kind": "artist",
-      "rating": "AAA",
+      "rating": "AAA+",
       "name": "jonrafman",
       "url": "https://www.instagram.com/jonrafman",
       "platform": "Instagram",
@@ -578,7 +855,7 @@
     {
       "id": "seed-2",
       "kind": "artist",
-      "rating": "AAA",
+      "rating": "AAA+",
       "name": "doopiidoo",
       "url": "https://www.instagram.com/doopiidoo",
       "platform": "Instagram",
@@ -590,7 +867,7 @@
     {
       "id": "seed-3",
       "kind": "artist",
-      "rating": "AA",
+      "rating": "AAA",
       "name": "synthetic_pink",
       "url": "https://www.instagram.com/synthetic_pink",
       "platform": "Instagram",
@@ -602,7 +879,7 @@
     {
       "id": "seed-4",
       "kind": "artist",
-      "rating": "AAA",
+      "rating": "AAA+",
       "name": "catsoup",
       "url": "https://www.instagram.com/catsoupai",
       "platform": "Instagram",
@@ -614,7 +891,7 @@
     {
       "id": "seed-5",
       "kind": "artist",
-      "rating": "AA",
+      "rating": "AAA+",
       "name": "plastekpet",
       "url": "https://www.instagram.com/plastekpet",
       "platform": "Instagram",
@@ -626,7 +903,7 @@
     {
       "id": "seed-6",
       "kind": "artist",
-      "rating": "AAA",
+      "rating": "AAA+",
       "name": "icysaw",
       "url": "https://www.instagram.com/icysaw",
       "platform": "Instagram",
@@ -638,7 +915,7 @@
     {
       "id": "seed-7",
       "kind": "artist",
-      "rating": "AAA",
+      "rating": "AAA+",
       "name": "xeocho",
       "url": "https://www.instagram.com/xeocho",
       "platform": "Instagram",
@@ -650,7 +927,7 @@
     {
       "id": "seed-8",
       "kind": "artist",
-      "rating": "AA",
+      "rating": "AAA",
       "name": "kingcon",
       "url": "https://www.instagram.com/kingcon2k11",
       "platform": "Instagram",
@@ -662,7 +939,7 @@
     {
       "id": "seed-9",
       "kind": "artist",
-      "rating": "AA",
+      "rating": "AAA",
       "name": "boeyman",
       "url": "https://www.instagram.com/boeyman",
       "platform": "Instagram",
@@ -674,7 +951,7 @@
     {
       "id": "seed-10",
       "kind": "artist",
-      "rating": "AA",
+      "rating": "AAA",
       "name": "bullithead",
       "url": "https://www.instagram.com/bullithead_",
       "platform": "Instagram",
@@ -686,7 +963,7 @@
     {
       "id": "seed-11",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "darkmoneylurker",
       "url": "https://www.instagram.com/darkmoneylurker",
       "platform": "Instagram",
@@ -698,7 +975,7 @@
     {
       "id": "seed-12",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "tbtrppn",
       "url": "https://www.instagram.com/tbtrppn",
       "platform": "Instagram",
@@ -710,7 +987,7 @@
     {
       "id": "seed-13",
       "kind": "artist",
-      "rating": "AA",
+      "rating": "AAA",
       "name": "fullwarp",
       "url": "https://www.instagram.com/fullwarp",
       "platform": "Instagram",
@@ -722,7 +999,7 @@
     {
       "id": "seed-14",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "shiverchain",
       "url": "https://www.instagram.com/shiverchain",
       "platform": "Instagram",
@@ -734,7 +1011,7 @@
     {
       "id": "seed-15",
       "kind": "artist",
-      "rating": "AA",
+      "rating": "AAA",
       "name": "the_synthetic_soul",
       "url": "https://www.instagram.com/the_synthetic_soul",
       "platform": "Instagram",
@@ -746,7 +1023,7 @@
     {
       "id": "seed-16",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "jboogxcreative",
       "url": "https://www.instagram.com/jboogxcreative",
       "platform": "Instagram",
@@ -758,7 +1035,7 @@
     {
       "id": "seed-17",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "hasbooof2",
       "url": "https://www.instagram.com/hasbooof2",
       "platform": "Instagram",
@@ -770,7 +1047,7 @@
     {
       "id": "seed-18",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "shockfactorstudios",
       "url": "https://www.instagram.com/shockfactorstudios",
       "platform": "Instagram",
@@ -804,7 +1081,7 @@
     {
       "id": "seed-21",
       "kind": "artist",
-      "rating": "AA",
+      "rating": "AAA",
       "name": "amonsilex",
       "url": "https://www.instagram.com/amonsilex",
       "platform": "Instagram",
@@ -816,7 +1093,7 @@
     {
       "id": "seed-22",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "noellevandijk",
       "url": "https://www.instagram.com/noellevandijk",
       "platform": "Instagram",
@@ -827,18 +1104,20 @@
     },
     {
       "id": "seed-23",
+      "kind": "artist",
+      "rating": "AA",
       "name": "neuronprolapse",
-      "url": "https://www.instagram.com/neuronprolapse/",
-      "section": "world",
+      "url": "https://www.instagram.com/neuronprolapse",
       "platform": "Instagram",
-      "description": "",
+      "section": "world",
       "image": "./public/avatars/instagram-a02f068888ec0d7a.jpg",
+      "description": "",
       "tags": ""
     },
     {
       "id": "seed-24",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "willis.visual",
       "url": "https://www.instagram.com/willis.visual",
       "platform": "Instagram",
@@ -850,7 +1129,7 @@
     {
       "id": "seed-25",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "palpa visuals",
       "url": "https://www.instagram.com/palpa_visuals",
       "platform": "Instagram",
@@ -874,7 +1153,7 @@
     {
       "id": "seed-27",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AAA",
       "name": "sasha sime",
       "url": "https://www.instagram.com/sasha_sime",
       "platform": "Instagram",
@@ -898,7 +1177,7 @@
     {
       "id": "seed-29",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "ifonly.ai",
       "url": "https://www.instagram.com/ifonly.ai",
       "platform": "Instagram",
@@ -910,7 +1189,7 @@
     {
       "id": "seed-30",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "kentskooking",
       "url": "https://www.instagram.com/kentskooking",
       "platform": "Instagram",
@@ -922,7 +1201,7 @@
     {
       "id": "seed-31",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "darylanselmo",
       "url": "https://www.instagram.com/darylanselmo",
       "platform": "Instagram",
@@ -934,7 +1213,7 @@
     {
       "id": "seed-32",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "karolinegeorges.art",
       "url": "https://www.instagram.com/karolinegeorges.art",
       "platform": "Instagram",
@@ -946,7 +1225,7 @@
     {
       "id": "seed-34",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "katsukokoiso",
       "url": "https://www.instagram.com/katsukokoiso.ai",
       "platform": "Instagram",
@@ -958,7 +1237,7 @@
     {
       "id": "seed-35",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "ulfi_love",
       "url": "https://www.instagram.com/ulfi_love",
       "platform": "Instagram",
@@ -970,7 +1249,7 @@
     {
       "id": "seed-37",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "strangelooptv",
       "url": "https://www.instagram.com/strangelooptv",
       "platform": "Instagram",
@@ -982,7 +1261,7 @@
     {
       "id": "seed-38",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "from_the_d.e.p.t.h",
       "url": "https://www.instagram.com/from_the_d.e.p.t.h",
       "platform": "Instagram",
@@ -994,7 +1273,7 @@
     {
       "id": "seed-39",
       "kind": "artist",
-      "rating": "AA",
+      "rating": "AAA",
       "name": "eggstonite",
       "url": "https://www.instagram.com/eggstonite",
       "platform": "Instagram",
@@ -1006,7 +1285,7 @@
     {
       "id": "seed-41",
       "kind": "artist",
-      "rating": "AAA",
+      "rating": "AAA+",
       "name": "gossipgoblin",
       "url": "https://www.instagram.com/gossipgoblin",
       "platform": "Instagram",
@@ -1030,7 +1309,7 @@
     {
       "id": "seed-43",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "uemuetyildiz",
       "url": "https://www.instagram.com/uemuetyildiz",
       "platform": "Instagram",
@@ -1042,7 +1321,7 @@
     {
       "id": "seed-44",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "_tinbrain_",
       "url": "https://www.instagram.com/_tinbrain_",
       "platform": "Instagram",
@@ -1054,7 +1333,7 @@
     {
       "id": "seed-45",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "m4wave",
       "url": "https://www.instagram.com/m4wave",
       "platform": "Instagram",
@@ -1066,7 +1345,7 @@
     {
       "id": "seed-46",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "therottensocietyclub",
       "url": "https://www.instagram.com/therottensocietyclub",
       "platform": "Instagram",
@@ -1078,7 +1357,7 @@
     {
       "id": "seed-47",
       "kind": "artist",
-      "rating": "AA",
+      "rating": "AAA",
       "name": "goo.vision",
       "url": "https://www.instagram.com/goo.vision",
       "platform": "Instagram",
@@ -1090,7 +1369,7 @@
     {
       "id": "seed-48",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "bengttibert",
       "url": "https://www.instagram.com/bengttibert",
       "platform": "Instagram",
@@ -1114,7 +1393,7 @@
     {
       "id": "seed-50",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "them_realms",
       "url": "https://www.instagram.com/them_realms",
       "platform": "Instagram",
@@ -1126,7 +1405,7 @@
     {
       "id": "seed-51",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "alsoguppyme",
       "url": "https://www.instagram.com/alsoguppyme",
       "platform": "Instagram",
@@ -1138,7 +1417,7 @@
     {
       "id": "seed-52",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AAA",
       "name": "ian haig",
       "url": "https://www.instagram.com/Ian_Haig2.0",
       "platform": "Instagram",
@@ -1150,7 +1429,7 @@
     {
       "id": "seed-53",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "PlacentaShake",
       "url": "https://www.instagram.com/PlacentaShake",
       "platform": "Instagram",
@@ -1162,7 +1441,7 @@
     {
       "id": "seed-54",
       "kind": "artist",
-      "rating": "AAA",
+      "rating": "AAA+",
       "name": "voidstomper",
       "url": "https://www.instagram.com/voidstomper",
       "platform": "Instagram",
@@ -1174,7 +1453,7 @@
     {
       "id": "seed-55",
       "kind": "artist",
-      "rating": "AAA",
+      "rating": "AAA+",
       "name": "gloomstomper",
       "url": "https://www.instagram.com/gloomstomper",
       "platform": "Instagram",
@@ -1186,7 +1465,7 @@
     {
       "id": "seed-56",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "myst.cult",
       "url": "https://www.instagram.com/myst.cult",
       "platform": "Instagram",
@@ -1198,7 +1477,7 @@
     {
       "id": "seed-57",
       "kind": "artist",
-      "rating": "AA",
+      "rating": "AAA+",
       "name": "noway_recordings",
       "url": "https://www.instagram.com/noway_recordings",
       "platform": "Instagram",
@@ -1210,7 +1489,7 @@
     {
       "id": "seed-58",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "sin.rostroz",
       "url": "https://www.instagram.com/sin.rostroz",
       "platform": "Instagram",
@@ -1222,7 +1501,7 @@
     {
       "id": "seed-59",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "unreal gaia",
       "url": "https://www.instagram.com/gaia_unreal",
       "platform": "Instagram",
@@ -1234,7 +1513,7 @@
     {
       "id": "seed-60",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "nikvsio",
       "url": "https://www.instagram.com/nikvsio",
       "platform": "Instagram",
@@ -1282,7 +1561,7 @@
     {
       "id": "seed-64",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "kangneko",
       "url": "https://www.instagram.com/kangneko3",
       "platform": "Instagram",
@@ -1294,7 +1573,7 @@
     {
       "id": "seed-65",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "other_realm_",
       "url": "https://www.instagram.com/other_realm_",
       "platform": "Instagram",
@@ -1306,7 +1585,7 @@
     {
       "id": "seed-66",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "exitdreamnow",
       "url": "https://www.instagram.com/exitdreamnow",
       "platform": "Instagram",
@@ -1330,7 +1609,7 @@
     {
       "id": "seed-69",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "azealter",
       "url": "https://www.instagram.com/azealter",
       "platform": "Instagram",
@@ -1342,7 +1621,7 @@
     {
       "id": "seed-70",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "balfua",
       "url": "https://www.instagram.com/balfua",
       "platform": "Instagram",
@@ -1354,7 +1633,7 @@
     {
       "id": "seed-71",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "lelabonoir",
       "url": "https://www.instagram.com/lelabonoir",
       "platform": "Instagram",
@@ -1366,7 +1645,7 @@
     {
       "id": "seed-72",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "ai_vitaminc_",
       "url": "https://www.instagram.com/ai_vitaminc_",
       "platform": "Instagram",
@@ -1378,7 +1657,7 @@
     {
       "id": "seed-73",
       "kind": "artist",
-      "rating": "AA",
+      "rating": "AAA",
       "name": "spikeandred",
       "url": "https://www.instagram.com/spikeandred",
       "platform": "Instagram",
@@ -1390,7 +1669,7 @@
     {
       "id": "seed-74",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "_mark450",
       "url": "https://www.instagram.com/_mark450",
       "platform": "Instagram",
@@ -1402,7 +1681,7 @@
     {
       "id": "seed-75",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "zeineldinn__",
       "url": "https://www.instagram.com/zeineldinn__",
       "platform": "Instagram",
@@ -1414,7 +1693,7 @@
     {
       "id": "seed-76",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "coooooolpan",
       "url": "https://www.instagram.com/coooooolpan",
       "platform": "Instagram",
@@ -1426,7 +1705,7 @@
     {
       "id": "seed-77",
       "kind": "artist",
-      "rating": "AA",
+      "rating": "AAA",
       "name": "fmaximishin",
       "url": "https://www.instagram.com/fmaximishin",
       "platform": "Instagram",
@@ -1438,7 +1717,7 @@
     {
       "id": "seed-78",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "kirill_kokora",
       "url": "https://www.instagram.com/kirill_kokora",
       "platform": "Instagram",
@@ -1450,7 +1729,7 @@
     {
       "id": "seed-79",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "Слава 𝖘𝖆𝖋",
       "url": "https://t.me/armorflower",
       "platform": "Telegram",
@@ -1462,7 +1741,7 @@
     {
       "id": "seed-80",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "sneemayu_shlyapu",
       "url": "https://www.instagram.com/sneemayu_shlyapu",
       "platform": "Instagram",
@@ -1474,7 +1753,7 @@
     {
       "id": "seed-81",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "EJANERESS",
       "url": "https://t.me/ejaneress",
       "platform": "Telegram",
@@ -1498,7 +1777,7 @@
     {
       "id": "seed-84",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "veronika.yad",
       "url": "https://www.instagram.com/veronika.yad",
       "platform": "Instagram",
@@ -1510,7 +1789,7 @@
     {
       "id": "seed-85",
       "kind": "artist",
-      "rating": "AAA",
+      "rating": "AAA+",
       "name": "SOLAR.W 🐉",
       "url": "https://t.me/solar_w",
       "platform": "Telegram",
@@ -1522,7 +1801,7 @@
     {
       "id": "seed-86",
       "kind": "artist",
-      "rating": "AAA",
+      "rating": "AAA+",
       "name": "sever.neuro",
       "url": "https://t.me/severneuro",
       "platform": "Telegram",
@@ -1534,7 +1813,7 @@
     {
       "id": "seed-87",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "benedict",
       "url": "https://t.me/bndct5",
       "platform": "Telegram",
@@ -1545,8 +1824,8 @@
     },
     {
       "id": "seed-88",
-      "kind": "artist",
-      "rating": "A",
+      "kind": "collective",
+      "rating": "AAA",
       "name": "No title yet . AI",
       "url": "https://t.me/notitleyetai",
       "platform": "Telegram",
@@ -1558,7 +1837,7 @@
     {
       "id": "seed-89",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "olgafedorova",
       "url": "https://www.instagram.com/olgamikhfedorova",
       "platform": "Instagram",
@@ -1570,7 +1849,7 @@
     {
       "id": "seed-90",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "SYMBIMIND",
       "url": "https://t.me/symbimind",
       "platform": "Telegram",
@@ -1582,7 +1861,7 @@
     {
       "id": "seed-91",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "vladimirovodov",
       "url": "https://www.instagram.com/vladimirovodov",
       "platform": "Instagram",
@@ -1594,7 +1873,7 @@
     {
       "id": "seed-92",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "jeniafilatova",
       "url": "https://www.instagram.com/jeniafilatova",
       "platform": "Instagram",
@@ -1606,7 +1885,7 @@
     {
       "id": "seed-93",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "BLACK APRIL",
       "url": "https://t.me/Black_april_cg",
       "platform": "Telegram",
@@ -1618,7 +1897,7 @@
     {
       "id": "seed-94",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "used2sdmns",
       "url": "https://t.me/used2sdmns",
       "platform": "Telegram",
@@ -1630,7 +1909,7 @@
     {
       "id": "seed-95",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "gazed",
       "url": "https://www.instagram.com/gazed",
       "platform": "Instagram",
@@ -1642,7 +1921,7 @@
     {
       "id": "seed-96",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "sarsap",
       "url": "https://www.instagram.com/syrosap",
       "platform": "Instagram",
@@ -1654,7 +1933,7 @@
     {
       "id": "seed-97",
       "kind": "artist",
-      "rating": "AA",
+      "rating": "AAA",
       "name": "тони хков",
       "url": "https://t.me/tonyholeycow",
       "platform": "Telegram",
@@ -1666,7 +1945,7 @@
     {
       "id": "seed-98",
       "kind": "artist",
-      "rating": "AAA",
+      "rating": "AAA+",
       "name": "дельфин дружит с кукушкой",
       "url": "https://t.me/votposmotrim",
       "platform": "Telegram",
@@ -1678,7 +1957,7 @@
     {
       "id": "seed-99",
       "kind": "media",
-      "rating": "AA",
+      "rating": "AAA",
       "name": "НЕЙРО Щ®",
       "url": "https://t.me/alkali_neuro",
       "platform": "Telegram",

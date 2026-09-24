@@ -1676,12 +1676,26 @@ footer .manifesto{min-height:235px;gap:9px;border-block-color:#d7293066;backgrou
   background:linear-gradient(180deg,#202427 0,#0a0c0e 20%,#111518 100%)!important;
   box-shadow:inset 0 1px #ffffff1c,inset 0 -2px #0008,0 4px 10px #0007!important;
 }
-.editor-dialog .artist-form [data-slot=select-trigger]:focus-visible,.editor-dialog .artist-form input:focus-visible,.editor-dialog .import-box input:focus-visible{outline:2px solid #ffe84d;outline-offset:2px}
+.editor-dialog .artist-form [data-slot=select-trigger]:focus-visible,.editor-dialog .artist-form input:not([type=radio]):focus-visible,.editor-dialog .artist-form textarea:focus-visible,.editor-dialog .import-box input:focus-visible{outline:2px solid #ffe84d;outline-offset:2px}
+.editor-dialog .artist-form .rating-option input[type=radio]{accent-color:var(--tag-accent)}
+.editor-dialog .artist-form .rating-option input[type=radio]:focus-visible{outline:2px solid var(--tag-accent);outline-offset:3px}
+.editor-dialog .artist-form .rating-option:has(input[type=radio]:focus-visible){outline:1px solid var(--tag-accent);outline-offset:3px}
 .editor-dialog .artist-form label,.editor-dialog .rating-options legend{color:#f1f2ed}
 .editor-dialog .artist-form .rating-option{min-width:99px;background:linear-gradient(180deg,#24282b,#111416);border:1px solid var(--tag-border);color:var(--tag-accent);box-shadow:inset 0 1px #ffffff20,0 4px 9px #0006}
 .editor-dialog .artist-form .rating-option:hover{background:color-mix(in srgb,var(--tag-accent) 18%,#151719);box-shadow:0 0 12px color-mix(in srgb,var(--tag-accent) 30%,transparent)}
 .editor-dialog .artist-form .rating-option:has(input:checked){background:linear-gradient(135deg,color-mix(in srgb,var(--tag-accent) 35%,#22262a),#111416);border:2px solid var(--tag-accent);box-shadow:0 0 0 2px #080a0c,0 0 14px color-mix(in srgb,var(--tag-accent) 42%,transparent)}
-.editor-dialog .artist-form .rating-option input:checked{box-shadow:inset 0 0 0 3px #16191c;background:var(--tag-accent)}
+.editor-dialog .artist-form .rating-option.rating-aa:has(input:checked){
+  color:#d9a6ff;border-color:#cc9aff;
+  background:linear-gradient(145deg,#38234a,#17121f 78%);
+  box-shadow:0 0 0 2px #080a0c,0 0 15px #b865ff80
+}
+.editor-dialog .artist-form .rating-option input[type=radio]{
+  color:var(--tag-accent);border-color:var(--tag-accent);accent-color:var(--tag-accent)
+}
+.editor-dialog .artist-form .rating-option input[type=radio]:checked{
+  background-color:var(--tag-accent);border-color:var(--tag-accent);
+  box-shadow:inset 0 0 0 3px #16191c,0 0 0 1px color-mix(in srgb,var(--tag-accent) 45%,transparent)
+}
 
 /* One media designation, on the avatar itself. */
 .admin-grid .record-type--avatar,.admin-rows:not(.admin-grid) .record-type--avatar{display:inline-flex;position:absolute;z-index:4;left:8px;bottom:8px;width:auto;max-width:calc(100% - 16px);margin:0;padding:5px 7px;background:#0c0f12e8;border:1px solid var(--kind-accent);border-radius:3px;color:#f4f2e9;box-shadow:0 3px 9px #000a;font-size:10px;letter-spacing:.07em}
@@ -2170,9 +2184,341 @@ footer{height:216px;min-height:216px;margin-top:28px}
 .manifesto-zalgo>.zalgo-layer:first-child{text-shadow:3px 2px #a62230,-2px -1px #63cad0,0 0 16px #eb312b88}
 @media(max-width:600px){.manifesto-zalgo{font-size:clamp(24px,7vw,42px);letter-spacing:-.04em}}
 
+/* Signal-console cards: hero-section metalwork with continuous Red Alert accents. */
+.artist-grid .artist-card[data-rating]{
+  isolation:isolate;
+  overflow:hidden;
+  border:1px solid color-mix(in srgb,var(--card-accent) 70%,#aeb7b7);
+  border-radius:13px;
+  background:linear-gradient(145deg,#31383b 0%,#111518 17%,#0b0e10 100%);
+  box-shadow:inset 0 1px #ffffff70,inset 0 0 0 1px #ffffff12,0 12px 28px #000a,0 0 22px var(--card-halo);
+  transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease,filter .2s ease;
+}
+.artist-grid .artist-card[data-rating]::before{
+  content:"";display:block;position:absolute;z-index:6;inset:0 0 auto;height:4px;
+  background:linear-gradient(90deg,#e52b32 0%,#ff4740 24%,var(--card-accent) 74%,#fff1a5 100%);
+  box-shadow:0 0 12px color-mix(in srgb,var(--card-accent) 45%,#ef272c),0 2px 5px #000b;
+  pointer-events:none;
+}
+.artist-grid .artist-card[data-rating]::after{
+  content:"";position:absolute;z-index:0;inset:4px 0 0;pointer-events:none;opacity:.28;
+  background:repeating-linear-gradient(0deg,transparent 0 5px,#dce4df0a 5px 6px),linear-gradient(115deg,#e72c3212,transparent 35%,transparent 70%,#5de0e31a);
+  mix-blend-mode:screen;
+}
+.artist-grid .artist-card[data-rating]:hover{
+  transform:translateY(-4px);
+  border-color:color-mix(in srgb,var(--card-accent) 76%,#fff);
+  box-shadow:inset 0 1px #ffffff9c,inset 0 0 0 1px #ffffff20,0 18px 38px #000c,0 0 30px color-mix(in srgb,var(--card-accent) 35%,transparent);
+  filter:saturate(1.12);
+}
+.artist-grid .artist-card[data-rating]>.art,.artist-grid .artist-card[data-rating]>.card-info{position:relative;z-index:1}
+.artist-grid .artist-card[data-rating]>.art{isolation:isolate}
+.artist-grid .artist-card[data-rating]>.art::after{
+  background:
+    repeating-linear-gradient(0deg,transparent 0 3px,#00000015 3px 4px),
+    linear-gradient(180deg,#e52c3210 0%,transparent 30%,transparent 58%,#060709bd 100%);
+}
+.artist-grid .artist-card[data-kind][data-rating] .card-info{
+  border-top:1px solid color-mix(in srgb,var(--card-accent) 55%,#697174);
+  background:
+    radial-gradient(ellipse at 100% 5%,color-mix(in srgb,var(--card-accent) 24%,transparent),transparent 58%),
+    repeating-linear-gradient(0deg,transparent 0 5px,#ffffff09 5px 6px),
+    repeating-linear-gradient(135deg,#ffffff08 0 1px,transparent 1px 11px),
+    linear-gradient(145deg,color-mix(in srgb,var(--card-panel) 80%,#303638),color-mix(in srgb,var(--card-panel-deep) 76%,#111518));
+  box-shadow:inset 0 1px #ffffff24;
+}
+.artist-grid .artist-card[data-rating] .card-info h2{ text-shadow:0 1px 1px #000,0 0 14px color-mix(in srgb,var(--card-accent) 22%,transparent) }
+.artist-grid .artist-card[data-rating] .card-info p{color:#e1e6dc}
+.artist-grid .artist-card[data-rating] .region-watermark{opacity:.36;filter:drop-shadow(0 0 8px color-mix(in srgb,var(--card-accent) 25%,#000))}
+.artist-grid .artist-card[data-rating]:hover .region-watermark{opacity:.48;transform:scale(1.035)}
+.artist-grid .artist-card[data-rating] .rating-tag{box-shadow:inset 0 1px #ffffff45,0 0 14px color-mix(in srgb,var(--tag-accent) 22%,transparent),0 4px 10px #000a}
+.artist-grid .artist-card[data-rating] .record-type--avatar{box-shadow:inset 0 1px #ffffff35,0 0 12px color-mix(in srgb,var(--kind-accent) 24%,transparent),0 4px 10px #000a}
+@media(prefers-reduced-motion:reduce){.artist-grid .artist-card[data-rating]{transition:none}.artist-grid .artist-card[data-rating]:hover{transform:none}}
+
+/* Keep the scrollbar's gray guide visibly continuous beneath the red thumb. */
+*::-webkit-scrollbar-thumb{
+  background:
+    linear-gradient(90deg,#454a4c 0 3px,transparent 3px),
+    repeating-linear-gradient(135deg,#e1372e 0 3px,#9e1015 3px 6px,#660e11 6px 9px);
+}
+.timeline-layout--horizontal .timeline-content::-webkit-scrollbar-thumb{
+  background:
+    linear-gradient(180deg,#454a4c 0 3px,transparent 3px),
+    repeating-linear-gradient(135deg,#e1372e 0 3px,#9e1015 3px 6px,#660e11 6px 9px);
+}
+
+/* Compact icon radios for catalog ordering, matching the view-mode console. */
+.catalog-sort-switch{display:flex;align-items:center;gap:3px;height:var(--control-height);min-height:var(--control-height);padding:3px;border:2px solid #666d70;border-top-color:#aab1b3;border-radius:4px;background:linear-gradient(180deg,#292e31,#111416 35%,#1b1f22);box-shadow:inset 1px 1px #ffffff30,inset -1px -1px #0009,0 4px 10px #0007}
+.catalog-sort-switch>span{padding:0 7px;color:#aeb6b6;font:700 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.09em}
+.catalog-sort-options{display:flex;align-items:center;gap:2px}
+.catalog-sort-options label{position:relative;display:grid;place-items:center;width:40px;height:38px;border-radius:2px;color:#afb7b8;cursor:pointer;transition:color .16s ease,background .16s ease,box-shadow .16s ease}
+.catalog-sort-options input[type="radio"]{appearance:none;position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.catalog-sort-options label:hover{color:#fff;background:#34393c}
+.catalog-sort-options label.active{color:#fff26b;background:linear-gradient(180deg,#d52327,#65090e);box-shadow:inset 1px 1px #ffb1a355,inset -1px -1px #000,0 0 12px #ec222e66}
+.catalog-sort-options label:has(input:focus-visible){outline:2px solid #fff26b;outline-offset:2px}
+.catalog-sort-options svg{width:18px;height:18px;pointer-events:none}
+@media(max-width:700px){.catalog-sort-switch{height:44px;min-height:44px}.catalog-sort-options label{height:34px;width:38px}.catalog-sort-switch>span{padding-inline:5px;font-size:9px}}
+.catalog-view-controls>.view-switch::before{content:"ТИП";display:flex;align-items:center;padding:0 7px 0 5px;color:#aeb6b6;font:700 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.09em}
+@media(max-width:700px){.catalog-view-controls>.view-switch::before{padding-inline:4px;font-size:9px}}
+
+/* Japanese warning headline with horizontally fused CJK, cuneiform and signal glyphs. */
+.manifesto-spires pre{font-family:'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans CJK JP','Noto Sans Cuneiform',sans-serif}
+.manifesto-zalgo{font-family:'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans CJK JP','Noto Sans Cuneiform',sans-serif;letter-spacing:-.11em}
+.manifesto-zalgo .zalgo-glyph,.manifesto-zalgo .zalgo-glyph:nth-child(7){width:.82em;margin-left:-.24em;overflow:visible;text-shadow:inherit}
+.manifesto-zalgo .zalgo-glyph:first-child{margin-left:0}
+.manifesto-zalgo>.zalgo-layer:nth-child(2){letter-spacing:-.16em}
+.manifesto-zalgo>.zalgo-layer:nth-child(3){letter-spacing:-.2em}
+@keyframes toyota-zalgo-ghost-a{
+  0%,100%{transform:translate(12px,-3px) skewX(-5deg);clip-path:inset(0 0 54% 0)}
+  28%{transform:translate(-18px,5px) skewX(4deg);clip-path:inset(26% 0 37% 0)}
+  62%{transform:translate(21px,-7px) skewX(-3deg);clip-path:inset(45% 0 18% 0)}
+}
+@keyframes toyota-zalgo-ghost-b{
+  0%,100%{transform:translate(-16px,7px) skewX(5deg);clip-path:inset(55% 0 0 0)}
+  38%{transform:translate(19px,-8px) skewX(-6deg);clip-path:inset(18% 0 49% 0)}
+  73%{transform:translate(-23px,3px) skewX(3deg);clip-path:inset(37% 0 28% 0)}
+}
+@media(max-width:600px){.manifesto-zalgo .zalgo-glyph,.manifesto-zalgo .zalgo-glyph:nth-child(7){width:.82em;margin-left:-.2em}}
+
+/* Toyota signal: broad columns, restrained density, and a stable centered headline. */
+.manifesto-transmission,.manifesto[data-open="true"] .manifesto-transmission{
+  left:50%;right:auto;width:min(1280px,96vw);height:510px;
+  bottom:calc(50% + 30px);overflow:visible;transform:translateX(-50%)
+}
+.manifesto-transmission .manifesto-spires{
+  inset:0 0 22px;width:auto;box-sizing:border-box;gap:0;justify-content:space-between;
+  opacity:.55;color:#d9e9b9;text-shadow:0 0 4px #d9e87955,1px 0 #e62b3540;
+  mask-image:linear-gradient(to bottom,transparent,#000 5%,#000 88%,transparent)
+}
+.manifesto-transmission .manifesto-spires pre{
+  flex:1 1 0;width:0;min-width:0;overflow:visible;
+  font-size:clamp(10px,.88vw,15px);line-height:1.04;text-align:center
+}
+.manifesto[data-open="true"] .manifesto-spires pre{
+  animation:toyota-code-arrive .8s steps(4,end) calc(var(--column) * 12ms) both,
+    toyota-code-drift 4.8s ease-in-out calc(.8s + var(--column) * 12ms) infinite alternate
+}
+.manifesto-zalgo{
+  bottom:100px;left:50%;right:auto;width:min(96vw,1100px);height:1.25em;
+  transform:translateX(-50%);font-size:clamp(30px,3.4vw,54px);letter-spacing:0
+}
+.manifesto-zalgo>.zalgo-layer{gap:0}
+.manifesto-zalgo .zalgo-glyph{width:auto!important;margin:0!important;transform:none!important}
+.manifesto-zalgo>.zalgo-layer:first-child{
+  color:#fff0b3;text-shadow:2px 2px #a62230,-1px -1px #63cad0,0 0 12px #eb312b66
+}
+.manifesto-zalgo>.zalgo-layer:nth-child(2){animation:toyota-zalgo-ghost-a 1.2s steps(3,end) infinite}
+.manifesto-zalgo>.zalgo-layer:nth-child(3){animation:toyota-zalgo-ghost-b 1s steps(2,end) infinite}
+.manifesto[data-open="true"] .manifesto-zalgo{
+  animation:toyota-zalgo-arrive .7s steps(5,end) .2s both
+}
+@media(max-width:600px){
+  .manifesto-transmission,.manifesto[data-open="true"] .manifesto-transmission{
+    width:100vw;height:390px;bottom:calc(50% + 22px)
+  }
+  .manifesto-transmission .manifesto-spires{inset-inline:0;opacity:.4}
+  .manifesto-transmission .manifesto-spires pre{font-size:8px}
+  .manifesto-zalgo{bottom:76px;font-size:clamp(23px,6vw,36px)}
+}
+
+/* Center rating labels with equal side padding; the frame already carries the rank color. */
+.artist-grid .art-badges .rating-tag,.artist-list .art-badges .rating-tag{justify-content:center;gap:0;padding-left:10px;padding-right:10px}
+.artist-grid .art-badges .rating-tag::before,.artist-list .art-badges .rating-tag::before{display:none}
+
+/* Red Alert dossier skin: machined bezel, recessed red display, HUD data panel. */
+.artist-grid .artist-card[data-rating]{
+  position:relative;isolation:isolate;overflow:hidden;padding:5px;
+  border:2px solid transparent;border-radius:14px;
+  background:
+    linear-gradient(#111416,#111416) padding-box,
+    linear-gradient(145deg,#d6dcdd 0%,#737b7e 5%,#272c2f 11%,#aeb5b7 12%,#343a3c 17%,#111416 22%,#aeb5b7 92%,#080a0b 100%) border-box;
+  box-shadow:inset 0 1px #ffffff55,inset 0 0 0 1px #090b0c,0 16px 34px #000a,0 0 22px var(--card-halo);
+}
+.artist-grid .artist-card[data-rating]::before{
+  content:""!important;display:block!important;position:absolute;z-index:3;inset:5px;
+  border:1px solid #ffffff25;border-radius:8px;pointer-events:none;
+  background:
+    radial-gradient(circle at 9px 9px,#d4d9d9 0 1px,#41474a 2px,transparent 3px),
+    radial-gradient(circle at calc(100% - 9px) 9px,#d4d9d9 0 1px,#41474a 2px,transparent 3px),
+    radial-gradient(circle at 9px calc(100% - 9px),#d4d9d9 0 1px,#41474a 2px,transparent 3px),
+    radial-gradient(circle at calc(100% - 9px) calc(100% - 9px),#d4d9d9 0 1px,#41474a 2px,transparent 3px);
+}
+.artist-grid .artist-card[data-rating]::after{
+  z-index:0;inset:5px;border-radius:8px;opacity:.72;pointer-events:none;
+  background:
+    repeating-linear-gradient(0deg,transparent 0 5px,#fff1 5px 6px),
+    linear-gradient(90deg,transparent 49.8%,#ff342322 50%,transparent 50.2%),
+    radial-gradient(ellipse at 50% 0%,#d71c2340,transparent 68%),
+    linear-gradient(145deg,#202528,#111416 38%,#1a1012 100%);
+}
+.artist-grid .artist-card[data-rating]>.art{
+  z-index:1;isolation:isolate;overflow:hidden;border:1px solid #646b6d;
+  border-radius:7px 7px 0 0;background:
+    radial-gradient(ellipse at 50% 0%,#d51e25aa,transparent 66%),
+    repeating-linear-gradient(0deg,transparent 0 5px,#ffffff0b 5px 6px),
+    linear-gradient(180deg,#5b1116,#141113 76%);
+}
+.artist-grid .artist-card[data-rating]>.art::after{
+  background:
+    repeating-linear-gradient(0deg,transparent 0 4px,#ffffff12 4px 5px),
+    linear-gradient(90deg,transparent 49.8%,#fa34301c 50%,transparent 50.2%),
+    radial-gradient(ellipse at 50% 0%,#f52b2629,transparent 62%),
+    linear-gradient(180deg,#100b0c16 0%,transparent 48%,#07090bd9 100%);
+}
+.artist-grid .artist-card[data-kind][data-rating]>.card-info{
+  z-index:1;margin-top:0;border:1px solid #60676a;border-top:2px solid #c0c6c7;
+  border-radius:0 0 7px 7px;padding:16px 15px 14px;min-height:124px;
+  background:
+    repeating-linear-gradient(0deg,transparent 0 7px,#ffffff0a 7px 8px),
+    linear-gradient(110deg,#501217 0%,#241417 38%,#111416 100%);
+  box-shadow:inset 0 1px #ffffff30,inset 0 -3px #080a0b;
+}
+.artist-grid .artist-card[data-rating] .card-info h2{
+  margin:0 0 14px;color:#f4f1df;font-size:18px;font-weight:800;
+  letter-spacing:.015em;text-shadow:0 2px #080a0b,0 0 12px #e62b2844
+}
+.artist-grid .artist-card[data-rating] .card-info p{
+  min-height:30px;margin:0;padding:9px 42px 0 0;
+  border-top:1px solid #bd34345c;color:#d6d9d4
+}
+.artist-grid .artist-card[data-rating] .artist-social{color:#c3c9c7}
+.artist-grid .artist-card[data-rating] .region-watermark{opacity:.25;filter:drop-shadow(0 0 10px #e32b2b44)}
+.artist-grid .artist-card[data-rating] .rating-tag{
+  border-radius:4px;color:var(--card-accent);background:linear-gradient(180deg,#252a2d,#101315);
+  box-shadow:inset 0 1px #ffffff4a,0 0 0 2px #111416,0 0 14px color-mix(in srgb,var(--card-accent) 28%,transparent),0 5px 12px #000a
+}
+.artist-grid .artist-card[data-rating],
+.artist-grid .artist-card[data-rating]::before,.artist-grid .artist-card[data-rating]::after,
+.artist-grid .artist-card[data-rating]>.art,.artist-grid .artist-card[data-rating]>.art::before,
+.artist-grid .artist-card[data-rating]>.art::after,.artist-grid .artist-card[data-rating]>.art img,
+.artist-grid .artist-card[data-rating]>.card-info,.artist-grid .artist-card[data-rating] .card-info h2,
+.artist-grid .artist-card[data-rating] .artist-social,.artist-grid .artist-card[data-rating] .rating-tag,
+.artist-grid .artist-card[data-rating] .record-type--avatar,.artist-grid .artist-card[data-rating] .region-watermark,
+.artist-grid .artist-card[data-rating] .card-edit{
+  transition:transform .24s cubic-bezier(.2,.7,.2,1),color .2s ease,border-color .24s ease,
+    background-color .24s ease,box-shadow .24s ease,opacity .24s ease,filter .24s ease,text-shadow .24s ease;
+}
+@media(prefers-reduced-motion:reduce){
+  .artist-grid .artist-card[data-rating],.artist-grid .artist-card[data-rating]::before,
+  .artist-grid .artist-card[data-rating]::after,.artist-grid .artist-card[data-rating] *{transition:none!important}
+}
+
+/* The active catalog tab keeps its count white against the red selection. */
+.catalog-head .filters button.active sup{color:#fff}
+
+/* Rare labels that cannot fit at the current map density appear on hover/focus. */
+.map-node[data-label-hidden="true"] text{display:none}
+.map-node[data-label-hidden="true"]:hover text,.map-node[data-label-hidden="true"]:focus text{display:block}
+.map-note span:nth-child(3) i{width:18px;height:6px;border-radius:4px;background:linear-gradient(90deg,#ff6670 0 25%,#cc9aff 25% 50%,#ffe067 50% 75%,#94ed93 75%);box-shadow:0 0 7px #ffffff33}
+
+/* Hide the internal sequence number; ratings live at the image's upper-right. */
+.artist-grid .art-index{display:none}
+.artist-grid .art-badges{position:absolute;inset:10px 10px auto auto!important;display:flex;width:max-content!important;max-width:calc(100% - 20px);justify-content:flex-end}
+
+/* Red Alert / hero dossier finish: no decorative cap stripe, clearer rating pill. */
+.artist-grid .artist-card[data-rating]::before{content:none!important;display:none!important}
+.artist-grid .art-badges .rating-tag{
+  box-sizing:border-box;display:inline-flex;flex:none;min-width:0;width:max-content;
+  margin:0;padding:0 17px!important;text-align:center;justify-content:center
+}
+.artist-grid .record-type--avatar,.admin-grid .record-type--avatar{
+  border:1px solid color-mix(in srgb,var(--card-accent) 72%,#aab1b3);
+  border-radius:4px;
+  background:
+    repeating-linear-gradient(0deg,transparent 0 3px,#ffffff0a 3px 4px),
+    linear-gradient(180deg,#282d30 0%,#15191c 48%,#0b0e10 100%);
+  color:var(--card-accent);
+  box-shadow:inset 0 1px #ffffff50,inset 0 -1px #000b,
+    0 0 10px color-mix(in srgb,var(--card-accent) 18%,transparent),0 4px 9px #000a;
+  text-shadow:0 0 7px color-mix(in srgb,var(--card-accent) 32%,transparent);
+  transition:background-color .18s ease,border-color .18s ease,color .18s ease,box-shadow .18s ease
+}
+.artist-grid .record-type--avatar svg,.admin-grid .record-type--avatar svg{color:var(--card-accent);filter:drop-shadow(0 0 3px color-mix(in srgb,var(--card-accent) 50%,transparent))}
+.admin-grid .mini-art .art-badges{top:10px;right:10px;bottom:auto;left:auto;display:flex;justify-content:flex-end}
+.admin-grid .mini-art .art-badges .rating-tag{
+  box-sizing:border-box;display:inline-flex;flex:none;min-width:0;width:max-content;
+  margin:0;padding:0 17px!important;text-align:center;justify-content:center
+}
+.admin-grid .mini-art .art-badges .rating-tag::before{display:none}
+.admin-grid .row-number{display:none!important}
+/* Type and rating badges share the same bezel, height and horizontal padding. */
+.artist-grid .artist-card[data-rating] .art-badges .rating-tag,
+.artist-grid .artist-card[data-rating] .record-type--avatar,
+.admin-grid .admin-row[data-rating] .mini-art .art-badges .rating-tag,
+.admin-grid .admin-row[data-rating] .record-type--avatar{
+  box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;
+  width:max-content;min-width:0;height:30px;min-height:30px;
+  padding:0 14px!important;border:1px solid color-mix(in srgb,var(--card-accent) 72%,#aab1b3);
+  border-radius:6px;background:linear-gradient(180deg,#282d30 0%,#15191c 48%,#0b0e10 100%);
+  color:var(--card-accent);font:700 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.06em;white-space:nowrap;text-shadow:0 0 7px color-mix(in srgb,var(--card-accent) 32%,transparent);
+  box-shadow:inset 0 1px #ffffff50,inset 0 -1px #000b,
+    0 0 10px color-mix(in srgb,var(--card-accent) 18%,transparent),0 4px 9px #000a
+}
+.artist-grid .artist-card[data-rating]{
+  border:1px solid color-mix(in srgb,var(--card-accent) 62%,#737b7b);
+  background:linear-gradient(145deg,#343b3d 0%,#15191b 16%,#0c0f11 100%);
+  box-shadow:inset 0 1px #ffffff55,inset 0 0 0 1px #ffffff0d,0 12px 28px #000a,0 0 18px var(--card-halo)
+}
+.artist-grid .artist-card[data-rating]>.art::after{
+  background:
+    repeating-linear-gradient(0deg,transparent 0 5px,#ffffff0a 5px 6px),
+    linear-gradient(180deg,#10171908 0%,transparent 48%,#080b0dd9 100%)
+}
+.artist-grid .artist-card[data-kind][data-rating] .card-info{
+  border-top:1px solid color-mix(in srgb,var(--card-accent) 43%,#555e60);
+  background:
+    radial-gradient(ellipse at 82% 20%,color-mix(in srgb,var(--card-accent) 16%,transparent),transparent 60%),
+    repeating-linear-gradient(0deg,transparent 0 6px,#ffffff08 6px 7px),
+    linear-gradient(155deg,color-mix(in srgb,var(--card-panel) 76%,#252a2c),color-mix(in srgb,var(--card-panel-deep) 78%,#101315) 78%);
+  box-shadow:inset 0 1px #ffffff1a
+}
+
 /* Rank tags use the same compact radio treatment as record type filters. */
 .catalog-type-controls{flex-wrap:wrap}
 .catalog-tag-filter{display:flex;align-items:center;gap:8px;max-width:100%;min-width:0}
 .catalog-tag-filter>span{color:#aeb6b6;font:700 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.09em}
 .catalog-tag-filter .catalog-type-radios{min-width:0}
 @media(max-width:700px){.catalog-tag-filter{width:100%}.catalog-tag-filter .catalog-type-radios{flex:1 1 auto}}
+
+/* Matching, restrained hover transitions for every visibly changing card part. */
+.artist-grid .artist-card[data-rating],.admin-grid .admin-row[data-rating]{
+  transition:transform .22s cubic-bezier(.2,.7,.2,1),border-color .22s ease,
+    box-shadow .22s ease,filter .22s ease
+}
+.artist-grid .artist-card[data-rating]>.art img:not(.region-watermark),
+.admin-grid .admin-row[data-rating] .mini-art img:not(.region-watermark){
+  transition:transform .28s cubic-bezier(.2,.7,.2,1),filter .22s ease
+}
+.artist-grid .artist-card[data-rating] .art-badges .rating-tag,
+.admin-grid .admin-row[data-rating] .mini-art .art-badges .rating-tag,
+.artist-grid .artist-card[data-rating] .record-type--avatar,
+.admin-grid .admin-row[data-rating] .record-type--avatar{
+  transition:transform .2s ease,color .2s ease,border-color .2s ease,
+    background-color .2s ease,box-shadow .2s ease,filter .2s ease
+}
+.artist-grid .artist-card[data-rating] .card-info h2,
+.admin-grid .admin-row[data-rating] .row-name strong{
+  transition:color .2s ease,text-shadow .2s ease,transform .2s ease
+}
+.artist-grid .artist-card[data-rating] .region-watermark,
+.admin-grid .admin-row[data-rating] .region-watermark{
+  transition:opacity .25s ease,transform .3s ease,filter .25s ease
+}
+.artist-grid .artist-card[data-rating]:hover .art-badges .rating-tag,
+.admin-grid .admin-row[data-rating]:hover .mini-art .art-badges .rating-tag,
+.artist-grid .artist-card[data-rating]:hover .record-type--avatar,
+.admin-grid .admin-row[data-rating]:hover .record-type--avatar{
+  transform:translateY(-1px) scale(1.035);
+  box-shadow:inset 0 1px #ffffff60,0 0 13px color-mix(in srgb,var(--card-accent) 30%,transparent),0 5px 11px #000a;
+  filter:brightness(1.08)
+}
+.artist-grid .artist-card[data-rating]:hover .card-info h2,
+.admin-grid .admin-row[data-rating]:hover .row-name strong{
+  color:#fff;text-shadow:0 0 12px color-mix(in srgb,var(--card-accent) 42%,transparent);
+  transform:translateX(2px)
+}
+@media(prefers-reduced-motion:reduce){
+  .artist-grid .artist-card[data-rating],.artist-grid .artist-card[data-rating] *,
+  .admin-grid .admin-row[data-rating],.admin-grid .admin-row[data-rating] *{transition:none!important}
+}
