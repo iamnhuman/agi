@@ -10,6 +10,7 @@ export default function Videos({admin=false}:{admin?:boolean}){
  const [videos,setVideos]=useState<Video[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState(''),[q,setQ]=useState(''),[order,setOrder]=useState('source'),[orientation,setOrientation]=useState<'vertical'|'horizontal'>('horizontal'),[draft,setDraft]=useState<Video|null>(null),[selected,setSelected]=useState<Video|null>(null),[deleting,setDeleting]=useState<Video|null>(null),[busy,setBusy]=useState(false),[formError,setFormError]=useState('');
  const [sceneZoom,setSceneZoom]=useState(.65);
  const timelineViewport=useRef<HTMLDivElement>(null),timelineCanvas=useRef<HTMLCanvasElement>(null);
+ const timelinePointer=useRef<{x:number;y:number}|null>(null);
  const drag=useRef<{pointerId:number;startX:number;scrollLeft:number;active:boolean}|null>(null);
  const suppressDragClick=useRef(false);
  const changeSceneZoom=(amount:number)=>setSceneZoom(current=>Math.round(Math.max(.65,Math.min(1.5,current+amount))*100)/100);
@@ -30,9 +31,18 @@ export default function Videos({admin=false}:{admin?:boolean}){
    frame=0;
    const cards=viewport.querySelector<HTMLElement>('.timeline-items');
    const firstCard=cards?.querySelector<HTMLElement>('.video-card');
+   const canvasBounds=canvas.getBoundingClientRect();
    const cardMargin=firstCard?parseFloat(getComputedStyle(firstCard).marginBottom)||0:0;
-   const railY=cards?cards.getBoundingClientRect().bottom-canvas.getBoundingClientRect().top-cardMargin+10:undefined;
-   drawTimelineRunway(canvas,viewport.scrollLeft,railY);
+   const railY=cards?cards.getBoundingClientRect().bottom-canvasBounds.top-cardMargin+10:undefined;
+   const dateTicks=[...viewport.querySelectorAll<HTMLElement>('.video-card')].flatMap(card=>{
+    const date=card.querySelector('time')?.dateTime;
+    if(!date)return [];
+    const [year,month,day]=date.split('-');
+    const bounds=card.getBoundingClientRect();
+    const x=bounds.left+bounds.width/2-canvasBounds.left;
+    return x < -40 || x > canvasBounds.width+40 ? [] : [{x,label:`${day}.${month}.${year.slice(-2)}`}];
+   });
+   drawTimelineRunway(canvas,viewport.scrollLeft,railY,dateTicks,timelinePointer.current);
   };
   const schedulePaint=()=>{if(!frame)frame=requestAnimationFrame(paint);};
   const onWheel=(event:WheelEvent)=>{
@@ -51,13 +61,22 @@ export default function Videos({admin=false}:{admin?:boolean}){
    viewport.scrollLeft=next;
    schedulePaint();
   };
+  const onPointerMove=(event:PointerEvent)=>{
+   if(event.pointerType==='touch')return;
+   const bounds=canvas.getBoundingClientRect();
+   timelinePointer.current={x:event.clientX-bounds.left,y:event.clientY-bounds.top};
+   schedulePaint();
+  };
+  const onPointerLeave=()=>{timelinePointer.current=null;schedulePaint();};
   const observer=new ResizeObserver(schedulePaint);
   observer.observe(viewport);
   viewport.querySelectorAll('.timeline-items').forEach(items=>observer.observe(items));
   viewport.addEventListener('wheel',onWheel,{passive:false});
   viewport.addEventListener('scroll',schedulePaint,{passive:true});
+  viewport.addEventListener('pointermove',onPointerMove,{passive:true});
+  viewport.addEventListener('pointerleave',onPointerLeave,{passive:true});
   schedulePaint();
-  return()=>{observer.disconnect();viewport.removeEventListener('wheel',onWheel);viewport.removeEventListener('scroll',schedulePaint);if(frame)cancelAnimationFrame(frame);};
+  return()=>{observer.disconnect();viewport.removeEventListener('wheel',onWheel);viewport.removeEventListener('scroll',schedulePaint);viewport.removeEventListener('pointermove',onPointerMove);viewport.removeEventListener('pointerleave',onPointerLeave);if(frame)cancelAnimationFrame(frame);};
  },[orientation,loading,order,filtered.length,sceneZoom]);
  useEffect(()=>{
   if(orientation!=='horizontal'||loading||!timelineViewport.current)return;
