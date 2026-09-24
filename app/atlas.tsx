@@ -78,25 +78,27 @@ return <>
 </div>
 </div>{view==='map'?<ArtistMap artists={artists} sections={sections}/>:<>{view==='deck'&&<div className="deck-toolbar"><span>КОЛОДА · колесо / перетягивание · Ctrl/⌘ + колесо — зум</span><div className="deck-zoom-controls" role="group" aria-label="Масштаб 3D-колоды"><label htmlFor="deck-zoom">ЗУМ</label><button type="button" aria-label="Уменьшить масштаб 3D-колоды" disabled={deckZoom<=.65} onClick={()=>changeDeckZoom(-.1)}><ZoomOut size={18}/></button><input id="deck-zoom" type="range" min="65" max="150" step="5" value={Math.round(deckZoom*100)} onChange={event=>setDeckZoom(Number(event.target.value)/100)} aria-label="Масштаб 3D-колоды"/><output htmlFor="deck-zoom" aria-live="polite">{Math.round(deckZoom*100)}%</output><button type="button" aria-label="Увеличить масштаб 3D-колоды" disabled={deckZoom>=1.5} onClick={()=>changeDeckZoom(.1)}><ZoomIn size={18}/></button></div></div>}<div ref={deckRef} className={view==='list'?'artist-list':view==='deck'?'artist-grid artist-deck':'artist-grid'} data-size={view==='grid'?cardSize:view==='list'?listSize:undefined} style={view==='deck'?{'--deck-zoom':deckZoom} as React.CSSProperties:undefined} aria-label={view==='deck'?'Горизонтальная 3D-колода досье':undefined} tabIndex={view==='deck'?0:undefined} onPointerDown={view==='deck'?startDeckDrag:undefined} onPointerMove={view==='deck'?moveDeckDrag:undefined} onPointerUp={view==='deck'?stopDeckDrag:undefined} onPointerCancel={view==='deck'?stopDeckDrag:undefined} onClickCapture={view==='deck'?event=>{if(suppressDeckClick.current){event.preventDefault();event.stopPropagation();suppressDeckClick.current=false;}}:undefined} onDragStart={view==='deck'?event=>event.preventDefault():undefined} onKeyDown={view==='deck'?event=>{if(event.key==='+'||event.key==='='){event.preventDefault();changeDeckZoom(.1);}else if(event.key==='-'){event.preventDefault();changeDeckZoom(-.1);}}:undefined}>{artists.map((a,i)=>
 <article className="artist-card" data-rating={a.rating||'A'} data-kind={a.kind||'artist'} data-section={a.section} key={a.id}>
-<a href={a.url} target="_blank" rel="noopener noreferrer" aria-label={"Открыть источник: "+a.name} className={'art art-'+i%8}>
+<div className={'art art-'+i%8}>
 <span className="art-index">{String(i+1).padStart(3,'0')}</span>
 <div className="missing-avatar" role="img" aria-label="Аватарка отсутствует">
 <span aria-hidden="true">×</span>
 </div>{a.image&&<img src={a.image} alt={a.name} loading="lazy" referrerPolicy="no-referrer" onError={e=>{e.currentTarget.style.display="none";}}/>}{a.kind==='collective'?<span className="record-type record-type--avatar"><UsersRound size={13} aria-hidden="true"/> Гэнг</span>:a.kind==='media'?<span className="record-type record-type--avatar"><Radio size={13} aria-hidden="true"/> Медиа</span>:null}<span className="art-badges">
 <span className={`rating-tag rating-${(a.rating||'A').toLowerCase()}`}>{a.rating||'A'}</span>
 </span>
-</a>
+</div>
 <div className="card-info">
 {(a.section==='world'||a.section==='runet')&&<img className="region-watermark" src={a.section==='world'?'./badges/region-en-eagle-cutout.png':'./badges/region-ru-emblem-cutout.png'} alt="" aria-hidden="true" loading="lazy" decoding="async"/>}
 <div>
 <h2>
-<a className="artist-name" title={a.name} href={a.url} target="_blank" rel="noopener noreferrer">{a.name}</a>
+<span className="artist-name" title={a.name}>{a.name}</span>
 </h2><p>
-<a className="artist-social" href={a.url} target="_blank" rel="noreferrer">{a.platform} <ArrowUpRight size={14}/>
-</a>
+<span className="artist-social">{a.platform} <ArrowUpRight size={14}/>
+</span>
 {a.kind==='collective'?<span className="list-kind-tag"><UsersRound size={11} aria-hidden="true"/>Гэнг</span>:a.kind==='media'?<span className="list-kind-tag"><Radio size={11} aria-hidden="true"/>Медиа</span>:null}
 </p>
-</div>{showLocalAdmin&&<a className="card-edit" title="Редактировать" aria-label={"Редактировать "+a.name} href={adminUrl+"/?edit="+encodeURIComponent(a.id)+"#catalog"}><Pencil size={15}/></a>}</div>
+</div></div>
+<a className="card-hit-area" href={a.url} target="_blank" rel="noopener noreferrer" aria-label={"Открыть источник: "+a.name}/>
+{showLocalAdmin&&<a className="card-edit" title="Редактировать" aria-label={"Редактировать "+a.name} href={adminUrl+"/?edit="+encodeURIComponent(a.id)+"#catalog"}><Pencil size={15}/></a>}
 </article>)}</div></>}{!artists.length&&<p className="empty">Сигнал не обнаружен. Измените запрос или фильтр.</p>}</section>
 </main>
 <footer>

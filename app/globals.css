@@ -2123,3 +2123,11 @@ footer{height:216px;min-height:216px;margin-top:28px}
 .artist-grid .artist-card[data-rating] .card-info p,.admin-grid .admin-row[data-rating] .row-secondary{
   border-top:0;
 }
+
+/* One full-card source link, with the local edit control above it. */
+.artist-card{position:relative}
+.artist-card .card-hit-area{position:absolute;inset:0;z-index:10;display:block;border-radius:inherit;cursor:pointer}
+.artist-card .card-hit-area:focus-visible{outline:2px solid #f3e42e;outline-offset:3px}
+.artist-card>.card-edit{position:absolute;z-index:11}
+.artist-grid .artist-card>.card-edit{left:6px;right:auto;bottom:5px}
+.artist-card:hover .artist-social{color:var(--card-accent,#d0ef88)}
