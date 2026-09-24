@@ -7,16 +7,16 @@ import {ArrowUpRight, Search, Grid2X2, List, Network, Layers3, Pencil, Radio, Us
 import CommandDeck from '@/client/command-deck';
 
 const glitchGlyphs=['電','機','信','号','光','影','未','来','空','夢','人','工','界','零','壊','警','報','乱','終','始','炎','月','星','龍','真','偽','視','覚','網','路','時','間','東','京','異','常','0','1','|','/','\\','+','-','=','<','>','*','#','%','@',':',';','[',']','{','}','X'];
-const titleGlitchGlyphs=['0','1','|','/','\\','+','-','=','<','>','*','#','%','@','X'];
+const titleGlitchGlyphs=['電','機','信','号','光','影','未','来','空','夢','人','工','界','零','壊','警','報','乱','終','始','炎','月','星','龍','真','偽','視','覚','網','路','時','間','東','京','異','常','シ','ス','テ','ム','破','損','検','出'];
 const glitchColumns=Array.from({length:48},(_,i)=>Array.from({length:28+(i*7)%14},(_,j)=>glitchGlyphs[(i*13+j*7+(j*j)%11)%glitchGlyphs.length]).join('\n'));
 function mutateSignal(columns:string[]){return columns.map(column=>{const symbols=column.split('');for(let i=0;i<Math.max(2,Math.floor(symbols.length/5));i++){const offset=Math.floor(Math.random()*symbols.length);if(symbols[offset]!=='\n')symbols[offset]=glitchGlyphs[Math.floor(Math.random()*glitchGlyphs.length)];}return symbols.join('');});}
-function zalgoSignal(tick:number,layer=0){return Array.from('СИГНАЛ ПОВРЕЖДЁН',(letter,index)=>{
+function zalgoSignal(tick:number,layer=0){return Array.from('システム信号が破損しました',(letter,index)=>{
   const seed=tick*11+index*17+layer*23;
-  const broken=layer>0&&letter!==' '&&seed%3===0;
-  const jump=layer>0&&letter!==' '&&seed%2===0;
-  const x=jump?((seed%7)-3)*(layer===0?2:4):0;
-  const y=jump?(((seed+index)%5)-2)*(layer===0?2:4):0;
-  return <span key={index} className="zalgo-glyph" style={{transform:`translate(${x}px,${y}px)`}}>{letter===' '?'\u00a0':broken?titleGlitchGlyphs[seed%titleGlitchGlyphs.length]:letter}</span>;
+  const broken=seed%(layer===0?9:3)===0;
+  const jump=seed%(layer===0?3:2)===0;
+  const x=jump?((seed%9)-4)*(layer===0?2:5):0;
+  const y=jump?(((seed+index)%7)-3)*(layer===0?1:4):0;
+  return <span key={index} className="zalgo-glyph" style={{transform:`translate(${x}px,${y}px)`}}>{broken?titleGlitchGlyphs[seed%titleGlitchGlyphs.length]:letter}</span>;
 });}
 
 export default function Atlas({initial}:{initial:Artist[]}){
