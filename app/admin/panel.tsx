@@ -42,7 +42,7 @@ export default function Admin(){
 <a className="brand" href={siteUrl} aria-label="AI & CONQUER — ASI ALERT, главная"><AiConquerLogo/></a>
 <nav className="primary-nav" aria-label="Разделы сайта">
 <a href={siteUrl+'/#catalog'} className="primary-nav-link">ИИ-артисты и медиа</a>
-<a href={siteUrl+'/#videos'} className="primary-nav-link">Видеоразведка</a>
+<a href={siteUrl+'/#videos'} className="primary-nav-link">Творчество с ИИ</a>
 </nav>
 <div className="header-actions"><span className="admin-link curator-link is-current" aria-current="page">Кураторский штаб</span></div>
 </header>

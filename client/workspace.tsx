@@ -16,7 +16,7 @@ export default function Workspace({admin=false}:{admin?:boolean}){
   <a className="brand" href="#catalog" aria-label="AI & CONQUER — ASI ALERT, главная"><AiConquerLogo/></a>
   <nav className="primary-nav" aria-label="Разделы сайта">
    <a href="#catalog" className="primary-nav-link">ИИ-артисты и медиа</a>
-   <a href="#videos" className="primary-nav-link is-active" aria-current="page">Видеоразведка</a>
+   <a href="#videos" className="primary-nav-link is-active" aria-current="page">Творчество с ИИ</a>
   </nav>
   <div className="header-actions">{(admin||showLocalAdmin)&&<a className="admin-link curator-link" href={(admin?siteUrl:adminUrl)+'/#videos'}>{admin?'На сайт':'Кураторский штаб'}<ArrowUpRight size={16}/></a>}</div>
  </header>:<CommandDeck mode="videos"/>}<main className="videos-main"><Videos admin={admin}/></main></>;
