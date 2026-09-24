@@ -6,16 +6,17 @@ import {defaultSections,type Artist,type Section} from '@/lib/types';
 import {ArrowUpRight, Search, Grid2X2, List, Network, Layers3, Pencil, Radio, UsersRound, ZoomIn, ZoomOut} from 'lucide-react';
 import CommandDeck from '@/client/command-deck';
 
-const glitchGlyphs=['0','1','|','/','\\','+','-','=','<','>','*','#','%','@','X','И','З','М'];
-const glitchColumns=Array.from({length:21},(_,i)=>Array.from({length:28+(i*7)%14},(_,j)=>glitchGlyphs[(i*13+j*7+(j*j)%11)%glitchGlyphs.length]).join('\n'));
-function mutateSignal(columns:string[]){return columns.map(column=>{const symbols=column.split('');for(let i=0;i<Math.max(2,Math.floor(symbols.length/8));i++){const offset=Math.floor(Math.random()*symbols.length);if(symbols[offset]!=='\n')symbols[offset]=glitchGlyphs[Math.floor(Math.random()*glitchGlyphs.length)];}return symbols.join('');});}
+const glitchGlyphs=['電','機','信','号','光','影','未','来','空','夢','人','工','界','零','壊','警','報','乱','終','始','炎','月','星','龍','真','偽','視','覚','網','路','時','間','東','京','異','常','0','1','|','/','\\','+','-','=','<','>','*','#','%','@',':',';','[',']','{','}','X'];
+const titleGlitchGlyphs=['0','1','|','/','\\','+','-','=','<','>','*','#','%','@','X'];
+const glitchColumns=Array.from({length:48},(_,i)=>Array.from({length:28+(i*7)%14},(_,j)=>glitchGlyphs[(i*13+j*7+(j*j)%11)%glitchGlyphs.length]).join('\n'));
+function mutateSignal(columns:string[]){return columns.map(column=>{const symbols=column.split('');for(let i=0;i<Math.max(2,Math.floor(symbols.length/5));i++){const offset=Math.floor(Math.random()*symbols.length);if(symbols[offset]!=='\n')symbols[offset]=glitchGlyphs[Math.floor(Math.random()*glitchGlyphs.length)];}return symbols.join('');});}
 function zalgoSignal(tick:number,layer=0){return Array.from('СИГНАЛ ПОВРЕЖДЁН',(letter,index)=>{
   const seed=tick*11+index*17+layer*23;
-  const broken=letter!==' '&&seed%(layer===0?13:3)===0;
-  const jump=letter!==' '&&seed%(layer===0?5:2)===0;
+  const broken=layer>0&&letter!==' '&&seed%3===0;
+  const jump=layer>0&&letter!==' '&&seed%2===0;
   const x=jump?((seed%7)-3)*(layer===0?2:4):0;
   const y=jump?(((seed+index)%5)-2)*(layer===0?2:4):0;
-  return <span key={index} className="zalgo-glyph" style={{transform:`translate(${x}px,${y}px)`}}>{letter===' '?'\u00a0':broken?glitchGlyphs[seed%glitchGlyphs.length]:letter}</span>;
+  return <span key={index} className="zalgo-glyph" style={{transform:`translate(${x}px,${y}px)`}}>{letter===' '?'\u00a0':broken?titleGlitchGlyphs[seed%titleGlitchGlyphs.length]:letter}</span>;
 });}
 
 export default function Atlas({initial}:{initial:Artist[]}){
@@ -25,7 +26,7 @@ useEffect(()=>{refresh();const onFocus=()=>refresh();window.addEventListener('fo
 const [section,setSection]=useState('all'),[q,setQ]=useState(''),[view,setView]=useState('grid'),[kind,setKind]=useState('all');
 const [signalOpen,setSignalOpen]=useState(false);
 const [signalColumns,setSignalColumns]=useState(glitchColumns),[signalTick,setSignalTick]=useState(0);
-useEffect(()=>{if(!signalOpen)return;setSignalColumns(mutateSignal);const timer=window.setInterval(()=>{setSignalColumns(mutateSignal);setSignalTick(tick=>tick+1);},110);return()=>window.clearInterval(timer);},[signalOpen]);
+useEffect(()=>{if(!signalOpen)return;setSignalColumns(mutateSignal);const timer=window.setInterval(()=>{setSignalColumns(mutateSignal);setSignalTick(tick=>tick+1);},55);return()=>window.clearInterval(timer);},[signalOpen]);
 const deckRef=useRef<HTMLDivElement|null>(null);
 const [deckZoom,setDeckZoom]=useState(1);
 const deckDrag=useRef<{pointerId:number;startX:number;scrollLeft:number;active:boolean}|null>(null);

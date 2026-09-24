@@ -2127,3 +2127,40 @@ footer{height:216px;min-height:216px;margin-top:28px}
 .artist-card>.card-edit{position:absolute;z-index:11}
 .artist-grid .artist-card>.card-edit{left:6px;right:auto;bottom:5px}
 .artist-card:hover .artist-social{color:var(--card-accent,#d0ef88)}
+
+/* Matching typography and frame, with natural width for each label. */
+.artist-grid .art-index,.artist-grid .art-badges .rating-tag,.artist-grid .record-type--avatar,
+.admin-grid:not([data-artwork="small"]) .row-number--art,
+.admin-grid:not([data-artwork="small"]) .mini-art .rating-tag,
+.admin-grid:not([data-artwork="small"]) .record-type--avatar{
+  box-sizing:border-box;width:max-content;min-width:0;max-width:calc(100% - 20px);
+  height:30px;min-height:30px;padding:0 10px;gap:5px;
+  border-width:1px;border-style:solid;border-radius:6px;
+  font:700 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.06em;white-space:nowrap;
+}
+
+/* Small, consistent transitions on the parts that react to card hover. */
+.artist-grid .artist-card .art-index,.artist-grid .artist-card .rating-tag,
+.artist-grid .artist-card .record-type--avatar,.artist-grid .artist-card .card-info,
+.artist-grid .artist-card .artist-name,.artist-grid .artist-card .artist-social,
+.artist-grid .artist-card .region-watermark,.artist-grid .artist-card .card-edit{
+  transition:color .18s ease,background-color .18s ease,border-color .18s ease,
+    box-shadow .18s ease,opacity .18s ease,transform .18s ease,filter .18s ease;
+}
+.artist-grid .artist-card .art img{transition:transform .22s ease,filter .18s ease}
+
+/* Denser, faster CJK transmission; keep the headline legible. */
+.manifesto-transmission .manifesto-spires{gap:0}
+.manifesto-transmission .manifesto-spires pre{
+  font-family:'Hiragino Kaku Gothic ProN','PingFang SC','Noto Sans CJK JP',sans-serif;
+  font-size:clamp(8px,.74vw,12px);line-height:1.02;letter-spacing:0;
+}
+.manifesto[data-open="true"] .manifesto-spires pre{
+  animation:toyota-code-arrive .85s steps(5,end) calc(var(--column) * 18ms) both,
+    toyota-code-drift 2s ease-in-out calc(.85s + var(--column) * 18ms) infinite alternate;
+}
+.manifesto-zalgo{font-family:Arial,Helvetica,sans-serif;font-size:clamp(24px,3.15vw,51px);font-weight:900;letter-spacing:0}
+.manifesto-zalgo .zalgo-glyph{width:.76em}
+.manifesto-zalgo .zalgo-glyph:nth-child(7){width:.3em}
+.manifesto-zalgo>.zalgo-layer:first-child{text-shadow:2px 2px #a62230,-1px -1px #63cad0,0 0 12px #eb312b66}
