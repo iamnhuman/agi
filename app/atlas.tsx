@@ -6,17 +6,17 @@ import {defaultSections,type Artist,type Section} from '@/lib/types';
 import {ArrowUpRight, Search, Grid2X2, List, Network, Layers3, ArrowRight, Pencil, Radio, UsersRound, ZoomIn, ZoomOut} from 'lucide-react';
 import CommandDeck from '@/client/command-deck';
 
-const glitchGlyphs=['█','▓','▒','░','╳','╱','╲','┼','┆','║','◆','◇','△','▽','◉','※','×','+','=','/','\\','0','1','И','З','М'];
+const glitchGlyphs=['0','1','|','/','\\','+','-','=','<','>','*','#','%','@','X','И','З','М'];
 const glitchColumns=Array.from({length:21},(_,i)=>Array.from({length:28+(i*7)%14},(_,j)=>glitchGlyphs[(i*13+j*7+(j*j)%11)%glitchGlyphs.length]).join('\n'));
-const zalgoAbove=['\u0300','\u0301','\u0302','\u0308','\u030b','\u030d','\u0310','\u033f','\u0342','\u0352'];
-const zalgoBelow=['\u0316','\u0317','\u0318','\u0323','\u0324','\u0327','\u0330','\u0331','\u0347','\u0359'];
 function mutateSignal(columns:string[]){return columns.map(column=>{const symbols=column.split('');for(let i=0;i<Math.max(2,Math.floor(symbols.length/8));i++){const offset=Math.floor(Math.random()*symbols.length);if(symbols[offset]!=='\n')symbols[offset]=glitchGlyphs[Math.floor(Math.random()*glitchGlyphs.length)];}return symbols.join('');});}
-function zalgoSignal(tick:number,layer=0){return [...'СИГНАЛ ПОВРЕЖДЁН'].map((letter,index)=>{
-  if(letter===' ')return ' ';
-  const seed=tick*3+index*7+layer*11;
-  const glyph=(seed%5===0||layer>0&&seed%3===0)?glitchGlyphs[seed%glitchGlyphs.length]:letter;
-  return glyph+zalgoAbove[seed%zalgoAbove.length]+zalgoAbove[(seed+4)%zalgoAbove.length]+zalgoBelow[(seed+3)%zalgoBelow.length]+(seed%2?zalgoBelow[(seed+7)%zalgoBelow.length]:'')+(seed%4===0?'\u0338':'');
-}).join('');}
+function zalgoSignal(tick:number,layer=0){return Array.from('СИГНАЛ ПОВРЕЖДЁН',(letter,index)=>{
+  const seed=tick*11+index*17+layer*23;
+  const broken=letter!==' '&&seed%(layer===0?13:3)===0;
+  const jump=letter!==' '&&seed%(layer===0?5:2)===0;
+  const x=jump?((seed%7)-3)*(layer===0?2:4):0;
+  const y=jump?(((seed+index)%5)-2)*(layer===0?2:4):0;
+  return <span key={index} className="zalgo-glyph" style={{transform:`translate(${x}px,${y}px)`}}>{letter===' '?'\u00a0':broken?glitchGlyphs[seed%glitchGlyphs.length]:letter}</span>;
+});}
 
 export default function Atlas({initial}:{initial:Artist[]}){
 const [data,setData]=useState(initial),[sections,setSections]=useState<Section[]>(defaultSections),[error,setError]=useState('');
@@ -101,7 +101,7 @@ return <>
 </main>
 <footer>
 <span>иизм © 2026 · АРХИВ ИИ-СЦЕНЫ</span>
-<div className="manifesto" data-open={signalOpen} onPointerLeave={event=>{if(event.pointerType==='mouse')setSignalOpen(false);}} onBlurCapture={event=>{if(!event.currentTarget.contains(event.relatedTarget as Node))setSignalOpen(false);}}><div id="toyota-transmission" className="manifesto-transmission" aria-hidden={!signalOpen}><div className="manifesto-spires">{signalColumns.map((column,i)=><pre key={i} style={{'--column':i} as CSSProperties}>{column}</pre>)}</div><div className="manifesto-zalgo" aria-hidden="true"><span>{zalgoSignal(signalTick)}</span><span>{zalgoSignal(signalTick+3,1)}</span><span>{zalgoSignal(signalTick+7,2)}</span></div></div><button type="button" className="toyota-mark" aria-label="Toyota: показать сигнал" aria-controls="toyota-transmission" aria-expanded={signalOpen} onPointerEnter={event=>{if(event.pointerType==='mouse')setSignalOpen(true);}} onKeyDown={event=>{if(event.key==='Escape')setSignalOpen(false);}} onClick={()=>{if(window.matchMedia('(hover: none)').matches)setSignalOpen(open=>!open);else setSignalOpen(true);}}><svg viewBox="0 0 240 160" aria-hidden="true"><ellipse cx="120" cy="70" rx="106" ry="61"/><ellipse cx="120" cy="55" rx="56" ry="22"/><ellipse cx="120" cy="64" rx="27" ry="53"/></svg><span>TOYOTA</span></button></div>{showLocalAdmin&&<a href={adminUrl}>Войти в штаб <ArrowRight size={16}/>
+<div className="manifesto" data-open={signalOpen} onPointerLeave={event=>{if(event.pointerType==='mouse')setSignalOpen(false);}} onBlurCapture={event=>{if(!event.currentTarget.contains(event.relatedTarget as Node))setSignalOpen(false);}}><div id="toyota-transmission" className="manifesto-transmission" aria-hidden={!signalOpen}><div className="manifesto-spires">{signalColumns.map((column,i)=><pre key={i} style={{'--column':i} as CSSProperties}>{column}</pre>)}</div><div className="manifesto-zalgo" aria-hidden="true"><span className="zalgo-layer">{zalgoSignal(signalTick)}</span><span className="zalgo-layer">{zalgoSignal(signalTick+3,1)}</span><span className="zalgo-layer">{zalgoSignal(signalTick+7,2)}</span></div></div><button type="button" className="toyota-mark" aria-label="Toyota: показать сигнал" aria-controls="toyota-transmission" aria-expanded={signalOpen} onPointerEnter={event=>{if(event.pointerType==='mouse')setSignalOpen(true);}} onKeyDown={event=>{if(event.key==='Escape')setSignalOpen(false);}} onClick={()=>{if(window.matchMedia('(hover: none)').matches)setSignalOpen(open=>!open);else setSignalOpen(true);}}><svg viewBox="0 0 240 160" aria-hidden="true"><ellipse cx="120" cy="70" rx="106" ry="61"/><ellipse cx="120" cy="55" rx="56" ry="22"/><ellipse cx="120" cy="64" rx="27" ry="53"/></svg><span>TOYOTA</span></button></div>{showLocalAdmin&&<a href={adminUrl}>Войти в штаб <ArrowRight size={16}/>
 </a>}</footer>
 </>;
 }

@@ -2059,16 +2059,26 @@ html{scrollbar-gutter:stable}
 /* Compact Toyota panel: the code rises into the preceding section, while the mark stays centered. */
 footer{height:216px;min-height:216px;margin-top:28px}
 .manifesto-transmission,.manifesto[data-open="true"] .manifesto-transmission{bottom:calc(50% + 57px);height:390px}
-.manifesto-zalgo{bottom:0;left:50%;right:auto;width:min(96vw,1100px);min-height:1.5em;transform:translateX(-50%);font-family:Impact,'Arial Black',sans-serif;font-size:clamp(24px,3.5vw,56px);letter-spacing:.025em;overflow:visible}
-.manifesto-zalgo span{position:absolute;top:0;left:0;width:100%;white-space:nowrap}
-.manifesto-zalgo span:first-child{z-index:3;color:#fff0b3;text-shadow:3px 2px #a62230,-2px -1px #63cad0,0 0 20px #eb312b99}
-.manifesto-zalgo span:nth-child(2){z-index:2;color:#f14e53;opacity:.5;transform:translate(-3px,-4px) skewX(-7deg);mix-blend-mode:screen;animation:toyota-zalgo-ghost-a .36s steps(3,end) infinite alternate}
-.manifesto-zalgo span:nth-child(3){z-index:1;color:#75d0d2;opacity:.42;transform:translate(4px,3px) skewX(5deg);mix-blend-mode:screen;animation:toyota-zalgo-ghost-b .29s steps(2,end) infinite alternate}
-@keyframes toyota-zalgo-ghost-a{to{transform:translate(4px,1px) skewX(4deg);opacity:.22}}
-@keyframes toyota-zalgo-ghost-b{to{transform:translate(-5px,-2px) skewX(-6deg);opacity:.58}}
+.manifesto-zalgo{bottom:0;left:50%;right:auto;width:min(96vw,1100px);height:1.5em;transform:translateX(-50%);font-family:Impact,'Arial Black',sans-serif;font-size:clamp(24px,3.5vw,56px);letter-spacing:.025em;overflow:visible}
+.manifesto-zalgo>.zalgo-layer{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;width:100%;white-space:nowrap}
+.manifesto-zalgo .zalgo-glyph{display:inline-block;flex:none;width:.68em;text-align:center}
+.manifesto-zalgo .zalgo-glyph:nth-child(7){width:.36em}
+.manifesto-zalgo>.zalgo-layer:first-child{z-index:3;color:#fff0b3;text-shadow:3px 2px #a62230,-2px -1px #63cad0,0 0 20px #eb312b99}
+.manifesto-zalgo>.zalgo-layer:nth-child(2){z-index:2;color:#f14e53;opacity:.52;mix-blend-mode:screen;animation:toyota-zalgo-ghost-a .42s steps(3,end) infinite}
+.manifesto-zalgo>.zalgo-layer:nth-child(3){z-index:1;color:#75d0d2;opacity:.46;mix-blend-mode:screen;animation:toyota-zalgo-ghost-b .33s steps(2,end) infinite}
+@keyframes toyota-zalgo-ghost-a{
+  0%,100%{transform:translate(9px,-7px) skewX(-3deg);clip-path:inset(0 0 62% 0)}
+  35%{transform:translate(-13px,4px) skewX(4deg);clip-path:inset(22% 0 48% 0)}
+  70%{transform:translate(15px,-3px) skewX(-2deg);clip-path:inset(46% 0 28% 0)}
+}
+@keyframes toyota-zalgo-ghost-b{
+  0%,100%{transform:translate(-11px,9px) skewX(3deg);clip-path:inset(55% 0 0 0)}
+  45%{transform:translate(14px,-5px) skewX(-4deg);clip-path:inset(38% 0 32% 0)}
+  75%{transform:translate(-5px,12px) skewX(2deg);clip-path:inset(68% 0 0 0)}
+}
 @media(max-width:900px){footer{height:205px;min-height:205px}.manifesto .toyota-mark{bottom:auto}}
 @media(max-width:600px){footer{height:190px;min-height:190px}.manifesto-transmission,.manifesto[data-open="true"] .manifesto-transmission{bottom:calc(50% + 48px);height:310px}.manifesto-zalgo{font-size:clamp(20px,5vw,32px)}}
-@media(prefers-reduced-motion:reduce){.manifesto-zalgo span:nth-child(2),.manifesto-zalgo span:nth-child(3){animation:none}}
+@media(prefers-reduced-motion:reduce){.manifesto-zalgo>.zalgo-layer:nth-child(2),.manifesto-zalgo>.zalgo-layer:nth-child(3){animation:none}}
 
 /* Mobile has one useful card/list density, so don't offer inert size choices. */
 @media(max-width:580px){
