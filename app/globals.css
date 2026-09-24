@@ -2083,28 +2083,33 @@ footer{height:216px;min-height:216px;margin-top:28px}
   .artist-list[data-size] .card-edit{top:11px;right:0;transform:none}
 }
 
-/* Command dossiers: the rank drives the entire chassis; record type colors only its badge. */
+/* One continuous rank-colored frame; record type colors only its badge. */
 .artist-grid .artist-card[data-rating],.admin-grid .admin-row[data-rating]{
-  border:1px solid color-mix(in srgb,var(--card-accent) 52%,#535b60);
-  background:#0c0f12;
-  box-shadow:inset 0 1px #ffffff3b,inset 0 0 0 2px #080a0d,0 14px 30px #000b,0 0 18px var(--card-halo);
+  border:1px solid color-mix(in srgb,var(--card-accent) 54%,#3b4246);
+  border-radius:11px;
+  background:linear-gradient(145deg,#323a3d,#111416 18%,#0d1012);
+  box-shadow:inset 0 1px #ffffff35,inset 0 0 0 1px #ffffff14,0 14px 30px #0009,0 0 20px var(--card-halo);
 }
 .artist-grid .artist-card[data-rating]::before,.admin-grid .admin-row[data-rating]::before{
-  display:block;content:"";position:absolute;z-index:5;top:0;right:0;left:0;height:4px;
-  background:linear-gradient(90deg,#b6bdc1 0 8%,#30383c 8% 12%,var(--card-accent) 12% 68%,#31393e 68% 100%);
-  box-shadow:0 1px #080a0c,0 0 10px var(--card-halo);
-  pointer-events:none;
+  display:none;
+}
+.artist-grid .artist-card[data-rating]>.art::after,.admin-grid .admin-row[data-rating] .mini-art::after{
+  background:
+    repeating-linear-gradient(0deg,transparent 0 3px,#0000000a 3px 4px),
+    linear-gradient(180deg,#0304052b 0%,transparent 35%,transparent 58%,#060709b8 100%);
 }
 .artist-grid .artist-card[data-kind][data-rating] .card-info,.admin-grid .admin-row[data-kind][data-rating] .row-name{
   position:relative;
-  border-top:1px solid color-mix(in srgb,var(--card-accent) 48%,#666d70);
+  border-top:1px solid color-mix(in srgb,var(--card-accent) 36%,#41484c);
   background:
-    radial-gradient(ellipse at 100% 0,color-mix(in srgb,var(--card-accent) 16%,transparent),transparent 62%),
-    repeating-linear-gradient(0deg,transparent 0 5px,#ffffff05 5px 6px),
-    linear-gradient(140deg,color-mix(in srgb,var(--card-panel) 56%,#171b1e),color-mix(in srgb,var(--card-panel-deep) 68%,#0b0e11) 76%);
+    radial-gradient(ellipse at 100% 90%,color-mix(in srgb,var(--card-accent) 13%,transparent),transparent 70%),
+    repeating-linear-gradient(135deg,#ffffff07 0 1px,transparent 1px 9px),
+    repeating-linear-gradient(0deg,#00000012 0 1px,transparent 1px 4px),
+    linear-gradient(150deg,color-mix(in srgb,var(--card-panel) 48%,#1b1f22),color-mix(in srgb,var(--card-panel-deep) 52%,#121518) 80%);
 }
 .artist-grid .artist-card[data-kind][data-rating] .card-info::before,.admin-grid .admin-row[data-kind][data-rating] .row-name::before{
-  display:block;content:"";position:absolute;top:0;bottom:0;left:0;width:3px;
-  background:linear-gradient(180deg,var(--card-accent),color-mix(in srgb,var(--card-accent) 30%,transparent));
-  opacity:.8;pointer-events:none;
+  display:none;
+}
+.artist-grid .artist-card[data-rating] .card-info p,.admin-grid .admin-row[data-rating] .row-secondary{
+  border-top:0;
 }
