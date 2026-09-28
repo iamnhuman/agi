@@ -1,5 +1,5 @@
 'use client';
-import {useEffect,useState,type CSSProperties} from 'react';
+import {useEffect,useRef,useState,type CSSProperties} from 'react';
 import {siteUrl} from '@/client/config';
 import {Plus,Search,ArrowUpRight,Pencil,Trash2,Link2,LoaderCircle,RefreshCw,Radio,UsersRound} from 'lucide-react';
 import AiConquerLogo from '@/client/ai-conquer-logo';
@@ -17,6 +17,35 @@ function ArtworkPreview({src,label,fresh=false}:{src:string;label:string;fresh?:
  <div>{src?<img src={src} alt={label} referrerPolicy="no-referrer" onLoad={e=>setSize(`${e.currentTarget.naturalWidth} × ${e.currentTarget.naturalHeight}`)} onError={()=>setSize('Не удалось открыть')}/>:<span>Нет изображения</span>}</div>
  <figcaption><strong>{label}</strong><span>{size||'Загрузка превью…'}</span></figcaption>
  </figure>;
+}
+function AdminCardName({name,columns}:{name:string;columns:number}){
+ const ref=useRef<HTMLElement>(null);
+ const isPhrase=/\s/.test(name);
+ useEffect(()=>{
+  const element=ref.current,row=element?.parentElement;
+  if(!element||!row)return;
+  let active=true;
+  const fit=()=>{
+   if(!active)return;
+   const rowStyle=getComputedStyle(row);
+   const available=row.clientWidth-parseFloat(rowStyle.paddingLeft)-parseFloat(rowStyle.paddingRight);
+   if(available<=0)return;
+   if(isPhrase){element.style.fontSize=`${columns===6?9:columns===4?12:14}px`;return;}
+   const max=columns===6?13:columns===4?15:columns===3?17:16;
+   element.style.fontSize=`${max}px`;
+   const range=document.createRange();
+   range.selectNodeContents(element);
+   const width=range.getBoundingClientRect().width;
+   const size=Math.max(7.2,Math.min(max,max*(available-4)/Math.max(width,1)));
+   element.style.fontSize=`${Math.floor(size*10)/10}px`;
+  };
+  const observer=new ResizeObserver(fit);
+  observer.observe(row);
+  fit();
+  document.fonts.ready.then(fit);
+  return()=>{active=false;observer.disconnect();};
+ },[name,columns,isPhrase]);
+ return <strong ref={ref} className="admin-card-name" data-phrase={isPhrase} title={name}>{name}</strong>;
 }
 export default function Admin(){
  const [columns,setColumns]=useState<number>(()=>{try{const saved=Number(localStorage.getItem('iizm-admin-columns'));return saved===7?6:saved===5?4:[1,3,4,6].includes(saved)?saved:6;}catch{return 6;}});
@@ -61,13 +90,14 @@ export default function Admin(){
 </div>}<div className="admin-tools">
 <label className="input-search">
 <Search size={17}/>
-<input aria-label="Поиск записи" placeholder="Имя, ссылка или тег…" value={q} onChange={e=>setQ(e.target.value)}/>
+<input aria-label="Поиск записи" placeholder="Поиск" value={q} onChange={e=>setQ(e.target.value)}/>
 </label>
 <div className="admin-view-controls">
 <div className="density-switch" role="group" aria-label="Размер карточек">
 {[{value:1,label:'Список',aria:'Список'},{value:6,label:'SM',aria:'Мелкие карточки'},{value:4,label:'MD',aria:'Карточки среднего размера'},{value:3,label:'LG',aria:'Крупные карточки'}].map(option=>
 <button key={option.value} type="button" aria-pressed={columns===option.value} aria-label={option.aria} onClick={()=>changeColumns(option.value)}>{option.label}</button>)}
 </div>
+<div className="admin-filter-groups">
 <fieldset className="admin-filter-set" aria-label="Тип записей">
 <label><input type="checkbox" checked={kinds.length===0} onChange={()=>setKinds([])}/><span>Все типы</span></label>
 {([['artist','Артисты'],['media','Медиа'],['collective','Проекты']] as const).map(([value,label])=><label key={value}><input type="checkbox" checked={kinds.includes(value)} onChange={()=>toggleKind(value)}/><span>{label}</span></label>)}
@@ -78,6 +108,7 @@ export default function Admin(){
 </fieldset>
 </div>
 </div>
+</div>
 <div className={`admin-rows${columns===1?'':' admin-grid'}`} data-artwork="full" data-columns={columns} style={{'--admin-columns':columns} as CSSProperties}>{loading?<p className="empty">Загружаем коллекцию…</p>:filtered.map((a,i)=>
 <div className="admin-row" data-rating={a.rating||'A'} data-kind={a.kind||'artist'} data-section={a.section} key={a.id}>
 <div className={'mini-art art-'+i%8}>
@@ -86,10 +117,7 @@ export default function Admin(){
 </div>{a.image&&<img src={a.image} alt={a.name} loading="lazy" referrerPolicy="no-referrer" onError={e=>{e.currentTarget.style.display='none';}}/>}{a.kind==='collective'?<span className="record-type record-type--avatar"><UsersRound size={13} aria-hidden="true"/> Проект</span>:a.kind==='media'?<span className="record-type record-type--avatar"><Radio size={13} aria-hidden="true"/> Медиа</span>:null}<span className="art-badges"><span className={`rating-tag rating-${(a.rating||'A').toLowerCase()}`}>{a.rating||'A'}</span></span></div>
 <div className="row-name">
 {(a.section==='world'||a.section==='runet')&&<img className="region-watermark" src={a.section==='world'?'./badges/region-en-eagle-cutout.png':'./badges/region-ru-emblem-cutout.png'} alt="" aria-hidden="true" loading="lazy" decoding="async"/>}
-<strong title={a.name}>{a.name}</strong>
-<div className="row-secondary"><a href={a.url} target="_blank" rel="noreferrer">{a.platform} <ArrowUpRight size={12}/>
-</a>
-</div>
+<AdminCardName name={a.name} columns={columns}/>
 </div>
 <div className="admin-card-footer">
 <div className="admin-tags">

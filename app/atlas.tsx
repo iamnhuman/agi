@@ -1,23 +1,119 @@
 'use client';
-import {useState,useEffect,useRef,type PointerEvent,type CSSProperties} from 'react';
+import {Fragment,useState,useEffect,useRef,type PointerEvent} from 'react';
 import {catalogUrl,adminUrl,showLocalAdmin} from '@/client/config';
 import ArtistMap from './artist-map';
 import {defaultSections,type Artist,type Section} from '@/lib/types';
-import {ArrowUpRight, Search, Grid2X2, List, Network, Layers3, Pencil, Radio, UsersRound, ZoomIn, ZoomOut, Shuffle, ListOrdered} from 'lucide-react';
+import {ArrowUpRight, Search, Grid2X2, List, Network, Layers3, Pencil, Radio, UsersRound, ZoomIn, ZoomOut, Shuffle, ListOrdered, RotateCcw} from 'lucide-react';
 import CommandDeck from '@/client/command-deck';
 
-const glitchGlyphs=Array.from('電機信号光影未来空夢人工界零壊警報乱終始炎月星龍真偽視覚網路時間東京異常𒀀𒁹𒂗𒆠𒄿𒅗𒊩𒀭𒈗𒌋𒇻𒉿𒂍𒊒𒁲𒆳𒄑𒉌𒌓𒃻0１|/\\+-=<>*#%@;[]{}ᚠᚷᛉᛟ⟡⌬⟁⧖');
+const cuneiformGlyphs=[
+  ...Array.from({length:96},(_,index)=>String.fromCodePoint(0x12000+index)),
+  ...Array.from({length:24},(_,index)=>String.fromCodePoint(0x12400+index)),
+];
 const titleGlitchGlyphs=Array.from('電機信号光影未来空夢人工界零壊警報乱終始炎月星龍真偽視覚網路時間東京異常システム破損検出');
-const cuneiformGlyphs=Array.from('𒀀𒁹𒂗𒆠𒄿𒅗𒊩𒀭𒈗𒌋𒇻𒉿𒂍𒊒𒁲𒆳𒄑𒉌𒌓𒃻');
 const signalCorruptionGlyphs=[...titleGlitchGlyphs,...cuneiformGlyphs,...Array.from('ᚠᚷᛉᛟ⟡⌬⟁⧖⍟⊗∆')];
-// The number of columns stays fixed; only their text changes while the signal is open.
-function glitchColumns(tick:number){return Array.from({length:48},(_,i)=>Array.from({length:54+(i*7)%13},(_,j)=>{
-  const phase=Math.floor((tick+i*3+j*5)/4);
-  const first=glitchGlyphs[(i*13+j*7+(j*j)%11+phase*11)%glitchGlyphs.length];
-  const second=(i*3+j*5)%3===0?glitchGlyphs[(i*5+j*11+phase*7+17)%glitchGlyphs.length]:'';
-  return first+second;
-}).join('\n'));}
+const signalFontStacks=[
+  "'Hiragino Kaku Gothic ProN','Yu Gothic',sans-serif",
+  "'Yu Mincho','Hiragino Mincho ProN',serif",
+  "Meiryo,'Yu Gothic',sans-serif",
+  "'MS Gothic','Osaka-Mono',monospace",
+  "'MS Mincho','Yu Mincho',serif",
+  "'Noto Sans JP','Noto Sans CJK JP',sans-serif",
+  "'Noto Serif JP','Noto Serif CJK JP',serif",
+  "Impact,'Arial Black','Yu Gothic',sans-serif",
+  "'Courier New','MS Gothic',monospace",
+  "Georgia,'Yu Mincho',serif",
+] as const;
+let signalSessionNumber=0;
+function createSignalScript(){
+ const session=(++signalSessionNumber).toString(16).padStart(4,'0');
+ const random=(max:number)=>Math.floor(Math.random()*max);
+ const pick=<T,>(items:readonly T[])=>items[random(items.length)];
+ const hex=(length:number)=>Array.from({length},()=>random(16).toString(16)).join('');
+ const sector=String(random(12)+1).padStart(2,'0');
+ const shard=String(random(8)+1).padStart(2,'0');
+ const node=pick(['archive-01','mirror-03','relay-07','vault-02']);
+ const channel=pick(['memory','catalog','signal','journal']);
+ const block=`0x${hex(4).toUpperCase()}`;
+ const digest=hex(8);
+ const latency=(8+random(120)/10).toFixed(1);
+ const events=12000+random(68000);
+ const drift=(0.006+random(24)/1000).toFixed(3);
+ const routines=[
+  [
+   `$ atlasctl verify --index=${channel} --shard=${shard}`,
+   `> digest mismatch at ${block}; observed=${digest}`,
+   `const delta = diff(snapshot, mirror["${shard}"]);`,
+   `if (delta.score > ${drift}) isolate("${channel}");`,
+  ],
+  [
+   `$ atlasctl trace --node=${node} --depth=${random(4)+3}`,
+   `> journal offset=${events} gap=${random(9)+1} entries`,
+   `const frames = await replay(journal, ${events});`,
+   `> replay complete; ${random(5)+2} frames flagged`,
+  ],
+  [
+   `$ atlasctl probe --channel=${channel} --sector=${sector}`,
+   `> carrier=${(12+random(400)/100).toFixed(2)}MHz noise=-${30+random(26)}dB`,
+   `await sync({ node:"${node}", shard:${Number(shard)} });`,
+   `> sync checkpoint ${hex(4)} accepted`,
+  ],
+ ];
+ const selected=routines.splice(random(routines.length),1)[0];
+ const followUp=pick(routines);
+ return [
+  `$ atlasctl session open --sector=${sector} --id=${session}`,
+  `> handshake ${node} accepted in ${latency}ms`,
+  `$ mount archive://imagination/${channel} --read-only`,
+  `> mounted /${channel} [shard=${shard} trace=${hex(6)}]`,
+  ...selected,
+  ...followUp,
+  `$ atlasctl reconcile --shard=${shard} --from=mirror`,
+  `> ${events} events checked; checksum=${hex(8)}`,
+  `$ atlasctl watch ${channel} --follow --session=${session}`,
+ ];
+}
+type SignalConsoleState={lines:string[];line:number;chars:number;pause:number};
+// Terminal halftone derived from a public-domain skull silhouette:
+// https://commons.wikimedia.org/wiki/File:Black_Skull_icon.svg
+const signalSkull=Array.from({length:25},(_,y)=>{
+ let row='';
+ for(let x=0;x<43;x++){
+  const dx=(x-21)/20,dy=(y-9)/9;
+  const dome=dx*dx+dy*dy<1;
+  const cheek=Math.abs(x-21)<15&&y>=9&&y<18;
+  const jaw=Math.abs(x-21)<13-(y-17)*.55&&y>=17&&y<=24;
+  const leftEye=((x-12)/6)**2+((y-11)/3.5)**2<1;
+  const rightEye=((x-30)/6)**2+((y-11)/3.5)**2<1;
+  const nose=y>=14&&y<19&&Math.abs(x-21)<(y-14)*.68;
+  const teeth=y>=20&&y<=23&&x>=11&&x<=31&&((x-11)%4===0||y===20);
+  let glyph=' ';
+  if((dome||cheek||jaw)&&!leftEye&&!rightEye&&!nose){
+   const grain=signalHash(x*173+y*997)%17;
+   glyph=teeth?'|':dome&&dx*dx+dy*dy>.83?'%':grain<2?'#':'@';
+  }
+  row+=glyph;
+ }
+ return row.trimEnd();
+}).join('\n');
+function signalHash(value:number){
+ value=Math.imul(value^(value>>>16),0x45d9f3b);
+ value=Math.imul(value^(value>>>16),0x45d9f3b);
+ return (value^(value>>>16))>>>0;
+}
 function orderHash(value:string,seed:number){let hash=2166136261^seed;for(let i=0;i<value.length;i++)hash=Math.imul(hash^value.charCodeAt(i),16777619);return hash>>>0;}
+function dossierFinish(id:string):React.CSSProperties{
+ const grain=orderHash(id,0x5e2d3a91);
+ const light=orderHash(id,0x1a7c4f63);
+ return {
+  '--dossier-sheen-x':`${18+grain%65}%`,
+  '--dossier-light-x':`${16+light%69}%`,
+  '--dossier-light-y':`${12+(light>>>8)%70}%`,
+  '--dossier-metal-angle':`${136+(grain>>>8)%23}deg`,
+  '--dossier-grain-angle':`${80+(grain>>>16)%21}deg`,
+  '--dossier-grain-step':`${5+(light>>>16)%5}px`,
+ } as React.CSSProperties;
+}
 function zalgoSignal(tick:number,layer=0){return Array.from('信号が破損しました',(letter,index)=>{
   const seed=tick*11+index*17+layer*23;
   const broken=seed%(layer===0?8:4)===0;
@@ -27,11 +123,241 @@ function zalgoSignal(tick:number,layer=0){return Array.from('信号が破損し�
   const glyph=broken?(layer===0?titleGlitchGlyphs[seed%titleGlitchGlyphs.length]:signalCorruptionGlyphs[seed%signalCorruptionGlyphs.length]):letter;
   return <span key={index} className="zalgo-glyph" style={{transform:`translate(${x}px,${y}px)`}}>{glyph}</span>;
 });}
+function signalFont(tick:number){const seed=Math.imul(tick+37,1103515245)^(tick*2654435761);return signalFontStacks[(seed>>>0)%signalFontStacks.length];}
+
+function SignalRain({active}:{active:boolean}){
+ const ref=useRef<HTMLCanvasElement>(null);
+ useEffect(()=>{
+  if(!active||!ref.current)return;
+  const canvas=ref.current,context=canvas.getContext('2d');
+  if(!context)return;
+  const cellWidth=16,cellHeight=20;
+  const kana=Array.from('アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン');
+  const kanji=Array.from('信号電光未来断片夢影機界壊警報空網路炎星龍真偽視覚記録通信回路秘密変換転送');
+  const marks=Array.from('⌁⌑⌖⌗⌘⌬⍟⎔⟁⊗╳∴≋≡<>/\\|:;');
+  const letters=Array.from('ABCDEFGHJKLMNPRSTUVWXYZ');
+  const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let width=0,height=0,columns=0,rows=0,frame=0,lastFrame=0;
+  const resize=()=>{
+   width=window.innerWidth;height=window.innerHeight;
+   const scale=Math.min(window.devicePixelRatio||1,1.5);
+   canvas.width=Math.ceil(width*scale);canvas.height=Math.ceil(height*scale);
+   context.setTransform(scale,0,0,scale,0,0);
+   columns=Math.ceil(width/cellWidth);rows=Math.ceil(height/cellHeight);
+  };
+  const draw=(time:number)=>{
+   frame=window.requestAnimationFrame(draw);
+   if(document.visibilityState!=='visible'||time-lastFrame<32)return;
+   lastFrame=time;
+   context.clearRect(0,0,width,height);
+   context.font='700 13px ui-monospace, SFMono-Regular, Menlo, monospace';
+   context.textAlign='center';context.textBaseline='middle';
+   for(let column=0;column<columns;column++){
+    const lane=signalHash(Math.imul(column+1,0x9e3779b1));
+    if(lane%11===0)continue;
+    for(let stream=0;stream<(lane%3===0?2:1);stream++){
+     const seed=signalHash(lane^Math.imul(stream+1,0x85ebca6b));
+     const trail=stream?10+seed%12:19+seed%24;
+     const speed=stream?5+seed%6:8+seed%13;
+     const cycle=rows+trail+8+seed%22;
+     const head=(time*.001*speed+seed%cycle)%cycle-trail;
+     const glyphFrame=Math.floor(time/(85+seed%5*24));
+     const x=column*cellWidth+cellWidth/2;
+     const beam=lane%4===0||stream===1;
+     if(beam&&head>0){
+      const beamTop=Math.max(0,(head-trail)*cellHeight);
+      const beamBottom=Math.min(height,(head+1)*cellHeight);
+      const horizon=Math.min(1,Math.max(0,(head/rows-.35)/.55));
+      const glow=context.createLinearGradient(x,beamTop,x,beamBottom);
+      glow.addColorStop(0,'#e72b4000');
+      glow.addColorStop(.64,`rgba(255,69,70,${.12+horizon*.2})`);
+      glow.addColorStop(1,`rgba(255,232,183,${.28+horizon*.62})`);
+      context.fillStyle=glow;
+      context.fillRect(x-(stream?3:4),beamTop,stream?6:8,beamBottom-beamTop);
+      context.fillStyle=`rgba(255,240,200,${.2+horizon*.48})`;
+      context.fillRect(x-1.5,Math.max(0,beamTop+trail*cellHeight*.42),3,Math.max(0,beamBottom-beamTop-trail*cellHeight*.42));
+     }
+     for(let step=0;step<trail;step++){
+      const row=Math.floor(head)-step;
+      if(row<0||row>=rows)continue;
+      const mixed=signalHash(Math.imul(column+1,0x27d4eb2d)^Math.imul(row+1,0x165667b1)^Math.imul(glyphFrame+1,0x9e3779b1)^seed);
+      const pool=mixed%12<7?kana:mixed%12<10?kanji:mixed%12===10?marks:letters;
+      const glyph=pool[signalHash(mixed^0x85ebca6b)%pool.length];
+      const fade=1-step/trail;
+      const horizon=Math.min(1,Math.max(0,(row/rows-.4)/.5));
+      context.globalAlpha=(stream?.56:.9)*(.16+fade*.84)*(mixed%13===0?.35:1);
+      context.fillStyle=step===0?'#fff0cb':step<4&&horizon>.3?'#ffbd9c':step<9?'#ff6673':'#d92a47';
+      context.fillText(glyph,x,row*cellHeight+cellHeight/2);
+      if(step===0&&beam){
+       context.globalAlpha=.4+horizon*.45;
+       context.fillStyle='#fff0cf';
+       context.fillRect(x-3,row*cellHeight+cellHeight/2-2,6,3);
+      }
+     }
+    }
+   }
+   // The main tracking tear wanders around the middle, then jumps between noisy frames.
+   context.save();
+   context.globalCompositeOperation='screen';
+   const noiseFrame=Math.floor(time/72);
+   const trackingFrame=Math.floor(time/240);
+   const trackingSeed=signalHash(Math.imul(trackingFrame+1,0x9e3779b1));
+   const trackingDrift=.58+.12*Math.sin(time*.00082)+.055*Math.sin(time*.0027);
+   const trackingJump=trackingSeed%7===0?((trackingSeed>>>8)%2?95:-95):0;
+   const trackingY=reduceMotion?height*.62:height*trackingDrift+(trackingSeed%111-55)+trackingJump;
+   for(let band=0;band<3;band++){
+    const travel=reduceMotion?.58:((time*(.00015+band*.000045)+band*.34)%1);
+    const y=band===0?trackingY:travel*(height+180)-90;
+    const spread=band===0?72:band===1?34:16;
+    const flicker=signalHash(Math.imul(noiseFrame+1,0x165667b1))%100;
+    const pulse=reduceMotion?.45:band===0?(flicker<9?.28:.65+flicker/250):.3+.7*Math.abs(Math.sin(time*.006+band*2.7));
+    const glow=context.createLinearGradient(0,y-spread,0,y+spread);
+    glow.addColorStop(0,'rgba(255,43,22,0)');
+    glow.addColorStop(.24,`rgba(255,64,25,${.12*pulse})`);
+    glow.addColorStop(.47,`rgba(255,122,49,${(band===0?.49:.23)*pulse})`);
+    glow.addColorStop(.51,`rgba(255,222,150,${(band===0?.4:.12)*pulse})`);
+    glow.addColorStop(.56,`rgba(255,88,40,${(band===0?.3:.12)*pulse})`);
+    glow.addColorStop(1,'rgba(255,36,30,0)');
+    context.globalAlpha=1;
+    context.fillStyle=glow;
+    context.fillRect(0,y-spread,width,spread*2);
+    for(let slice=0;slice<(band===0?70:28);slice++){
+     const seed=signalHash(Math.imul(slice+1,11939)^Math.imul(noiseFrame+1,7919)^Math.imul(band+1,3167));
+     if(seed%6===0)continue;
+     const offset=(seed%Math.max(1,spread*2))-spread;
+     const x=seed%Math.max(1,width);
+     const length=12+seed%Math.max(20,Math.floor(width*(band===0?.3:.18)));
+     context.globalAlpha=(.25+(seed%6)*.095)*pulse;
+     context.fillStyle=seed%4===0?'#fff0cb':seed%3===0?'#ffb55d':'#ff6542';
+     context.fillRect(x,y+offset,length,seed%7===0?4:seed%5===0?2:1);
+    }
+    // A few displaced horizontal fragments make the band read as analog VHS tearing.
+    for(let tear=0;tear<(band===0?8:4);tear++){
+     const seed=signalHash(Math.imul(noiseFrame+tear+1,0x85ebca6b)^band);
+     context.globalAlpha=(.32+seed%4*.11)*pulse;
+     context.fillStyle=tear%3===0?'#ffe2ab':tear%2?'#ffb56c':'#ff4937';
+     context.fillRect((seed%7-3)*18,y-spread*.5+tear*9,width*.22+seed%Math.max(1,Math.floor(width*.47)),tear%3===1?5:2);
+    }
+   }
+   context.globalCompositeOperation='source-over';
+   for(let tear=0;tear<5;tear++){
+    const seed=signalHash(Math.imul(noiseFrame+tear+1,0x27d4eb2d));
+    context.fillStyle=`rgba(9,0,5,${.28+(seed%4)*.09})`;
+    context.fillRect(seed%Math.max(1,Math.floor(width*.5)),trackingY-52+seed%104,
+     width*.18+seed%Math.max(1,Math.floor(width*.35)),seed%3===0?5:2);
+   }
+   context.restore();
+   context.globalAlpha=1;
+  };
+  resize();window.addEventListener('resize',resize);
+  frame=window.requestAnimationFrame(draw);
+  return()=>{window.cancelAnimationFrame(frame);window.removeEventListener('resize',resize);};
+ },[active]);
+ return <canvas ref={ref} className="signal-rain" aria-hidden="true"/>;
+}
+
+function ArtistName({name,fitToCard}:{name:string;fitToCard:boolean}){
+ const ref=useRef<HTMLSpanElement>(null);
+ const hasNaturalBreak=/[\s._-]/.test(name);
+ useEffect(()=>{
+  const element=ref.current;
+  if(!element)return;
+  element.style.removeProperty('font-size');
+  if(!fitToCard||hasNaturalBreak)return;
+  const cardInfo=element.closest('.card-info');
+  if(!cardInfo)return;
+  let active=true;
+  const fit=()=>{
+   element.style.removeProperty('font-size');
+   const available=element.clientWidth;
+   if(!available)return;
+   const preferred=parseFloat(getComputedStyle(element).fontSize);
+   const required=element.scrollWidth;
+   if(required>available){
+    const size=Math.max(11,Math.floor(preferred*(available-2)/required*10)/10);
+    element.style.fontSize=`${size}px`;
+   }
+  };
+  const observer=new ResizeObserver(fit);
+  observer.observe(cardInfo);
+  document.fonts.ready.then(()=>{if(active)fit();});
+  return()=>{active=false;observer.disconnect();};
+ },[name,fitToCard,hasNaturalBreak]);
+ const parts=name.split(/([._-])/);
+ return <span ref={ref} className="artist-name" data-phrase={hasNaturalBreak} title={name}>{parts.map((part,index)=><Fragment key={index}>{part}{/[._-]/.test(part)&&<wbr/>}</Fragment>)}</span>;
+}
+
+function ArtistTicker({name}:{name:string}){
+ const screenRef=useRef<HTMLSpanElement>(null),copyRef=useRef<HTMLSpanElement>(null);
+ useEffect(()=>{
+  const screen=screenRef.current,copy=copyRef.current;
+  if(!screen||!copy)return;
+  let active=true;
+  const fit=()=>{
+   screen.style.removeProperty('--ticker-font-size');
+   const available=screen.clientWidth-12;
+   if(available<=0)return;
+   const preferred=parseFloat(getComputedStyle(copy).fontSize);
+   const range=document.createRange();
+   range.selectNodeContents(copy);
+   const required=range.getBoundingClientRect().width;
+   if(!required||!preferred)return;
+   const minimum=Math.max(11,preferred*.78);
+   const size=required>available
+    ?Math.max(minimum,Math.floor(preferred*available/required*10)/10)
+    :preferred;
+   const repeatWidth=required*size/preferred+size*1.2;
+   screen.style.setProperty('--ticker-font-size',`${size}px`);
+   screen.style.setProperty('--ticker-duration',`${Math.max(6,Math.min(14,repeatWidth/16))}s`);
+  };
+  const observer=new ResizeObserver(fit);
+  observer.observe(screen);
+  document.fonts.ready.then(()=>{if(active)fit();});
+  return()=>{active=false;observer.disconnect();};
+ },[name]);
+ return <span ref={screenRef} className="card-name-screen" aria-label={name} title={name}>
+  <span className="card-name-track" aria-hidden="true">
+   <span ref={copyRef} className="card-name-copy">{name}</span>
+   {Array.from({length:4},(_,index)=><span className="card-name-copy" key={index}>{name}</span>)}
+  </span>
+ </span>;
+}
 
 function ToyotaFooter(){
  const [signalOpen,setSignalOpen]=useState(false),[signalTick,setSignalTick]=useState(0);
- useEffect(()=>{if(!signalOpen)return;const timer=window.setInterval(()=>{if(document.visibilityState==='visible')setSignalTick(tick=>(tick+1)%4096);},180);return()=>window.clearInterval(timer);},[signalOpen]);
- return <footer><div className="manifesto" data-open={signalOpen} onPointerLeave={event=>{if(event.pointerType==='mouse')setSignalOpen(false);}} onBlurCapture={event=>{if(!event.currentTarget.contains(event.relatedTarget as Node))setSignalOpen(false);}}><div id="toyota-transmission" className="manifesto-transmission" aria-hidden={!signalOpen}><div className="manifesto-spires">{glitchColumns(signalTick).map((column,i)=><pre key={i} style={{'--column':i} as CSSProperties}>{column}</pre>)}</div><div className="manifesto-zalgo" aria-hidden="true"><span className="zalgo-layer">{zalgoSignal(Math.floor(signalTick/3))}</span><span className="zalgo-layer">{zalgoSignal(Math.floor(signalTick/3)+3,1)}</span><span className="zalgo-layer">{zalgoSignal(Math.floor(signalTick/3)+7,2)}</span></div></div><button type="button" className="toyota-mark" aria-label="Toyota: показать сигнал" aria-controls="toyota-transmission" aria-expanded={signalOpen} onPointerEnter={event=>{if(event.pointerType==='mouse')setSignalOpen(true);}} onKeyDown={event=>{if(event.key==='Escape')setSignalOpen(false);}} onClick={()=>{if(window.matchMedia('(hover: none)').matches)setSignalOpen(open=>!open);else setSignalOpen(true);}}><svg viewBox="0 0 240 160" aria-hidden="true"><ellipse cx="120" cy="70" rx="106" ry="61"/><ellipse cx="120" cy="55" rx="56" ry="22"/><ellipse cx="120" cy="64" rx="27" ry="53"/></svg><span>TOYOTA</span></button></div></footer>;
+ const [consoleState,setConsoleState]=useState<SignalConsoleState>({lines:[],line:0,chars:0,pause:0});
+ useEffect(()=>{if(!signalOpen)return;const timer=window.setInterval(()=>{if(document.visibilityState==='visible')setSignalTick(tick=>(tick+4)%40960);},64);return()=>window.clearInterval(timer);},[signalOpen]);
+ useEffect(()=>{
+  if(!signalOpen)return;
+  setConsoleState({lines:createSignalScript(),line:0,chars:0,pause:0});
+  const timer=window.setInterval(()=>setConsoleState(current=>{
+   if(document.visibilityState!=='visible'||!current.lines.length)return current;
+   const text=current.lines[current.line];
+   if(current.chars<text.length)return {...current,chars:current.chars+1};
+   const finalLine=current.line===current.lines.length-1;
+   const pauseLimit=finalLine?28:5;
+   if(current.pause<pauseLimit)return {...current,pause:current.pause+1};
+   return finalLine?{lines:createSignalScript(),line:0,chars:0,pause:0}:{...current,line:current.line+1,chars:0,pause:0};
+  }),28);
+  return()=>window.clearInterval(timer);
+ },[signalOpen]);
+ const fontTick=Math.floor(signalTick/40);
+ const firstConsoleLine=Math.max(0,consoleState.line-7);
+ const consoleLines=consoleState.lines.slice(firstConsoleLine,consoleState.line+1);
+ return <footer><div className="manifesto" data-open={signalOpen} onPointerLeave={event=>{if(event.pointerType==='mouse')setSignalOpen(false);}} onBlurCapture={event=>{if(!event.currentTarget.contains(event.relatedTarget as Node))setSignalOpen(false);}}>
+  <div id="toyota-transmission" className="manifesto-transmission" aria-hidden={!signalOpen}>
+   <SignalRain active={signalOpen}/>
+   <div className="manifesto-interference">
+    <div className="signal-console-title">ARCHIVE://DEAD_SIGNAL <b>ERROR 01 / LINK DEGRADED</b></div>
+    <div className="signal-console-body">
+     <div className="signal-console-log">{consoleLines.map((fragment,i)=>{const lineIndex=firstConsoleLine+i;const active=lineIndex===consoleState.line;return <span className={active?'console-line is-active':'console-line'} key={`${lineIndex}-${active?'active':'done'}`}>{active?fragment.slice(0,consoleState.chars):fragment}</span>;})}</div>
+     <div className="signal-skull-block"><div>UNRECOVERED SECTOR // 0x01F4</div><pre>{signalSkull}</pre><div>MEMORY CORRUPTION DETECTED</div></div>
+    </div>
+   </div>
+   <div className="manifesto-zalgo" aria-hidden="true" style={{fontFamily:signalFont(fontTick)}}><span className="zalgo-layer">{zalgoSignal(Math.floor(signalTick/3))}</span><span className="zalgo-layer">{zalgoSignal(Math.floor(signalTick/3)+3,1)}</span><span className="zalgo-layer">{zalgoSignal(Math.floor(signalTick/3)+7,2)}</span></div>
+  </div>
+  <button type="button" className="toyota-mark" aria-label="Toyota: показать сигнал" aria-controls="toyota-transmission" aria-expanded={signalOpen} onPointerEnter={event=>{if(event.pointerType==='mouse')setSignalOpen(true);}} onKeyDown={event=>{if(event.key==='Escape')setSignalOpen(false);}} onClick={()=>{if(window.matchMedia('(hover: none)').matches)setSignalOpen(open=>!open);else setSignalOpen(true);}}><svg viewBox="0 0 240 160" aria-hidden="true"><ellipse cx="120" cy="70" rx="106" ry="61"/><ellipse cx="120" cy="55" rx="56" ry="22"/><ellipse cx="120" cy="64" rx="27" ry="53"/></svg><span>TOYOTA</span></button>
+ </div></footer>;
 }
 
 export default function Atlas({initial}:{initial:Artist[]}){
@@ -60,6 +386,12 @@ function stopDeckDrag(event:PointerEvent<HTMLDivElement>){const drag=deckDrag.cu
 const [cardSize,setCardSize]=useState<'sm'|'md'|'lg'>('sm');
 const [listSize,setListSize]=useState<'sm'|'md'|'lg'>('sm');
 function changeView(next:string){if(next===view)return;setView(next);setCardSize('sm');setListSize('sm');}
+const catalogIsDefault=section==='all'&&kind==='all'&&rating==='all'&&!q&&view==='grid'&&cardSize==='sm'&&listSize==='sm'&&sortMode==='posting'&&deckZoom===1;
+function resetCatalog(){
+ setSection('all');setKind('all');setRating('all');setQ('');
+ setView('grid');setCardSize('sm');setListSize('sm');
+ setSortMode('posting');setShuffleSeed(0);setDeckZoom(1);
+}
 const matchingArtists=data.filter(a=>(section==='all'||a.section===section)&&(kind==='all'||(a.kind||'artist')===kind)&&(rating==='all'||(a.rating||'A').toUpperCase()===rating)&&(a.name+' '+a.tags+' '+a.description).toLowerCase().includes(q.toLowerCase()));
 const sourceOrder=new Map(data.map((artist,index)=>[artist.id,index]));
 const artists=[...matchingArtists].sort((a,b)=>sortMode==='posting'?(sourceOrder.get(a.id)!-sourceOrder.get(b.id)!):(orderHash(a.id,shuffleSeed)-orderHash(b.id,shuffleSeed)));
@@ -72,6 +404,7 @@ return <>
 <div className="filters">{[['all','Все досье'],...sections.map(s=>[s.id,s.name])].map(([id,title])=>
 <button key={id} className={section===id?'active':''} onClick={()=>setSection(id)}>{title}<sup>{id==='all'?data.length:data.filter(a=>a.section===id).length}</sup>
 </button>)}</div>
+<button type="button" className="catalog-reset" aria-label="Сбросить настройки каталога" title="Сбросить настройки каталога" disabled={catalogIsDefault} onClick={resetCatalog}><RotateCcw size={18} aria-hidden="true"/></button>
 <div className="catalog-view-controls">{view==='grid'&&<div className="catalog-density" role="group" aria-label="Размер карточек">
 <span>Размер</span>{(['sm','md','lg'] as const).map(value=><button key={value} type="button" aria-label={`Размер карточек: ${value.toUpperCase()}`} aria-pressed={cardSize===value} onClick={()=>setCardSize(value)}>{value.toUpperCase()}</button>)}
 </div>}{view==='list'&&<div className="catalog-density" role="group" aria-label="Размер элементов списка">
@@ -84,37 +417,37 @@ return <>
 <div className="search-row">
 <label className="input-search">
 <Search size={17}/>
-<input aria-label="Поиск записи" placeholder="Поиск по досье: артист или медиа…" value={q} onChange={e=>setQ(e.target.value)}/>
+<input aria-label="Поиск записи" placeholder="Поиск" value={q} onChange={e=>setQ(e.target.value)}/>
 </label>
 <div className="catalog-type-controls">
-<span className="catalog-result-count"><span className="catalog-result-number">{artists.length}</span> ДОСЬЕ <span className="muted">/ В БАЗЕ</span>
-</span>
 <div className="catalog-type-radios" role="radiogroup" aria-label="Тип записей">{[['all','Все'],['artist','Артисты'],['media','Медиа'],['collective','Проекты']].map(([id,label])=><label key={id} className={kind===id?'is-active':''}><input type="radio" name="catalog-kind" value={id} checked={kind===id} onChange={()=>setKind(id)}/><span>{label}</span></label>)}</div>
 <div className="catalog-tag-filter"><span>ТЕГ</span><div className="catalog-type-radios" role="radiogroup" aria-label="Рейтинг тегов">{[['all','Все'],['A','A'],['AA','AA'],['AAA','AAA'],['AAA+','AAA+']].map(([id,label])=><label key={id} className={rating===id?'is-active':''}><input type="radio" name="catalog-rating" value={id} checked={rating===id} onChange={()=>setRating(id)}/><span>{label}</span></label>)}</div></div>
 </div>
 </div>{view==='map'?<ArtistMap artists={artists} sections={sections}/>:<>{view==='deck'&&<div className="deck-toolbar"><span>КОЛОДА · колесо / перетягивание · Ctrl/⌘ + колесо — зум</span><div className="deck-zoom-controls" role="group" aria-label="Масштаб 3D-колоды"><label htmlFor="deck-zoom">ЗУМ</label><button type="button" aria-label="Уменьшить масштаб 3D-колоды" disabled={deckZoom<=.65} onClick={()=>changeDeckZoom(-.1)}><ZoomOut size={18}/></button><input id="deck-zoom" type="range" min="65" max="150" step="5" value={Math.round(deckZoom*100)} onChange={event=>setDeckZoom(Number(event.target.value)/100)} aria-label="Масштаб 3D-колоды"/><output htmlFor="deck-zoom" aria-live="polite">{Math.round(deckZoom*100)}%</output><button type="button" aria-label="Увеличить масштаб 3D-колоды" disabled={deckZoom>=1.5} onClick={()=>changeDeckZoom(.1)}><ZoomIn size={18}/></button></div></div>}<div ref={deckRef} className={view==='list'?'artist-list':view==='deck'?'artist-grid artist-deck':'artist-grid'} data-size={view==='grid'?cardSize:view==='list'?listSize:undefined} style={view==='deck'?{'--deck-zoom':deckZoom} as React.CSSProperties:undefined} aria-label={view==='deck'?'Горизонтальная 3D-колода досье':undefined} tabIndex={view==='deck'?0:undefined} onPointerDown={view==='deck'?startDeckDrag:undefined} onPointerMove={view==='deck'?moveDeckDrag:undefined} onPointerUp={view==='deck'?stopDeckDrag:undefined} onPointerCancel={view==='deck'?stopDeckDrag:undefined} onClickCapture={view==='deck'?event=>{if(suppressDeckClick.current){event.preventDefault();event.stopPropagation();suppressDeckClick.current=false;}}:undefined} onDragStart={view==='deck'?event=>event.preventDefault():undefined} onKeyDown={view==='deck'?event=>{if(event.key==='+'||event.key==='='){event.preventDefault();changeDeckZoom(.1);}else if(event.key==='-'){event.preventDefault();changeDeckZoom(-.1);}}:undefined}>{artists.map((a,i)=>
-<article className="artist-card" data-rating={a.rating||'A'} data-kind={a.kind||'artist'} data-section={a.section} key={a.id}>
+<article className="artist-card" data-rating={a.rating||'A'} data-kind={a.kind||'artist'} data-section={a.section} style={dossierFinish(a.id)} key={a.id}>
 <div className={'art art-'+i%8}>
 <span className="art-index">{String(i+1).padStart(3,'0')}</span>
 <div className="missing-avatar" role="img" aria-label="Аватарка отсутствует">
 <span aria-hidden="true">×</span>
-</div>{a.image&&<img src={a.image} alt={a.name} loading="lazy" referrerPolicy="no-referrer" onError={e=>{e.currentTarget.style.display="none";}}/>}{a.kind==='collective'?<span className="record-type record-type--avatar"><UsersRound size={13} aria-hidden="true"/> Проект</span>:a.kind==='media'?<span className="record-type record-type--avatar"><Radio size={13} aria-hidden="true"/> Медиа</span>:null}<span className="art-badges">
+</div>{a.image&&<img src={a.image} alt={a.name} loading="lazy" draggable={false} referrerPolicy="no-referrer" onError={e=>{e.currentTarget.style.display="none";}}/>}{view!=='list'&&(a.kind==='collective'?<span className="record-type record-type--avatar"><UsersRound size={13} aria-hidden="true"/> Проект</span>:a.kind==='media'?<span className="record-type record-type--avatar"><Radio size={13} aria-hidden="true"/> Медиа</span>:null)}{view!=='list'&&<span className="art-badges">
 <span className={`rating-tag rating-${(a.rating||'A').toLowerCase()}`}>{a.rating||'A'}</span>
-</span>
+</span>}
+{showLocalAdmin&&view==='grid'&&<a className="card-edit card-edit--image" aria-label={"Редактировать "+a.name} href={adminUrl+"/?edit="+encodeURIComponent(a.id)+"#catalog"}><Pencil size={15}/></a>}
+<span className="art-platform-tag" aria-hidden="true"><span className="platform-full">{a.platform}</span><span className="platform-short">{a.platform==='Instagram'?'IG':a.platform==='Telegram'?'TG':a.platform.slice(0,2)}</span><ArrowUpRight size={13}/></span>
 </div>
 <div className="card-info">
 {(a.section==='world'||a.section==='runet')&&<img className="region-watermark" src={a.section==='world'?'./badges/region-en-eagle-cutout.png':'./badges/region-ru-emblem-cutout.png'} alt="" aria-hidden="true" loading="lazy" decoding="async"/>}
 <div>
-<h2>
-<span className="artist-name" title={a.name}>{a.name}</span>
-</h2><p>
+<h2 aria-label={a.name}>
+{view==='grid'?<ArtistTicker name={a.name}/>:<ArtistName name={a.name} fitToCard={false}/>}
+</h2>{view==='list'&&<div className="list-tags"><span className="list-rating-tag">{a.rating||'A'}</span>{a.kind==='collective'?<span className="list-kind-tag"><UsersRound size={11} aria-hidden="true"/>Проект</span>:a.kind==='media'?<span className="list-kind-tag"><Radio size={11} aria-hidden="true"/>Медиа</span>:null}</div>}{view!=='list'&&<p>
 <span className="artist-social">{a.platform} <ArrowUpRight size={14}/>
 </span>
 {a.kind==='collective'?<span className="list-kind-tag"><UsersRound size={11} aria-hidden="true"/>Проект</span>:a.kind==='media'?<span className="list-kind-tag"><Radio size={11} aria-hidden="true"/>Медиа</span>:null}
-</p>
+</p>}
 </div></div>
 <a className="card-hit-area" href={a.url} target="_blank" rel="noopener noreferrer" aria-label={"Открыть источник: "+a.name}/>
-{showLocalAdmin&&<a className="card-edit" title="Редактировать" aria-label={"Редактировать "+a.name} href={adminUrl+"/?edit="+encodeURIComponent(a.id)+"#catalog"}><Pencil size={15}/></a>}
+{showLocalAdmin&&view!=='grid'&&<a className="card-edit" aria-label={"Редактировать "+a.name} href={adminUrl+"/?edit="+encodeURIComponent(a.id)+"#catalog"}><Pencil size={15}/></a>}
 </article>)}</div></>}{!artists.length&&<p className="empty">Сигнал не обнаружен. Измените запрос или фильтр.</p>}</section>
 </main>
 <ToyotaFooter/>

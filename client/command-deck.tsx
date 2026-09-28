@@ -1,4 +1,4 @@
-import {ArrowUpRight} from 'lucide-react';
+import {ArrowUpRight,RotateCw} from 'lucide-react';
 import AiConquerLogo from './ai-conquer-logo';
 import {adminUrl,showLocalAdmin} from './config';
 
@@ -26,15 +26,15 @@ export default function CommandDeck({mode,total}:{mode:'catalog'|'videos';total?
     <div className="command-signal" aria-hidden="true"><i/><i/><i/><i/><i/><i/><i/><i/><i/><i/><i/><i/><i/><i/><i/></div>
    </div>
    <nav className="command-menu" aria-label="Разделы сайта">
-    <a className={!videos?'is-active':''} aria-label="ИИ-артисты и медиа" aria-current={!videos?'page':undefined} href="#catalog"><span>01</span> АРТИСТЫ И МЕДИА <ArrowUpRight size={15}/></a>
-    <a className={videos?'is-active':''} aria-label="ИИ в творчестве" aria-current={videos?'page':undefined} href="#videos"><span>02</span> ИИ В ТВОРЧЕСТВЕ <ArrowUpRight size={15}/></a>
-    {showLocalAdmin&&<a href={adminUrl} aria-label="Кураторский штаб" className="command-menu-admin"><span>03</span> КУРАТОРСКАЯ <ArrowUpRight size={15}/></a>}
+    <a className={!videos?'is-active':''} aria-label="ИИ-артисты и медиа" aria-current={!videos?'page':undefined} href="#catalog">АРТИСТЫ И МЕДИА <ArrowUpRight size={15}/></a>
+    <a className={videos?'is-active':''} aria-label="ИИ в творчестве" aria-current={videos?'page':undefined} href="#videos">ИИ В ТВОРЧЕСТВЕ <ArrowUpRight size={15}/></a>
+    {showLocalAdmin&&<a href={adminUrl} aria-label="Кураторский штаб" className="command-menu-admin">КУРАТОРСКАЯ <ArrowUpRight size={15}/></a>}
    </nav>
    <div className="command-console-readout">
-    <span className="command-console-readout-label">{videos?'КАНАЛ / 02':'АРХИВ / 01'} <span>● НА СВЯЗИ</span></span>
+    <span className="command-console-readout-label"><span className="command-console-readout-title">{videos?'КАНАЛ / 02':'АРХИВ / 01'}</span><span className="command-console-update"><RotateCw size={12} aria-hidden="true"/>ОБНОВЛЕНИЕ</span></span>
     <div className="command-console-readout-main"><strong>{total??'LIVE'}</strong><span>{videos?'РАБОТ\nВ АРХИВЕ':'ДОСЬЕ\nВ БАЗЕ'}</span></div>
     <div className="command-console-readout-meter" aria-hidden="true"/>
-    <small>{videos?'МУЗЫКА · ВИДЕО · ВИЗУАЛЬНОЕ':'СОБРАНО ЧЕЛОВЕКОМ / СОЗДАНО С ИИ'}</small>
+    {videos?<small>МУЗЫКА · ВИДЕО · ВИЗУАЛЬНОЕ</small>:<small className="command-console-readout-note"><span>СОБРАНО ЧЕЛОВЕКОМ</span><span className="command-console-readout-divider"> / </span><span>СОЗДАНО С ИИ</span></small>}
    </div>
   </aside>
  </header>;
