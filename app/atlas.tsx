@@ -4,6 +4,7 @@ import {catalogUrl,adminUrl,showLocalAdmin} from '@/client/config';
 import ArtistMap from './artist-map';
 import {defaultSections,type Artist,type Section} from '@/lib/types';
 import {ArrowUpRight, Search, Grid2X2, List, Network, Layers3, Pencil, Radio, UsersRound, ZoomIn, ZoomOut, Shuffle, ListOrdered, RotateCcw} from 'lucide-react';
+import {Runner,vhs} from '@vysmo/effects';
 import CommandDeck from '@/client/command-deck';
 
 const cuneiformGlyphs=[
@@ -129,8 +130,11 @@ function SignalRain({active}:{active:boolean}){
  const ref=useRef<HTMLCanvasElement>(null);
  useEffect(()=>{
   if(!active||!ref.current)return;
-  const canvas=ref.current,context=canvas.getContext('2d');
+  const canvas=ref.current,source=document.createElement('canvas'),context=source.getContext('2d');
   if(!context)return;
+  let runner:Runner|null=null;
+  try{runner=new Runner({canvas,contextAttributes:{alpha:true,premultipliedAlpha:false}});}catch{}
+  const fallback=runner?null:canvas.getContext('2d');
   const cellWidth=16,cellHeight=20;
   const kana=Array.from('アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン');
   const kanji=Array.from('信号電光未来断片夢影機界壊警報空網路炎星龍真偽視覚記録通信回路秘密変換転送');
@@ -141,8 +145,9 @@ function SignalRain({active}:{active:boolean}){
   const resize=()=>{
    width=window.innerWidth;height=window.innerHeight;
    const scale=Math.min(window.devicePixelRatio||1,1.5);
-   canvas.width=Math.ceil(width*scale);canvas.height=Math.ceil(height*scale);
+   source.width=canvas.width=Math.ceil(width*scale);source.height=canvas.height=Math.ceil(height*scale);
    context.setTransform(scale,0,0,scale,0,0);
+   fallback?.setTransform(scale,0,0,scale,0,0);
    columns=Math.ceil(width/cellWidth);rows=Math.ceil(height/cellHeight);
   };
   const draw=(time:number)=>{
@@ -196,62 +201,13 @@ function SignalRain({active}:{active:boolean}){
      }
     }
    }
-   // The main tracking tear wanders around the middle, then jumps between noisy frames.
-   context.save();
-   context.globalCompositeOperation='screen';
-   const noiseFrame=Math.floor(time/72);
-   const trackingFrame=Math.floor(time/240);
-   const trackingSeed=signalHash(Math.imul(trackingFrame+1,0x9e3779b1));
-   const trackingDrift=.58+.12*Math.sin(time*.00082)+.055*Math.sin(time*.0027);
-   const trackingJump=trackingSeed%7===0?((trackingSeed>>>8)%2?95:-95):0;
-   const trackingY=reduceMotion?height*.62:height*trackingDrift+(trackingSeed%111-55)+trackingJump;
-   for(let band=0;band<3;band++){
-    const travel=reduceMotion?.58:((time*(.00015+band*.000045)+band*.34)%1);
-    const y=band===0?trackingY:travel*(height+180)-90;
-    const spread=band===0?72:band===1?34:16;
-    const flicker=signalHash(Math.imul(noiseFrame+1,0x165667b1))%100;
-    const pulse=reduceMotion?.45:band===0?(flicker<9?.28:.65+flicker/250):.3+.7*Math.abs(Math.sin(time*.006+band*2.7));
-    const glow=context.createLinearGradient(0,y-spread,0,y+spread);
-    glow.addColorStop(0,'rgba(255,43,22,0)');
-    glow.addColorStop(.24,`rgba(255,64,25,${.12*pulse})`);
-    glow.addColorStop(.47,`rgba(255,122,49,${(band===0?.49:.23)*pulse})`);
-    glow.addColorStop(.51,`rgba(255,222,150,${(band===0?.4:.12)*pulse})`);
-    glow.addColorStop(.56,`rgba(255,88,40,${(band===0?.3:.12)*pulse})`);
-    glow.addColorStop(1,'rgba(255,36,30,0)');
-    context.globalAlpha=1;
-    context.fillStyle=glow;
-    context.fillRect(0,y-spread,width,spread*2);
-    for(let slice=0;slice<(band===0?70:28);slice++){
-     const seed=signalHash(Math.imul(slice+1,11939)^Math.imul(noiseFrame+1,7919)^Math.imul(band+1,3167));
-     if(seed%6===0)continue;
-     const offset=(seed%Math.max(1,spread*2))-spread;
-     const x=seed%Math.max(1,width);
-     const length=12+seed%Math.max(20,Math.floor(width*(band===0?.3:.18)));
-     context.globalAlpha=(.25+(seed%6)*.095)*pulse;
-     context.fillStyle=seed%4===0?'#fff0cb':seed%3===0?'#ffb55d':'#ff6542';
-     context.fillRect(x,y+offset,length,seed%7===0?4:seed%5===0?2:1);
-    }
-    // A few displaced horizontal fragments make the band read as analog VHS tearing.
-    for(let tear=0;tear<(band===0?8:4);tear++){
-     const seed=signalHash(Math.imul(noiseFrame+tear+1,0x85ebca6b)^band);
-     context.globalAlpha=(.32+seed%4*.11)*pulse;
-     context.fillStyle=tear%3===0?'#ffe2ab':tear%2?'#ffb56c':'#ff4937';
-     context.fillRect((seed%7-3)*18,y-spread*.5+tear*9,width*.22+seed%Math.max(1,Math.floor(width*.47)),tear%3===1?5:2);
-    }
-   }
-   context.globalCompositeOperation='source-over';
-   for(let tear=0;tear<5;tear++){
-    const seed=signalHash(Math.imul(noiseFrame+tear+1,0x27d4eb2d));
-    context.fillStyle=`rgba(9,0,5,${.28+(seed%4)*.09})`;
-    context.fillRect(seed%Math.max(1,Math.floor(width*.5)),trackingY-52+seed%104,
-     width*.18+seed%Math.max(1,Math.floor(width*.35)),seed%3===0?5:2);
-   }
-   context.restore();
    context.globalAlpha=1;
+   if(runner)runner.render(vhs,{source,params:{intensity:.46,seed:reduceMotion?0:Math.floor(time/72)}});
+   else if(fallback){fallback.clearRect(0,0,width,height);fallback.drawImage(source,0,0,width,height);}
   };
   resize();window.addEventListener('resize',resize);
   frame=window.requestAnimationFrame(draw);
-  return()=>{window.cancelAnimationFrame(frame);window.removeEventListener('resize',resize);};
+  return()=>{window.cancelAnimationFrame(frame);window.removeEventListener('resize',resize);runner?.dispose();};
  },[active]);
  return <canvas ref={ref} className="signal-rain" aria-hidden="true"/>;
 }

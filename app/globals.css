@@ -4042,3 +4042,7 @@ body,body *{font-family:'Press Start 2P',ui-monospace,monospace!important}
   .admin-grid .admin-card-actions{gap:4px}
   .admin-grid .admin-card-actions button{width:32px;height:32px;min-width:32px;min-height:32px}
 }
+
+/* The VHS shader now generates the scan texture from the live signal canvas. */
+.manifesto-transmission::before{background:none!important;mix-blend-mode:normal}
+.manifesto-transmission::after{display:none!important}
