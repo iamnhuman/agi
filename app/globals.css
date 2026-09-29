@@ -4129,3 +4129,18 @@ body,body *{font-family:'Press Start 2P',ui-monospace,monospace!important}
 .artist-grid:not(.artist-deck) .artist-card[data-rating] .card-info h2{
   transition-duration:.48s!important;transition-delay:0s!important;
 }
+
+/* Make the faction emblem itself grow clearly and smoothly on hover. */
+.artist-grid:not(.artist-deck) .artist-card[data-rating] .card-info .region-watermark{
+  transition:transform .62s cubic-bezier(.16,1,.3,1),opacity .38s ease,filter .42s ease!important;
+  transition-delay:0s!important;
+  will-change:transform;
+}
+.artist-grid:not(.artist-deck) .artist-card[data-section="runet"][data-rating]:hover .card-info .region-watermark,
+.artist-grid:not(.artist-deck) .artist-card[data-section="runet"][data-rating]:focus-within .card-info .region-watermark{
+  transform:translateX(-50%) translateY(-4px) scale(1.42)!important;
+}
+.artist-grid:not(.artist-deck) .artist-card[data-section="world"][data-rating]:hover .card-info .region-watermark,
+.artist-grid:not(.artist-deck) .artist-card[data-section="world"][data-rating]:focus-within .card-info .region-watermark{
+  transform:translateX(-50%) translateY(-3px) scale(1.45)!important;
+}
