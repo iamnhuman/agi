@@ -3905,3 +3905,25 @@ body,body *{font-family:'Press Start 2P',ui-monospace,monospace!important}
 .artist-grid:not(.artist-deck) .artist-card[data-section="world"][data-rating]:focus-within .card-info .region-watermark{
   transform:translateX(-50%) translateY(-3px) rotate(-1deg) scale(1.12)!important;
 }
+
+/* Faction crests track the selected dossier density and grow smoothly on hover. */
+.artist-grid:not(.artist-deck) .artist-card[data-rating] .card-info .region-watermark{
+  transform-origin:50% 50%;
+  transition:transform .42s cubic-bezier(.22,.72,.24,1),opacity .32s ease,filter .32s ease;
+}
+.artist-grid:not(.artist-deck)[data-size="sm"] .artist-card[data-section="runet"][data-rating] .card-info .region-watermark{width:42px;height:33px}
+.artist-grid:not(.artist-deck)[data-size="md"] .artist-card[data-section="runet"][data-rating] .card-info .region-watermark{width:50px;height:39px}
+.artist-grid:not(.artist-deck)[data-size="lg"] .artist-card[data-section="runet"][data-rating] .card-info .region-watermark{width:58px;height:45px}
+.artist-grid:not(.artist-deck)[data-size="sm"] .artist-card[data-section="world"][data-rating] .card-info .region-watermark{width:46px;height:29px}
+.artist-grid:not(.artist-deck)[data-size="md"] .artist-card[data-section="world"][data-rating] .card-info .region-watermark{width:56px;height:36px}
+.artist-grid:not(.artist-deck)[data-size="lg"] .artist-card[data-section="world"][data-rating] .card-info .region-watermark{width:66px;height:42px}
+.artist-grid:not(.artist-deck) .artist-card[data-section="runet"][data-rating]:hover .card-info .region-watermark,
+.artist-grid:not(.artist-deck) .artist-card[data-section="runet"][data-rating]:focus-within .card-info .region-watermark{
+  transform:translateX(-50%) translateY(-4px) scale(1.25)!important;
+  opacity:1;filter:drop-shadow(0 2px 5px color-mix(in srgb,var(--card-accent) 55%,#000));
+}
+.artist-grid:not(.artist-deck) .artist-card[data-section="world"][data-rating]:hover .card-info .region-watermark,
+.artist-grid:not(.artist-deck) .artist-card[data-section="world"][data-rating]:focus-within .card-info .region-watermark{
+  transform:translateX(-50%) translateY(-3px) scale(1.28)!important;
+  opacity:1;filter:drop-shadow(0 2px 5px #419fffaa);
+}
