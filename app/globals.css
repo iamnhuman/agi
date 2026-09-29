@@ -4097,3 +4097,35 @@ body,body *{font-family:'Press Start 2P',ui-monospace,monospace!important}
 }
 .manifesto-transmission::before{display:none!important;background:none!important;mix-blend-mode:normal}
 .manifesto-transmission::after{display:none!important}
+
+/* Keep every dossier hover response in one continuous, delay-free transition. */
+.artist-grid:not(.artist-deck) .artist-card[data-rating]{
+  --card-hover-ease:cubic-bezier(.22,.72,.24,1);
+  transition:transform .48s var(--card-hover-ease),border-color .48s ease,
+    box-shadow .52s var(--card-hover-ease),filter .48s ease!important;
+  transition-delay:0s!important;
+}
+.artist-grid:not(.artist-deck) .artist-card[data-rating]::before{
+  opacity:.72;transition:opacity .45s ease,filter .45s ease;transition-delay:0s;
+}
+.artist-grid:not(.artist-deck) .artist-card[data-rating]::after{
+  opacity:.14;
+  background:
+    repeating-linear-gradient(0deg,transparent 0 5px,#ffffff0a 5px 6px),
+    radial-gradient(ellipse at var(--dossier-sheen-x,50%) 100%,color-mix(in srgb,var(--card-accent) 34%,transparent),transparent 70%),
+    linear-gradient(115deg,#e72c320c,transparent 42%,transparent 72%,#5de0e311);
+  transition:opacity .52s var(--card-hover-ease),filter .52s ease;
+  transition-delay:0s;
+}
+.artist-grid:not(.artist-deck) .artist-card[data-rating]:hover::after,
+.artist-grid:not(.artist-deck) .artist-card[data-rating]:focus-within::after{opacity:.62;filter:brightness(1.18)}
+.artist-grid:not(.artist-deck) .artist-card[data-rating]:hover::before,
+.artist-grid:not(.artist-deck) .artist-card[data-rating]:focus-within::before{opacity:1;filter:brightness(1.08)}
+.artist-grid:not(.artist-deck) .artist-card[data-rating]>.art img:not(.region-watermark){
+  transition:transform .55s var(--card-hover-ease),filter .48s ease!important;transition-delay:0s!important;
+}
+.artist-grid:not(.artist-deck) .artist-card[data-rating] .card-info,
+.artist-grid:not(.artist-deck) .artist-card[data-rating] .region-watermark,
+.artist-grid:not(.artist-deck) .artist-card[data-rating] .card-info h2{
+  transition-duration:.48s!important;transition-delay:0s!important;
+}
