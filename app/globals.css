@@ -3848,7 +3848,7 @@ body,body *{font-family:'Press Start 2P',ui-monospace,monospace!important}
   opacity:.95;filter:drop-shadow(0 1px 1px #000);
 }
 .artist-grid:not(.artist-deck) .artist-card[data-section="runet"][data-rating] .card-info .region-watermark{
-  inset:-12px auto auto 50%;width:42px;height:33px;
+  inset:-14px auto auto 50%;width:42px;height:33px;
 }
 
 /* Restore fine CRT texture and rank-coloured light without tinting the bezel. */
