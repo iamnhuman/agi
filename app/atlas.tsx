@@ -32,45 +32,45 @@ function createSignalScript(){
  const hex=(length:number)=>Array.from({length},()=>random(16).toString(16)).join('');
  const sector=String(random(12)+1).padStart(2,'0');
  const shard=String(random(8)+1).padStart(2,'0');
- const node=pick(['archive-01','mirror-03','relay-07','vault-02']);
- const channel=pick(['memory','catalog','signal','journal']);
+ const node=pick(['ghost-13','proxy-07','icebox-02','root-node']);
+ const channel=pick(['sandbox','vault','relay','blackbox']);
  const block=`0x${hex(4).toUpperCase()}`;
  const digest=hex(8);
  const latency=(8+random(120)/10).toFixed(1);
  const events=12000+random(68000);
- const drift=(0.006+random(24)/1000).toFixed(3);
  const routines=[
   [
-   `$ atlasctl verify --index=${channel} --shard=${shard}`,
-   `> digest mismatch at ${block}; observed=${digest}`,
-   `const delta = diff(snapshot, mirror["${shard}"]);`,
-   `if (delta.score > ${drift}) isolate("${channel}");`,
+   `$ ghostctl exploit --vector=sim-rce --target=${node}`,
+   `const payload = Buffer.from("${digest}", "hex");`,
+   `await inject(payload, "sandbox://${node}");`,
+   `> payload staged; root shell denied [SIM]`,
   ],
   [
-   `$ atlasctl trace --node=${node} --depth=${random(4)+3}`,
-   `> journal offset=${events} gap=${random(9)+1} entries`,
-   `const frames = await replay(journal, ${events});`,
-   `> replay complete; ${random(5)+2} frames flagged`,
+   `$ ghostctl crack --hash=${digest} --mode=offline-sim`,
+   `> keyspace=${events} candidates; salt=${block}`,
+   `const token = await hashProbe("${node}", digest);`,
+   `> credential match: decoy // sandbox`,
   ],
   [
-   `$ atlasctl probe --channel=${channel} --sector=${sector}`,
-   `> carrier=${(12+random(400)/100).toFixed(2)}MHz noise=-${30+random(26)}dB`,
-   `await sync({ node:"${node}", shard:${Number(shard)} });`,
-   `> sync checkpoint ${hex(4)} accepted`,
+   `$ ghostctl bypass --firewall=${sector} --dry-run`,
+   `> rule ${sector} mapped; egress=locked`,
+   `const route = await tunnel("proxy://${node}", "${channel}");`,
+   `> pivot staged; remote writes=0 [SIM]`,
   ],
  ];
  const selected=routines.splice(random(routines.length),1)[0];
  const followUp=pick(routines);
  return [
-  `$ atlasctl session open --sector=${sector} --id=${session}`,
-  `> handshake ${node} accepted in ${latency}ms`,
-  `$ mount archive://imagination/${channel} --read-only`,
-  `> mounted /${channel} [shard=${shard} trace=${hex(6)}]`,
+  `$ ghostctl recon ${node} --ports=sim --stealth`,
+  `> ports 22/443/8080 mapped; honeypot=${random(2)}`,
+  `const session = await proxy.route("${node}", "relay://ghost");`,
+  `> tunnel sealed; fingerprint=${hex(6)} (${latency}ms)`,
   ...selected,
   ...followUp,
-  `$ atlasctl reconcile --shard=${shard} --from=mirror`,
-  `> ${events} events checked; checksum=${hex(8)}`,
-  `$ atlasctl watch ${channel} --follow --session=${session}`,
+  `$ ghostctl exfil --target=${node} --sink=blackbox://sim`,
+  `> ${events} bytes sealed; checksum=${hex(8)}`,
+  `$ ghostctl cleanup --session=${session} --dry-run`,
+  `> traces scrubbed; host writes=0 // SIM`,
  ];
 }
 type SignalConsoleState={lines:string[];line:number;chars:number;pause:number};
@@ -348,10 +348,10 @@ function ToyotaFooter(){
   <div id="toyota-transmission" className="manifesto-transmission" aria-hidden={!signalOpen}>
    <SignalRain active={signalOpen}/>
    <div className="manifesto-interference">
-    <div className="signal-console-title">ARCHIVE://DEAD_SIGNAL <b>ERROR 01 / LINK DEGRADED</b></div>
+    <div className="signal-console-title">ROOTKIT://GHOST_SESSION <b>EXPLOIT SIM // SANDBOXED</b></div>
     <div className="signal-console-body">
      <div className="signal-console-log">{consoleLines.map((fragment,i)=>{const lineIndex=firstConsoleLine+i;const active=lineIndex===consoleState.line;return <span className={active?'console-line is-active':'console-line'} key={`${lineIndex}-${active?'active':'done'}`}>{active?fragment.slice(0,consoleState.chars):fragment}</span>;})}</div>
-     <div className="signal-skull-block"><div>UNRECOVERED SECTOR // 0x01F4</div><pre>{signalSkull}</pre><div>MEMORY CORRUPTION DETECTED</div></div>
+     <div className="signal-skull-block"><div>TARGET NODE // {`0x01F4`}</div><pre>{signalSkull}</pre><div>ROOT ACCESS SIMULATED</div></div>
     </div>
    </div>
    <div className="manifesto-zalgo" aria-hidden="true" style={{fontFamily:signalFont(fontTick)}}><span className="zalgo-layer">{zalgoSignal(Math.floor(signalTick/3))}</span><span className="zalgo-layer">{zalgoSignal(Math.floor(signalTick/3)+3,1)}</span><span className="zalgo-layer">{zalgoSignal(Math.floor(signalTick/3)+7,2)}</span></div>
