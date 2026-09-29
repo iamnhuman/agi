@@ -3825,6 +3825,18 @@ body,body *{font-family:'Press Start 2P',ui-monospace,monospace!important}
   .catalog-view-controls>.view-switch button svg{width:19px;height:19px}
 }
 
+/* Name the content-kind filter just like the neighboring rating filter. */
+.search-row .catalog-type-controls>.catalog-type-radios[aria-label="Тип записей"]::before{
+  content:"ТИП";display:flex;flex:none;align-items:center;padding:0 9px 0 7px;
+  color:#aeb6b8;font:700 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.12em;text-shadow:0 1px #000;white-space:nowrap;
+}
+@media(max-width:700px){
+  .search-row .catalog-type-controls>.catalog-type-radios[aria-label="Тип записей"]::before{
+    grid-column:1/-1;min-height:22px;padding:3px 6px 0;font-size:9px;
+  }
+}
+
 /* Dossiers read as a restrained archive system, not miniature arcade cabinets. */
 .artist-grid:not(.artist-deck) .artist-card[data-rating]{
   padding:4px;border:1px solid #687175;border-radius:9px;
