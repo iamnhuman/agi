@@ -114,7 +114,7 @@ export default function Admin(){
 <div className={'mini-art art-'+i%8}>
 <div className="missing-avatar" role="img" aria-label="Аватарка отсутствует">
 <span aria-hidden="true">×</span>
-</div>{a.image&&<img src={a.image} alt={a.name} loading="lazy" referrerPolicy="no-referrer" onError={e=>{e.currentTarget.style.display='none';}}/>}{a.kind==='collective'?<span className="record-type record-type--avatar"><UsersRound size={13} aria-hidden="true"/> Проект</span>:a.kind==='media'?<span className="record-type record-type--avatar"><Radio size={13} aria-hidden="true"/> Медиа</span>:null}<span className="art-badges"><span className={`rating-tag rating-${(a.rating||'A').toLowerCase()}`}>{a.rating||'A'}</span></span></div>
+</div>{a.image&&<a className="admin-artwork-link" href={a.url||a.image} target="_blank" rel="noopener noreferrer" aria-label={`Открыть ${a.name} в новой вкладке`}><img src={a.image} alt={a.name} loading="lazy" referrerPolicy="no-referrer" onError={e=>{e.currentTarget.style.display='none';}}/></a>}{a.kind==='collective'?<span className="record-type record-type--avatar"><UsersRound size={13} aria-hidden="true"/> Проект</span>:a.kind==='media'?<span className="record-type record-type--avatar"><Radio size={13} aria-hidden="true"/> Медиа</span>:null}<span className="art-badges"><span className={`rating-tag rating-${(a.rating||'A').toLowerCase()}`}>{a.rating||'A'}</span></span></div>
 <div className="row-name">
 {(a.section==='world'||a.section==='runet')&&<img className="region-watermark" src={a.section==='world'?'./badges/region-en-eagle-cutout.png':'./badges/region-ru-emblem-cutout.png'} alt="" aria-hidden="true" loading="lazy" decoding="async"/>}
 <AdminCardName name={a.name} columns={columns}/>
