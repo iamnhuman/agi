@@ -4093,22 +4093,3 @@ body,body *{font-family:'Press Start 2P',ui-monospace,monospace!important}
 /* The VHS shader now generates the scan texture from the live signal canvas. */
 .manifesto-transmission::before{background:none!important;mix-blend-mode:normal}
 .manifesto-transmission::after{display:none!important}
-
-/* The dossier rack uses a pointer-lit surface and tighter cards instead of oversized flat tiles. */
-.artist-grid.artist-deck{gap:10px;min-height:440px;padding:48px clamp(24px,5vw,72px) 56px;overflow-y:visible;perspective:1000px;perspective-origin:50% 44%;background:radial-gradient(ellipse at 50% 42%,#4e1b2855,transparent 58%),linear-gradient(180deg,#171719,#0b0d0e 78%);isolation:isolate}
-.artist-deck .artist-card{position:relative;flex-basis:calc(clamp(195px,18vw,255px) * var(--deck-zoom,.8));width:calc(clamp(195px,18vw,255px) * var(--deck-zoom,.8));height:auto;min-height:0;margin-right:-34px;overflow:hidden;transform:perspective(900px) rotateX(var(--tilt-x,0deg)) rotateY(calc(var(--base-tilt,-12deg) + var(--tilt-y,0deg))) translateZ(-18px) scale(.94);transform-style:preserve-3d;transition:transform .32s cubic-bezier(.2,.75,.25,1),border-color .3s,box-shadow .3s;box-shadow:inset 0 1px #fff8,inset 0 0 0 1px #ffffff18,0 16px 24px #000b,0 2px 4px #fff2;will-change:transform}
-.artist-deck .artist-card:nth-child(even){--base-tilt:12deg}
-.artist-deck .artist-card:hover,.artist-deck .artist-card:focus-within{transform:perspective(900px) rotateX(var(--tilt-x,0deg)) rotateY(var(--tilt-y,0deg)) translateY(-12px) translateZ(48px) scale(1.035);z-index:8;border-color:var(--card-accent);box-shadow:inset 0 1px #fff,inset 0 0 0 1px #ffffff3a,0 32px 48px #000e,0 0 30px var(--card-glow),0 2px 4px #fff6}
-.artist-deck .artist-card::before{content:"";position:absolute;z-index:6;inset:0;pointer-events:none;opacity:0;background:radial-gradient(ellipse at var(--shine-x,50%) var(--shine-y,35%),#ffffff40,transparent 42%),linear-gradient(115deg,transparent 25%,#ffffff12 48%,transparent 68%);mix-blend-mode:screen;transition:opacity .25s}
-.artist-deck .artist-card:hover::before,.artist-deck .artist-card:focus-within::before{opacity:1}
-.artist-deck .artist-card>.art{position:relative;aspect-ratio:1/1;border-radius:0;overflow:hidden;border-bottom:1px solid color-mix(in srgb,var(--card-accent) 62%,#777);box-shadow:inset 0 0 32px #0005}
-.artist-deck .artist-card>.art img{transition:transform .6s cubic-bezier(.2,.75,.25,1),filter .4s;filter:saturate(.9) contrast(1.05)}
-.artist-deck .artist-card:hover>.art img{transform:scale(1.07);filter:saturate(1.16) contrast(1.08)}
-.artist-deck .card-info{min-height:88px;padding:16px 18px 12px;background:linear-gradient(155deg,color-mix(in srgb,var(--card-surface) 88%,#fff 12%),var(--card-surface-deep) 62%);box-shadow:inset 0 1px #ffffff18}
-.artist-deck .card-info p,.artist-deck .artist-social{display:none}
-.artist-deck .card-info h2{margin:0}
-.artist-deck .card-info .region-watermark{width:76px;height:76px;right:-8px;opacity:.08}
-.artist-deck .card-hit-area{display:none}
-.artist-deck::before{top:14px;align-self:flex-start;text-shadow:0 0 12px #f3d95870}
-.artist-deck[data-dragging="true"] .artist-card::before{display:none}
-@media(max-width:700px){.artist-grid.artist-deck{min-height:340px;padding:42px 22px 42px;gap:4px;perspective:760px}.artist-deck .artist-card{flex-basis:calc(min(68vw,230px) * var(--deck-zoom,.8));width:calc(min(68vw,230px) * var(--deck-zoom,.8));margin-right:-24px;transform:perspective(760px) rotateY(var(--base-tilt,-8deg)) translateZ(-12px) scale(.96)}.artist-deck .artist-card:nth-child(even){--base-tilt:8deg}.artist-deck .artist-card:hover,.artist-deck .artist-card:focus-within{transform:perspective(760px) rotateY(0) translateY(-7px) translateZ(20px) scale(1.015)}}
