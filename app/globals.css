@@ -3790,6 +3790,41 @@ body,body *{font-family:'Press Start 2P',ui-monospace,monospace!important}
   .search-row .catalog-tag-filter .catalog-type-radios span{font-size:9px}
 }
 
+/* A compact, evenly weighted segmented selector for the four catalog views. */
+.catalog-view-controls>.view-switch{
+  display:flex;align-items:center;justify-content:stretch;gap:3px;min-width:0;
+  padding:4px;border:1px solid #727a7e;border-radius:4px;
+  background:linear-gradient(180deg,#252a2d 0%,#111416 34%,#191d20 100%);
+  box-shadow:inset 0 1px #ffffff30,inset 0 -2px #0009,0 3px 9px #0008;
+}
+.catalog-view-controls>.view-switch::before{
+  flex:1 1 auto;justify-content:flex-start;min-width:44px;padding:0 9px 0 7px;
+  color:#aeb6b8;font:700 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.12em;text-shadow:0 1px #000;text-align:left;
+}
+.catalog-view-controls>.view-switch button{
+  position:relative;flex:0 0 clamp(42px,4.2vw,50px);width:auto;height:42px;min-height:42px;
+  border:1px solid transparent;border-radius:3px;background:linear-gradient(180deg,#ffffff08,#00000012);
+  color:#b9c0c2;transition:color .18s,border-color .18s,background .18s,box-shadow .18s,transform .18s;
+}
+.catalog-view-controls>.view-switch button svg{width:20px;height:20px;stroke-width:2.1}
+.catalog-view-controls>.view-switch button:hover{border-color:#727b7f;background:linear-gradient(180deg,#414649,#222629);color:#f2e7bd}
+.catalog-view-controls>.view-switch button.active{
+  border-color:#c9494b;background:linear-gradient(180deg,#c22a30,#78131a 70%,#511015);
+  color:#ffe85b;box-shadow:inset 0 1px #ffffff52,inset 0 -2px #30090c,0 0 9px #e3243450;
+}
+.catalog-view-controls>.view-switch button:active{transform:translateY(1px)}
+@media(max-width:700px){
+  .catalog-view-controls>.view-switch{justify-content:stretch;min-height:52px}
+  .catalog-view-controls>.view-switch::before{flex:1 1 auto;min-width:40px;padding-inline:7px;font-size:9px}
+  .catalog-view-controls>.view-switch button{flex:1 1 0;width:auto;height:42px}
+}
+@media(max-width:420px){
+  .catalog-view-controls>.view-switch::before{flex:0 0 48px;min-width:0;padding-inline:5px;font-size:8px}
+  .catalog-view-controls>.view-switch button{flex:1 1 0;min-width:0;height:40px}
+  .catalog-view-controls>.view-switch button svg{width:19px;height:19px}
+}
+
 /* Dossiers read as a restrained archive system, not miniature arcade cabinets. */
 .artist-grid:not(.artist-deck) .artist-card[data-rating]{
   padding:4px;border:1px solid #687175;border-radius:9px;
