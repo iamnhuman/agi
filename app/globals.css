@@ -3888,6 +3888,13 @@ body,body *{font-family:'Press Start 2P',ui-monospace,monospace!important}
 .artist-grid:not(.artist-deck) .card-name-copy{
   text-shadow:0 1px 2px #000,0 0 8px color-mix(in srgb,var(--card-accent) 42%,transparent);
 }
+.artist-grid:not(.artist-deck) .artist-card[data-kind][data-rating]>.card-info::before{
+  opacity:0;transition:opacity .28s ease,filter .28s ease;
+}
+.artist-grid:not(.artist-deck) .artist-card[data-kind][data-rating]:hover>.card-info::before,
+.artist-grid:not(.artist-deck) .artist-card[data-kind][data-rating]:focus-within>.card-info::before{
+  opacity:.85;filter:drop-shadow(0 0 5px var(--card-accent));
+}
 
 /* Nudge the faction crests to their optical centres on the name plate. */
 .artist-grid:not(.artist-deck) .artist-card[data-section="runet"][data-rating] .card-info .region-watermark{
