@@ -3851,76 +3851,57 @@ body,body *{font-family:'Press Start 2P',ui-monospace,monospace!important}
   inset:-12px auto auto 50%;width:42px;height:33px;
 }
 
-/* Restore the Red Alert cabinet face over the neutral metal finish. */
+/* Restore fine CRT texture and rank-coloured light without tinting the bezel. */
 .artist-grid:not(.artist-deck) .artist-card[data-rating]{
-  padding:5px;border:2px solid transparent;border-radius:14px;
-  background:
-    linear-gradient(#111416,#111416) padding-box,
-    linear-gradient(145deg,#d6dcdd 0%,#737b7e 5%,#272c2f 11%,#aeb5b7 12%,#343a3c 17%,#111416 22%,#aeb5b7 92%,#080a0b 100%) border-box;
-  box-shadow:inset 0 1px #ffffff55,inset 0 0 0 1px #090b0c,0 16px 34px #000a,0 0 22px var(--card-halo);
-}
-.artist-grid:not(.artist-deck) .artist-card[data-rating]::before{
-  content:""!important;display:block!important;position:absolute;z-index:3;inset:5px;
-  border:1px solid #ffffff25;border-radius:8px;pointer-events:none;
-  background:
-    radial-gradient(circle at 9px 9px,#d4d9d9 0 1px,#41474a 2px,transparent 3px),
-    radial-gradient(circle at calc(100% - 9px) 9px,#d4d9d9 0 1px,#41474a 2px,transparent 3px),
-    radial-gradient(circle at 9px calc(100% - 9px),#d4d9d9 0 1px,#41474a 2px,transparent 3px),
-    radial-gradient(circle at calc(100% - 9px) calc(100% - 9px),#d4d9d9 0 1px,#41474a 2px,transparent 3px);
-}
-.artist-grid:not(.artist-deck) .artist-card[data-rating]::after{
-  display:block;z-index:0;inset:5px;border:1px solid #e6424833;border-radius:8px;
-  opacity:.78;pointer-events:none;
-  background:
-    repeating-linear-gradient(0deg,transparent 0 5px,#fff1 5px 6px),
-    linear-gradient(90deg,transparent 49.8%,#ff342322 50%,transparent 50.2%),
-    radial-gradient(ellipse at 50% 0%,#d71c2340,transparent 68%),
-    linear-gradient(145deg,#202528,#111416 38%,#1a1012 100%);
-}
-.artist-grid:not(.artist-deck) .artist-card[data-rating]>.art{
-  border:1px solid #646b6d;border-bottom-color:#8b3438;
-  border-radius:7px 7px 0 0;
-  background:radial-gradient(ellipse at 50% 0%,#d51e2533,transparent 66%),#141113;
+  box-shadow:inset 0 1px #ffffff55,0 8px 22px #000a,
+    0 0 16px color-mix(in srgb,var(--card-accent) 18%,transparent);
 }
 .artist-grid:not(.artist-deck) .artist-card[data-rating]>.art::after{
   background:
-    repeating-linear-gradient(0deg,transparent 0 4px,#ffffff12 4px 5px),
-    linear-gradient(90deg,transparent 49.8%,#fa34301c 50%,transparent 50.2%),
-    radial-gradient(ellipse at 50% 0%,#f52b261a,transparent 62%),
-    linear-gradient(180deg,#100b0c16 0%,transparent 48%,#07090bd9 100%);
+    radial-gradient(ellipse 46% 72% at var(--dossier-light-x) var(--dossier-light-y),color-mix(in srgb,var(--card-accent) 20%,transparent),transparent 76%),
+    repeating-linear-gradient(0deg,transparent 0 4px,#ffffff0c 4px 5px),
+    linear-gradient(180deg,#10171908 0%,transparent 48%,#080b0dd9 100%);
 }
 .artist-grid:not(.artist-deck) .artist-card[data-kind][data-rating]>.card-info{
-  border:1px solid #743137;border-top:2px solid #c3484c;
-  border-radius:0 0 7px 7px;
   background:
-    repeating-linear-gradient(0deg,transparent 0 7px,#ffffff0a 7px 8px),
-    linear-gradient(110deg,#501217 0%,#241417 38%,#111416 100%);
-  box-shadow:inset 0 1px #ffffff30,inset 0 -3px #080a0b;
+    radial-gradient(ellipse at var(--dossier-light-x) 100%,color-mix(in srgb,var(--card-accent) 30%,transparent),transparent 75%),
+    repeating-linear-gradient(var(--dossier-grain-angle),#ffffff05 0 1px,transparent 1px var(--dossier-grain-step)),
+    linear-gradient(155deg,#303639,#121719 35%,#080c0e);
+  box-shadow:inset 0 1px #ffffff1a;
 }
-.artist-grid:not(.artist-deck) .artist-card[data-kind][data-rating]>.card-info::before{
-  background:linear-gradient(90deg,#df3038,#8d1b22 48%,transparent);
-  box-shadow:0 0 7px #e32b2b66;
+.artist-grid:not(.artist-deck) .card-name-screen{
+  border:1px solid #06090a;border-top-color:#030506;border-bottom-color:#687174;
+  background:
+    repeating-linear-gradient(0deg,#ffffff07 0 1px,transparent 1px 4px),
+    radial-gradient(ellipse at 50% 75%,color-mix(in srgb,var(--card-accent) 24%,transparent),transparent 75%),
+    linear-gradient(180deg,#05090cb8,#10171a9c 50%,#030608bd);
+  box-shadow:inset 0 3px 9px #000e,
+    inset 0 0 15px color-mix(in srgb,var(--card-accent) 30%,transparent),
+    inset 0 0 0 1px #8b96954a,0 1px #b1baba2b;
 }
-.artist-grid:not(.artist-deck) .artist-card[data-rating] .art-badges .rating-tag,
-.artist-grid:not(.artist-deck) .artist-card[data-rating] .record-type--avatar{
-  border-color:color-mix(in srgb,var(--card-accent) 60%,#8c3c40);
-  background:linear-gradient(180deg,#252a2d,#101315);
-  box-shadow:inset 0 1px #ffffff4a,0 0 0 2px #111416,0 0 14px color-mix(in srgb,var(--card-accent) 28%,transparent),0 5px 12px #000a;
+.artist-grid:not(.artist-deck) .card-name-screen::after{
+  display:block;
+  background:
+    radial-gradient(ellipse 42% 82% at var(--dossier-sheen-x) 0%,#ffffff20,transparent 78%),
+    linear-gradient(180deg,#ffffff12,transparent 31%,transparent 75%,#0008);
+}
+.artist-grid:not(.artist-deck) .card-name-copy{
+  text-shadow:0 1px 2px #000,0 0 8px color-mix(in srgb,var(--card-accent) 42%,transparent);
 }
 
 /* Nudge the faction crests to their optical centres on the name plate. */
 .artist-grid:not(.artist-deck) .artist-card[data-section="runet"][data-rating] .card-info .region-watermark{
-  transform:translateX(-50%) translateY(-2px)!important;
+  transform:translateX(-50%) translateY(-4px)!important;
 }
 .artist-grid:not(.artist-deck) .artist-card[data-section="runet"][data-rating]:hover .card-info .region-watermark,
 .artist-grid:not(.artist-deck) .artist-card[data-section="runet"][data-rating]:focus-within .card-info .region-watermark{
-  transform:translateX(-50%) translateY(-2px) rotate(-1deg) scale(1.04)!important;
+  transform:translateX(-50%) translateY(-4px) rotate(-1deg) scale(1.04)!important;
 }
 .artist-grid:not(.artist-deck) .artist-card[data-section="world"][data-rating] .card-info .region-watermark{
   width:46px;height:29px;
-  transform:translateX(-50%) translateY(-1px) scale(1.08)!important;
+  transform:translateX(-50%) translateY(-3px) scale(1.08)!important;
 }
 .artist-grid:not(.artist-deck) .artist-card[data-section="world"][data-rating]:hover .card-info .region-watermark,
 .artist-grid:not(.artist-deck) .artist-card[data-section="world"][data-rating]:focus-within .card-info .region-watermark{
-  transform:translateX(-50%) translateY(-1px) rotate(-1deg) scale(1.12)!important;
+  transform:translateX(-50%) translateY(-3px) rotate(-1deg) scale(1.12)!important;
 }
