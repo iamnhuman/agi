@@ -202,7 +202,7 @@ function SignalRain({active}:{active:boolean}){
     }
    }
    context.globalAlpha=1;
-   if(runner)runner.render(vhs,{source,params:{intensity:.46,seed:reduceMotion?0:Math.floor(time/72)}});
+   if(runner)runner.render(vhs,{source,params:{intensity:.88,seed:reduceMotion?0:Math.floor(time/48)}});
    else if(fallback){fallback.clearRect(0,0,width,height);fallback.drawImage(source,0,0,width,height);}
   };
   resize();window.addEventListener('resize',resize);

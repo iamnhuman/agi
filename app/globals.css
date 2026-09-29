@@ -4090,6 +4090,10 @@ body,body *{font-family:'Press Start 2P',ui-monospace,monospace!important}
   .admin-grid .admin-card-actions button{width:32px;height:32px;min-width:32px;min-height:32px}
 }
 
-/* The VHS shader now generates the scan texture from the live signal canvas. */
-.manifesto-transmission::before{background:none!important;mix-blend-mode:normal}
+/* Let the WebGL VHS pass on the live rain canvas carry the scanline treatment. */
+.manifesto-transmission,.manifesto[data-open="true"] .manifesto-transmission{
+  background:radial-gradient(ellipse 78% 78% at 50% 48%,#310b16b8 0%,#10080dd9 64%,#050609f2 100%)!important;
+  animation:none!important;
+}
+.manifesto-transmission::before{display:none!important;background:none!important;mix-blend-mode:normal}
 .manifesto-transmission::after{display:none!important}
