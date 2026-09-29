@@ -13,6 +13,9 @@ if (pages) {
     readFile('public/favicon.svg'),
     readFile('site.html','utf8'),
   ]);
+  // GitHub Pages publishes this repository from its root, so public assets
+  // are served under ./public rather than from the site's domain root.
+  styles = styles.replaceAll('url(../fonts/','url(./fonts/');
   if(/^\s*(import|export)\s/m.test(javascript)) throw new Error('Pages-бандл содержит import/export; ожидается обычный скрипт.');
   // A closing script tag inside React's embedded strings would terminate an inline script in HTML.
   javascript = javascript.replace(/<\/script/gi,'<\\/script');
@@ -27,6 +30,7 @@ if (pages) {
   const rootHtml = html
     .replaceAll('./avatars/','./public/avatars/')
     .replaceAll('./badges/','./public/badges/')
+    .replaceAll('url(./fonts/','url(./public/fonts/')
     .replaceAll('./radar-world-red.webp','./public/radar-world-red.webp')
     .replaceAll('../cursor-','./public/cursor-');
   await writeFile('index.html',rootHtml);
