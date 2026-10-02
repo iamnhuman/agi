@@ -20,14 +20,17 @@ export function videoLink(raw){
  if(!fetchUrl&&platform==='Telegram'&&parts.length===1&&/^[\w]+$/.test(parts[0]))fetchUrl=`https://t.me/${parts[0]}`;
  const reference=!(videoId||platform==='Telegram'&&/^[\w]+$/.test(parts[0]||'')&&/^\d+$/.test(parts.at(-1)||'')||platform==='Instagram'&&['p','reel'].includes(parts[0])||platform==='VK'&&/^(?:video|clip)-?\d+_\d+$/.test(parts[0]||''));return {url:u.href,platform,videoId,fetchUrl,reference};
 }
-function decode(s){return s.replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&#(\d+);/g,(_,n)=>String.fromCodePoint(Math.min(+n,0x10ffff)));}
+function decode(s){let value=s;for(let i=0;i<3;i++){const next=value.replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;|&apos;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&#x([\da-f]+);/gi,(_,n)=>String.fromCodePoint(Math.min(parseInt(n,16),0x10ffff))).replace(/&#(\d+);/g,(_,n)=>String.fromCodePoint(Math.min(+n,0x10ffff)));if(next===value)break;value=next;}return value;}
 export function videoMetadata(html,link){
  const meta={};for(const tag of html.match(/<meta\b[^>]*>/gi)||[]){const a={};for(const m of tag.matchAll(/([\w:-]+)\s*=\s*(["'])(.*?)\2/g))a[m[1].toLowerCase()]=decode(m[3]);const key=a.property||a.itemprop||a.name;if(key&&!meta[key])meta[key]=a.content;}
  let date='',title=meta['og:title']||'',description=meta['og:description']||meta.description||'',image=meta['og:image']||meta['og:image:url']||meta['og:image:secure_url']||meta['twitter:image']||meta['twitter:image:src']||meta.thumbnail||'';
  if(link.platform==='YouTube')date=meta.datePublished||html.match(/"publishDate"\s*:\s*"(\d{4}-\d{2}-\d{2})/)?.[1]||'';
  if(link.platform==='Telegram'){
   date=html.match(/<time\b[^>]*datetime="([^"]+)"/)?.[1]||'';
-  image=decode(html.match(/background-image:url\('([^']+)'\)/)?.[1]||image);
+  const media=html.match(/<[a-z]+\b[^>]*class="[^"]*(?:tgme_widget_message_(?:video_thumb|photo_wrap)|link_preview_(?:right_image|image))[^"]*"[^>]*>/i)?.[0]||'';
+  const styleImage=media.match(/background-image\s*:\s*url\((?:'([^']+)'|"([^"]+)"|([^)]*))\)/i)?.slice(1).find(Boolean);
+  const postImage=styleImage||[...html.matchAll(/background-image\s*:\s*url\(['"]?([^'"\)]+)['"]?\)/gi)].map(match=>match[1]).find(value=>/(?:telesco\.pe|telegram-cdn\.org)\//i.test(value));
+  image=decode(postImage||image);
   const message=html.match(/<div\b[^>]*class="[^"]*tgme_widget_message_text[^\"]*"[^>]*>([\s\S]*?)<\/div>/i)?.[1]||'';
   const text=decode(message.replace(/<br\s*\/?>/gi,'\n').replace(/<[^>]*>/g,' ').replace(/[\t\r ]+/g,' ').replace(/\n\s+/g,'\n')).trim();
   title=text.slice(0,250);
@@ -35,19 +38,37 @@ export function videoMetadata(html,link){
  }
  if(link.platform==='Instagram')date=meta['article:published_time']||html.match(/"uploadDate"\s*:\s*"(\d{4}-\d{2}-\d{2}[^" ]*)"/)?.[1]||'';
  if(link.platform==='VK')date=meta['article:published_time']||meta['og:published_time']||meta['ya:ovs:upload_date']||html.match(/"(?:datePublished|uploadDate)"\s*:\s*"(\d{4}-\d{2}-\d{2}[^" ]*)"/)?.[1]||'';
+ if(!image)image=html.match(/"thumbnailUrl"\s*:\s*(?:\[\s*)?"([^"]+)"/)?.[1]?.replace(/\\u0026/g,'&').replace(/\\\//g,'/')||'';
  if(new URL(link.url).searchParams.has('comment'))date='';
  date=/^\d{4}-\d{2}-\d{2}/.test(date)?date.slice(0,10):'';
  try{image=image?new URL(image,link.fetchUrl||link.url).href:'';}catch{image='';}
  if(!image.startsWith('https://'))image='';
+ // Telegram's generic emoji and logo Open Graph assets are not post previews.
+ if(link.platform==='Telegram'&&image&&new URL(image).hostname==='telegram.org')image='';
  const isVideo=Boolean(link.videoId||/^(?:video|clip)-?\d+_\d+$/.test(new URL(link.url).pathname.split('/').filter(Boolean)[0]||'')||new URL(link.url).pathname.split('/').filter(Boolean)[0]==='reel'||meta['og:type']?.startsWith('video')||meta['og:video']||meta['og:video:url']||/<video\b|<source\b[^>]*type=["']video\//i.test(html));
  return {title:title.replace(/ - YouTube$/,'').slice(0,250),description:description.slice(0,1500),image,publishedAt:date,dateSource:date?'source':'unknown',dateUrl:date?link.fetchUrl:'',isVideo};
 }
 export async function importVideo(raw,fetcher=fetch){
  const link=videoLink(raw);let metadata={title:'',image:'',publishedAt:'',dateSource:'unknown',dateUrl:'',isVideo:Boolean(link.videoId||/^(?:video|clip)-?\d+_\d+$/.test(new URL(link.url).pathname.split('/').filter(Boolean)[0]||'')||new URL(link.url).pathname.split('/').filter(Boolean)[0]==='reel')};
- if(link.fetchUrl)try{
- const r=await fetcher(link.fetchUrl,{redirect:'manual',signal:AbortSignal.timeout(12000),headers:{'User-Agent':'Mozilla/5.0'}});
- if(r.ok){const reader=r.body.getReader();let html='',n=0;const decoder=new TextDecoder();try{while(n<2500000){const x=await reader.read();if(x.done)break;const b=x.value.subarray(0,2500000-n);n+=b.length;html+=decoder.decode(b,{stream:true});}}finally{await reader.cancel();}metadata=videoMetadata(html,link);}else await r.body?.cancel();
- }catch{}
+ async function readMetadata(source){
+  if(!source.fetchUrl)return null;
+  try{
+   const r=await fetcher(source.fetchUrl,{redirect:'manual',signal:AbortSignal.timeout(12000),headers:{'User-Agent':'Mozilla/5.0'}});
+   if(!r.ok){await r.body?.cancel();return null;}
+   const reader=r.body.getReader();let html='',n=0;const decoder=new TextDecoder();
+   try{while(n<2500000){const x=await reader.read();if(x.done)break;const b=x.value.subarray(0,2500000-n);n+=b.length;html+=decoder.decode(b,{stream:true});}}finally{await reader.cancel();}
+   return videoMetadata(html,source);
+  }catch{return null;}
+ }
+ metadata=await readMetadata(link)||metadata;
+ if(!metadata.image&&link.platform==='Telegram'){
+  const channel=new URL(link.url).pathname.split('/').filter(Boolean).find(part=>part!=='s');
+  if(channel&&/^[\w]+$/.test(channel)){
+   const channelLink=videoLink(`https://t.me/${channel}`);
+   if(channelLink.fetchUrl!==link.fetchUrl){const channelMetadata=await readMetadata(channelLink);if(channelMetadata?.image)metadata.image=channelMetadata.image;}
+  }
+ }
+ if(!metadata.image&&link.videoId)metadata.image=`https://i.ytimg.com/vi/${link.videoId}/hqdefault.jpg`;
  return {...link,...metadata};
 }
 export function validVideoDate(value){return value===''||typeof value==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(value)&&!isNaN(Date.parse(value))&&new Date(value).toISOString().slice(0,10)===value;}

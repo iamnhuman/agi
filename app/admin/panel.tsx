@@ -1,13 +1,15 @@
 'use client';
 import {useEffect,useRef,useState,type CSSProperties} from 'react';
 import {siteUrl} from '@/client/config';
-import {Plus,Search,ArrowUpRight,Pencil,Trash2,Link2,LoaderCircle,RefreshCw,Radio,UsersRound} from 'lucide-react';
+import {Plus,Search,ArrowUpRight,Pencil,Trash2,Link2,LoaderCircle,RefreshCw,Radio,UsersRound,ChevronLeft,ChevronRight} from 'lucide-react';
 import AiConquerLogo from '@/client/ai-conquer-logo';
 import {Dialog,DialogContent,DialogTitle,DialogDescription} from '@/components/ui/dialog';
 import {AlertDialog,AlertDialogContent,AlertDialogHeader,AlertDialogTitle,AlertDialogDescription,AlertDialogFooter,AlertDialogCancel,AlertDialogAction} from '@/components/ui/alert-dialog';
 import {Select,SelectTrigger,SelectValue,SelectContent,SelectItem} from '@/components/ui/select';
 import type {Artist,ArtistRating,Section} from '@/lib/types';
 const blank:Artist={kind:'artist',rating:'A',id:'',name:'',url:'',section:'world',platform:'Instagram',description:'',image:'',tags:''};
+const ADMIN_PAGE_SIZE=18;
+type AdminPage=number|'all';
 function completedProfileUrl(value:string){const input=value.trim(),username=input.replace(/^@/,'');if(/^[a-zA-Z0-9._]+$/.test(username))return `https://www.instagram.com/${username}`;if(/^(?:www\.)?(?:instagram\.com|t\.me|telegram\.me)(?=\/|[?#]|$)/i.test(input))return `https://${input}`;return input;}
 function sizeFromImageUrl(src:string){const match=src.match(/[_-]s(\d+)x(\d+)(?:[_-]|$)/i);return match?`${match[1]} × ${match[2]}`:'';}
 function ArtworkPreview({src,label,fresh=false}:{src:string;label:string;fresh?:boolean}){
@@ -47,14 +49,30 @@ function AdminCardName({name,columns}:{name:string;columns:number}){
  },[name,columns,isPhrase]);
  return <strong ref={ref} className="admin-card-name" data-phrase={isPhrase} title={name}>{name}</strong>;
 }
+function AdminPagination({page,pageCount,first,last,total,onChange,placement}:{page:AdminPage;pageCount:number;first:number;last:number;total:number;onChange:(page:AdminPage)=>void;placement:'top'|'bottom'}){
+ return <nav className={`admin-pagination admin-pagination--${placement}`} aria-label={placement==='top'?'Страницы коллекции над карточками':'Страницы коллекции под карточками'}>
+ <span className="admin-pagination-range">{first}–{last} <span>из {total}</span></span>
+ <div className="admin-pagination-controls">
+ <button type="button" aria-label="Предыдущая страница" disabled={page==='all'||page===1} onClick={()=>{if(typeof page==='number')onChange(page-1);}}><ChevronLeft size={18} aria-hidden="true"/></button>
+ <select aria-label="Страница коллекции" value={page} onChange={event=>onChange(event.target.value==='all'?'all':Number(event.target.value))}>
+ <option value="all">Все</option>
+ {Array.from({length:pageCount},(_,index)=><option key={index+1} value={index+1}>{String(index+1).padStart(2,'0')} / {String(pageCount).padStart(2,'0')}</option>)}
+ </select>
+ <button type="button" aria-label="Следующая страница" disabled={page==='all'||page===pageCount} onClick={()=>{if(typeof page==='number')onChange(page+1);}}><ChevronRight size={18} aria-hidden="true"/></button>
+ </div>
+ </nav>;
+}
 export default function Admin(){
  const [columns,setColumns]=useState<number>(()=>{try{const saved=Number(localStorage.getItem('iizm-admin-columns'));return saved===7?6:saved===5?4:[1,3,4,6].includes(saved)?saved:6;}catch{return 6;}});
  function changeColumns(value:number){setColumns(value);try{localStorage.setItem('iizm-admin-columns',String(value));}catch{}}
 
  const [artists,setArtists]=useState<Artist[]>([]),[sections,setSections]=useState<Section[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState(''),[notice,setNotice]=useState(''),[q,setQ]=useState('');
+ const [page,setPage]=useState<AdminPage>(1);
+ function resetPage(){setPage(current=>current==='all'?'all':1);}
+ const rowsRef=useRef<HTMLDivElement>(null);
  const [groups,setGroups]=useState<string[]>([]),[kinds,setKinds]=useState<NonNullable<Artist['kind']>[]>([]);
- function toggleGroup(value:string){setGroups(current=>current.includes(value)?current.filter(item=>item!==value):[...current,value]);}
- function toggleKind(value:NonNullable<Artist['kind']>){setKinds(current=>current.includes(value)?current.filter(item=>item!==value):[...current,value]);}
+ function toggleGroup(value:string){resetPage();setGroups(current=>current.includes(value)?current.filter(item=>item!==value):[...current,value]);}
+ function toggleKind(value:NonNullable<Artist['kind']>){resetPage();setKinds(current=>current.includes(value)?current.filter(item=>item!==value):[...current,value]);}
  const [draft,setDraft]=useState<Artist|null>(null),[link,setLink]=useState(''),[busy,setBusy]=useState(false),[formError,setFormError]=useState(''),[importNote,setImportNote]=useState(''),[deleting,setDeleting]=useState<Artist|null>(null),[artworkBefore,setArtworkBefore]=useState('');
  async function load(){setLoading(true);setError('');try{const r=await fetch('/api/catalog');const d:any=await r.json();if(!r.ok)throw Error(d.error);setArtists(d.artists);setSections(d.sections);const editId=new URLSearchParams(location.search).get("edit");if(editId){const item=d.artists.find((a:Artist)=>a.id===editId);if(item)start(item);const url=new URL(location.href);url.searchParams.delete("edit");history.replaceState(null,"",url);}}catch(e){setError((e as Error).message);}finally{setLoading(false);}}
  useEffect(()=>{load();},[]);
@@ -66,12 +84,22 @@ export default function Admin(){
  async function importLink(refresh=false){setBusy(true);setFormError('');setImportNote('');try{const source=refresh?draft?.url:completedProfileUrl(link);const r=await fetch('/api/import',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:source})});const d:any=await r.json();if(!r.ok)throw Error(d.error);if(!refresh)setLink(d.artist.url);setDraft(prev=>refresh?{...prev!,platform:d.artist.platform,...((d.metadataLoaded||d.artist.platform==='Instagram')&&d.artist.name?{name:d.artist.name}:{}),...(d.artist.description?{description:d.artist.description}:{}),...(d.artist.image&&(!prev?.image||!d.lowResolution)?{image:d.artist.image}:{})}:{...prev!,...d.artist});if(d.imageNotice&&!d.hdAvatar)setFormError(d.imageNotice);else setImportNote(d.hdAvatar&&d.imageSavedLocally?'HD-аватарка профиля найдена и сохранена локально. Проверьте карточку перед сохранением.':d.imageSavedLocally?'Обложка найдена и сохранена локально. Проверьте карточку перед сохранением.':d.lowResolution?"Instagram отдал только уменьшенную аватарку. Можно загрузить файл вручную.":refresh?d.metadataLoaded?"Доступные данные обновлены. Проверьте их и сохраните карточку. Поля без новых данных оставлены без изменений.":"Площадка не отдала данные аккаунта. Существующие поля сохранены.":d.notice);}catch(e){setFormError((e as Error).message);}finally{setBusy(false);}}
  async function save(e:React.FormEvent){e.preventDefault();setBusy(true);setFormError('');try{const expectedRating=draft?.rating||'A';const artist=draft?{...draft,url:completedProfileUrl(draft.url)}:draft;const d=await mutate({action:'save',artist});if(d.artist.rating!==expectedRating)throw Error('Сервер не применил тег рейтинга. Перезапустите локальный сайт и повторите сохранение.');setArtists(prev=>prev.some(a=>a.id===d.artist.id)?prev.map(a=>a.id===d.artist.id?d.artist:a):[d.artist,...prev]);setDraft(null);setNotice(`Карточка сохранена с тегом ${d.artist.rating}.`);}catch(e){setFormError((e as Error).message);}finally{setBusy(false);}}
  const filtered=artists.filter(a=>(groups.length===0||groups.includes(a.section))&&(kinds.length===0||kinds.includes(a.kind||'artist'))&&(a.name+' '+a.url+' '+a.tags).toLowerCase().includes(q.toLowerCase()));
+ const pageCount=Math.max(1,Math.ceil(filtered.length/ADMIN_PAGE_SIZE));
+ const currentPage=page==='all'?'all':Math.min(page,pageCount);
+ const first=filtered.length?(currentPage==='all'?1:(currentPage-1)*ADMIN_PAGE_SIZE+1):0;
+ const last=currentPage==='all'?filtered.length:Math.min(currentPage*ADMIN_PAGE_SIZE,filtered.length);
+ const visible=filtered.slice(first?first-1:0,last);
+ function changePage(next:AdminPage){
+  if(next===currentPage||(typeof next==='number'&&(next<1||next>pageCount)))return;
+  setPage(next);
+  requestAnimationFrame(()=>rowsRef.current?.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'}));
+ }
  return <>
 <header className="topbar">
 <a className="brand" href={siteUrl} aria-label="AI & CONQUER — ASI ALERT, главная"><AiConquerLogo/></a>
 <nav className="primary-nav" aria-label="Разделы сайта">
 <a href={siteUrl+'/#catalog'} className="primary-nav-link">ИИ-артисты и медиа</a>
-<a href={siteUrl+'/#videos'} className="primary-nav-link">ИИ в творчестве</a>
+<a href="#videos" className="primary-nav-link">Видео · ИИ в творчестве</a>
 </nav>
 <div className="header-actions"><span className="admin-link curator-link is-current" aria-current="page">Кураторский штаб</span></div>
 </header>
@@ -90,7 +118,7 @@ export default function Admin(){
 </div>}<div className="admin-tools">
 <label className="input-search">
 <Search size={17}/>
-<input aria-label="Поиск записи" placeholder="Поиск" value={q} onChange={e=>setQ(e.target.value)}/>
+<input aria-label="Поиск записи" placeholder="Поиск" value={q} onChange={e=>{resetPage();setQ(e.target.value);}}/>
 </label>
 <div className="admin-view-controls">
 <div className="density-switch" role="group" aria-label="Размер карточек">
@@ -99,22 +127,27 @@ export default function Admin(){
 </div>
 <div className="admin-filter-groups">
 <fieldset className="admin-filter-set" aria-label="Тип записей">
-<label><input type="checkbox" checked={kinds.length===0} onChange={()=>setKinds([])}/><span>Все типы</span></label>
+<legend>ТИП</legend><div className="admin-filter-options">
+<label><input type="checkbox" checked={kinds.length===0} onChange={()=>{resetPage();setKinds([]);}}/><span>Все</span></label>
 {([['artist','Артисты'],['media','Медиа'],['collective','Проекты']] as const).map(([value,label])=><label key={value}><input type="checkbox" checked={kinds.includes(value)} onChange={()=>toggleKind(value)}/><span>{label}</span></label>)}
+</div>
 </fieldset>
 <fieldset className="admin-filter-set" aria-label="География">
-<label><input type="checkbox" checked={groups.length===0} onChange={()=>setGroups([])}/><span>Вся география</span></label>
+<legend>ГЕОГРАФИЯ</legend><div className="admin-filter-options">
+<label><input type="checkbox" checked={groups.length===0} onChange={()=>{resetPage();setGroups([]);}}/><span>Вся</span></label>
 {sections.map(section=><label key={section.id}><input type="checkbox" checked={groups.includes(section.id)} onChange={()=>toggleGroup(section.id)}/><span>{section.name}</span></label>)}
+</div>
 </fieldset>
 </div>
+{!loading&&filtered.length>0&&<AdminPagination page={currentPage} pageCount={pageCount} first={first} last={last} total={filtered.length} onChange={changePage} placement="top"/>}
 </div>
 </div>
-<div className={`admin-rows${columns===1?'':' admin-grid'}`} data-artwork="full" data-columns={columns} style={{'--admin-columns':columns} as CSSProperties}>{loading?<p className="empty">Загружаем коллекцию…</p>:filtered.map((a,i)=>
+<div ref={rowsRef} className={`admin-rows${columns===1?'':' admin-grid'}`} data-artwork="full" data-columns={columns} style={{'--admin-columns':columns} as CSSProperties}>{loading?<p className="empty">Загружаем коллекцию…</p>:visible.map((a,i)=>
 <div className="admin-row" data-rating={a.rating||'A'} data-kind={a.kind||'artist'} data-section={a.section} key={a.id}>
 <div className={'mini-art art-'+i%8}>
 <div className="missing-avatar" role="img" aria-label="Аватарка отсутствует">
 <span aria-hidden="true">×</span>
-</div>{a.image&&<a className="admin-artwork-link" href={a.url||a.image} target="_blank" rel="noopener noreferrer" aria-label={`Открыть ${a.name} в новой вкладке`}><img src={a.image} alt={a.name} loading="lazy" referrerPolicy="no-referrer" onError={e=>{e.currentTarget.style.display='none';}}/></a>}{a.kind==='collective'?<span className="record-type record-type--avatar"><UsersRound size={13} aria-hidden="true"/> Проект</span>:a.kind==='media'?<span className="record-type record-type--avatar"><Radio size={13} aria-hidden="true"/> Медиа</span>:null}<span className="art-badges"><span className={`rating-tag rating-${(a.rating||'A').toLowerCase()}`}>{a.rating||'A'}</span></span></div>
+</div>{a.image&&<a className="admin-artwork-link" href={a.url||a.image} target="_blank" rel="noopener noreferrer" aria-label={`Открыть ${a.name} в новой вкладке`}><img src={a.image} alt={a.name} loading="lazy" referrerPolicy="no-referrer" onError={e=>{e.currentTarget.style.display='none';}}/></a>}{a.kind==='collective'?<span className="record-type record-type--avatar"><UsersRound size={13} aria-hidden="true"/><span className="record-type-label">Проект</span></span>:a.kind==='media'?<span className="record-type record-type--avatar"><Radio size={13} aria-hidden="true"/><span className="record-type-label">Медиа</span></span>:null}<span className="art-badges"><span className={`rating-tag rating-${(a.rating||'A').toLowerCase()}`}>{a.rating||'A'}</span></span></div>
 <div className="row-name">
 {(a.section==='world'||a.section==='runet')&&<img className="region-watermark" src={a.section==='world'?'./badges/region-en-eagle-cutout.png':'./badges/region-ru-emblem-cutout.png'} alt="" aria-hidden="true" loading="lazy" decoding="async"/>}
 <AdminCardName name={a.name} columns={columns}/>

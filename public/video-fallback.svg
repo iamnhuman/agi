@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="Обложка материала">
+ <defs>
+  <radialGradient id="glow"><stop stop-color="#8b1b25"/><stop offset=".48" stop-color="#28161b"/><stop offset="1" stop-color="#0d1115"/></radialGradient>
+  <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#e4444b" stroke-opacity=".13"/></pattern>
+ </defs>
+ <path fill="url(#glow)" d="M0 0h640v360H0z"/><path fill="url(#grid)" d="M0 0h640v360H0z"/>
+ <path d="M0 26h640M0 334h640" stroke="#c63d44" stroke-opacity=".65" stroke-width="2"/>
+ <circle cx="320" cy="180" r="84" fill="#0e1218" fill-opacity=".75" stroke="#f04b54" stroke-width="3"/>
+ <circle cx="320" cy="180" r="64" fill="none" stroke="#ffdb60" stroke-opacity=".45" stroke-width="2" stroke-dasharray="8 12"/>
+ <path d="m302 141 61 39-61 39z" fill="#ffe678" stroke="#ff6860" stroke-width="5" stroke-linejoin="round"/>
+ <text x="26" y="54" fill="#ffdc74" font-family="monospace" font-size="18" font-weight="bold" letter-spacing="4">AI // ARCHIVE</text>
+ <text x="614" y="318" text-anchor="end" fill="#f3787b" font-family="monospace" font-size="13" letter-spacing="3">SOURCE PREVIEW</text>
+</svg>

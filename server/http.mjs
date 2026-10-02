@@ -3,9 +3,10 @@ import {readFile, stat} from 'node:fs/promises';
 import {resolve, extname, sep} from 'node:path';
 import {createCatalogStore} from './catalog.mjs';
 import {importVideo} from './video-import.mjs';
+import {downloadVideoImage} from './video-images.mjs';
 import {importArtist} from './import.mjs';
 import {downloadRemoteAvatar,MAX_AVATAR_BYTES,saveAvatarBytes} from './avatar-files.mjs';
-import {instagramSessionAvatar} from './instagram-session.mjs';
+import {instagramSessionAvatar,instagramSessionPost} from './instagram-session.mjs';
 import {parseArtistLink} from './links.mjs';
 
 const mime = {'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.jpg':'image/jpeg','.jpeg':'image/jpeg','.png':'image/png','.webp':'image/webp','.ico':'image/x-icon','.woff2':'font/woff2'};
@@ -54,6 +55,7 @@ export async function startServers({catalogFile,distDir,sitePort=3333,adminPort=
         const url = new URL(req.url, `http://${req.headers.host}`);
         if (url.pathname.startsWith('/api/')) {
           if (url.pathname === '/api/catalog' && req.method === 'GET') return json(res,200,await store.read());
+          if (url.pathname === '/api/client-ip' && req.method === 'GET') return json(res,200,{ip:req.socket.remoteAddress||null});
           if (req.method !== 'POST') return json(res,405,{error:'Метод не поддерживается.'});
           if (kind !== 'admin') return json(res,403,{error:'Изменения доступны только в админке.'});
           if (req.headers.origin !== `http://${req.headers.host}` || req.headers['sec-fetch-site'] === 'cross-site') return json(res,403,{error:'Запрос должен быть отправлен из локальной админки.'});
@@ -63,7 +65,29 @@ export async function startServers({catalogFile,distDir,sitePort=3333,adminPort=
           }
           const body = await readBody(req);
           if (url.pathname === '/api/catalog') return json(res,200,await store.mutate(body));
-          if (url.pathname === '/api/video-import') return json(res,200,await importVideo(String(body?.url||''),fetcher));
+          if (url.pathname === '/api/video-import') {
+            const imported=await importVideo(String(body?.url||''),fetcher);
+            if(imported.platform==='Instagram'){
+              const parts=new URL(imported.url).pathname.split('/').filter(Boolean);
+              if(['p','reel'].includes(parts[0])&&parts[1])try{
+                const post=await instagramSessionPost(parts[1]);
+                imported.image=post.url;
+                imported.publishedAt=imported.publishedAt||post.publishedAt;
+                imported.dateSource=imported.publishedAt?'source':'unknown';
+                imported.dateUrl=imported.publishedAt?imported.fetchUrl:'';
+                imported.title=post.title||imported.title;
+                imported.isVideo=post.isVideo;
+              }catch(error){imported.sessionNotice=error.message;}
+              else if(parts.length===1&&/^[A-Za-z0-9._]+$/.test(parts[0]))try{
+                const avatar=await instagramSessionAvatar(parts[0]);
+                imported.image=avatar.url;
+              }catch(error){imported.sessionNotice=error.message;}
+            }
+            if(imported.image)try{imported.image=await downloadVideoImage(imported.image,distDir,fetcher);imported.imageSavedLocally=true;}
+            catch(error){imported.imageNotice=error.message;}
+            return json(res,200,imported);
+          }
+          if (url.pathname === '/api/video-image') return json(res,200,{image:await downloadVideoImage(String(body?.url||''),distDir,fetcher)});
           if (url.pathname === '/api/avatar-from-url') return json(res,200,{image:await downloadRemoteAvatar(String(body?.url||''),distDir,fetcher)});
           if (url.pathname === '/api/import') {
             const raw=String(body?.url || '');

@@ -183,6 +183,23 @@ def avatar(username: str) -> None:
     )
 
 
+def post(shortcode: str) -> None:
+    if not re.fullmatch(r"[A-Za-z0-9_-]{5,30}", shortcode):
+        raise RuntimeError("Некорректный код публикации Instagram.")
+    loader, _ = load_session()
+    media = instaloader.Post.from_shortcode(loader.context, shortcode)
+    image = str(media.url)
+    if not image.startswith("https://"):
+        raise RuntimeError("Instagram не отдал обложку публикации.")
+    print(json.dumps({
+        "shortcode": shortcode,
+        "url": image,
+        "publishedAt": media.date_utc.date().isoformat(),
+        "title": (media.caption or "").strip()[:250],
+        "isVideo": bool(media.is_video),
+    }))
+
+
 def disconnect() -> None:
     if STATE_DIR.exists():
         shutil.rmtree(STATE_DIR)
@@ -200,6 +217,8 @@ def main() -> None:
     check.add_argument("--online", action="store_true")
     get_avatar = sub.add_parser("avatar")
     get_avatar.add_argument("username")
+    get_post = sub.add_parser("post")
+    get_post.add_argument("shortcode")
     sub.add_parser("disconnect")
     args = parser.parse_args()
     if args.command == "connect":
@@ -210,6 +229,8 @@ def main() -> None:
         status(args.online)
     elif args.command == "avatar":
         avatar(args.username)
+    elif args.command == "post":
+        post(args.shortcode)
     else:
         disconnect()
 
