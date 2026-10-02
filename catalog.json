@@ -1,6 +1,186 @@
 {
   "artists": [
     {
+      "id": "97b7f4cf-9bae-4ac3-8452-b251d9902695",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "creaturopedia_cg",
+      "url": "https://www.instagram.com/creaturopedia_cg",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-5af0cb51bb3dc26b.jpg",
+      "description": "367K Followers, 276 Following, 223 Posts - See Instagram photos and videos from Creaturopedia: Chimeric Garden (@creaturopedia_cg)",
+      "tags": ""
+    },
+    {
+      "id": "b33a9202-354f-4652-a4a4-798c48411d6d",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "javigandolfo",
+      "url": "https://www.instagram.com/javigandolfo",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-b32b129b6daf63b8.jpg",
+      "description": "47K Followers, 1,868 Following, 734 Posts - See Instagram photos and videos from Javier Gandolfo (@javigandolfo)",
+      "tags": ""
+    },
+    {
+      "id": "96eae8a1-97a3-41f7-a099-1ea30ffadd89",
+      "kind": "artist",
+      "rating": "AAA",
+      "name": "rayrays.weaponsnfirearms",
+      "url": "https://www.instagram.com/rayrays.weaponsnfirearms",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-7e70feb7dc8a7367.jpg",
+      "description": "308K Followers, 12 Following, 81 Posts - See Instagram photos and videos from Cousin Ray Ray (@rayrays.weaponsnfirearms)",
+      "tags": ""
+    },
+    {
+      "id": "3622fbea-b695-43ca-85fd-04b8df70b979",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "kawagebofilm",
+      "url": "https://www.instagram.com/kawagebofilm",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-f856749f41574623.jpg",
+      "description": "4,436 Followers, 37 Following, 37 Posts - See Instagram photos and videos from KAWAGEBO FILM (@kawagebofilm)",
+      "tags": ""
+    },
+    {
+      "id": "3f10e432-91c7-499c-8199-7b874b0570cf",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "ЭйАйЛера",
+      "url": "https://t.me/leraneuralpics",
+      "platform": "Telegram",
+      "section": "runet",
+      "image": "./public/avatars/upload-18169f17439cb288.jpg",
+      "description": "Я Валерия и я кормлю разные нейросети разными картинками\t\tinstagram: lerarussia\t\tконтакт для связи: @lerarussia",
+      "tags": ""
+    },
+    {
+      "id": "19a4164d-d222-4b5c-95eb-15d931b492d2",
+      "kind": "artist",
+      "rating": "AAA",
+      "name": "whypas_ai",
+      "url": "https://www.instagram.com/whypas_ai",
+      "platform": "Instagram",
+      "section": "runet",
+      "image": "./public/avatars/upload-c1f8b592821e49de.jpg",
+      "description": "1,282 Followers, 960 Following, 41 Posts - See Instagram photos and videos from Anastasiia Pas &#x2022; AI creative producer (@whypas_ai)",
+      "tags": ""
+    },
+    {
+      "id": "5e11af4c-8c33-4acb-8c41-d46ade22da8d",
+      "kind": "artist",
+      "rating": "AAA",
+      "name": "thedorbrothers",
+      "url": "https://www.instagram.com/thedorbrothers",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-ad477685b38e5795.jpg",
+      "description": "115K Followers, 684 Following, 782 Posts - See Instagram photos and videos from The Dor Brothers (@thedorbrothers)",
+      "tags": ""
+    },
+    {
+      "id": "270a2220-1231-4d3f-8fcb-251301f07283",
+      "kind": "collective",
+      "rating": "AA",
+      "name": "kartel_ai",
+      "url": "https://www.instagram.com/kartel_ai",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-7a3cb55a56714754.jpg",
+      "description": "2,732 Followers, 468 Following, 65 Posts - See Instagram photos and videos from KARTEL.ai (@kartel_ai)",
+      "tags": ""
+    },
+    {
+      "id": "ea21b593-8b3c-47f3-b551-7b01b9b90218",
+      "kind": "artist",
+      "rating": "AAA",
+      "name": "ВАНЯ КОМА",
+      "url": "https://t.me/vanyakoma",
+      "platform": "Telegram",
+      "section": "runet",
+      "image": "./public/avatars/upload-c8e9ec79999a5f54.jpg",
+      "description": "Cвязь со мной @komaclinical\tvanyakoma.ru\t\tCredits: \tSALUKI, ЭЛДЖЕЙ, ПОШЛАЯ МОЛЛИ, THOMAS MRAZ, YANIX, BUSHIDO ZHO, CREAM SODA, A$THMA BOYS, LUVU, 3G + SABU, CAKEBOY, IROH, CARNIVAL RECORDS, outsiderinc, НОКТУ, hangov3r, HQD ENERGY",
+      "tags": ""
+    },
+    {
+      "id": "187db808-baa5-4f8d-8ee1-a98fea02f67a",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "mmetemumtaz",
+      "url": "https://www.instagram.com/mmetemumtaz",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-cf53564774401456.jpg",
+      "description": "5,378 Followers, 880 Following, 182 Posts - See Instagram photos and videos from mete (@mmetemumtaz)",
+      "tags": ""
+    },
+    {
+      "id": "930fe99e-778f-43fd-b60b-6433f03ce501",
+      "kind": "media",
+      "rating": "A",
+      "name": "artificialinteligencevids",
+      "url": "https://www.instagram.com/artificialinteligencevids",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-c59c064e0a69de72.jpg",
+      "description": "156K Followers, 0 Following, 656 Posts - See Instagram photos and videos from Artificial Intelligence (@artificialinteligencevids)",
+      "tags": ""
+    },
+    {
+      "id": "473e49c9-b7f9-43f0-b406-84c08f6a78f4",
+      "kind": "artist",
+      "rating": "AAA",
+      "name": "ali.bardavid",
+      "url": "https://www.instagram.com/ali.bardavid",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-13f837e2396f054a.jpg",
+      "description": "3,146 Followers, 3,830 Following, 904 Posts - See Instagram photos and videos from alinici0us (@ali.bardavid)",
+      "tags": ""
+    },
+    {
+      "id": "75bf7cd5-b09f-46d0-a9f3-20dd2b0b26d6",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "kvantavsn",
+      "url": "https://www.instagram.com/kvantavsn",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-758c1deeaa89ab30.jpg",
+      "description": "909 Followers, 35 Following, 4 Posts - See Instagram photos and videos from kvanta vision (@kvantavsn)",
+      "tags": ""
+    },
+    {
+      "id": "82779da0-73d6-4349-acce-5f3c04cb6f3e",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "theartofrd",
+      "url": "https://www.instagram.com/theartofrd",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-3c2be4d370fc0388.jpg",
+      "description": "29K Followers, 81 Following, 34 Posts - See Instagram photos and videos from RD&#x1f4ab; (@theartofrd)",
+      "tags": ""
+    },
+    {
+      "id": "827b1bce-0afd-499d-a52f-d44fcaaf573b",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "panoramachannel",
+      "url": "https://www.instagram.com/panoramachannel",
+      "platform": "Instagram",
+      "section": "runet",
+      "image": "./public/avatars/upload-54e73eed1682a94e.jpg",
+      "description": "51K Followers, 1,041 Following, 738 Posts - See Instagram photos and videos from PANORAMA CHANNEL (@panoramachannel)",
+      "tags": ""
+    },
+    {
       "id": "f6c45be1-0860-4855-8959-2d4a68449062",
       "kind": "artist",
       "rating": "AA",
@@ -843,7 +1023,7 @@
     {
       "id": "5e75a557-f33f-4b29-8444-16b2d48c61de",
       "kind": "artist",
-      "rating": "AAA",
+      "rating": "AA",
       "name": "hntrdi",
       "url": "https://www.instagram.com/hntrdi",
       "platform": "Instagram",
@@ -963,7 +1143,7 @@
     {
       "id": "d344a397-e440-4430-800c-fd755400a2ba",
       "kind": "artist",
-      "rating": "AA",
+      "rating": "AAA",
       "name": "рэткэт",
       "url": "https://t.me/r4tc4t",
       "platform": "Telegram",
@@ -1874,7 +2054,7 @@
       "id": "seed-61",
       "kind": "artist",
       "rating": "A",
-      "name": "___infrarouge",
+      "name": "infrarouge",
       "url": "https://www.instagram.com/___infrarouge",
       "platform": "Instagram",
       "section": "world",
@@ -2078,7 +2258,7 @@
       "id": "seed-79",
       "kind": "artist",
       "rating": "AA",
-      "name": "Слава 𝖘𝖆𝖋",
+      "name": "Слава saf",
       "url": "https://t.me/armorflower",
       "platform": "Telegram",
       "section": "runet",
@@ -2113,7 +2293,7 @@
     {
       "id": "seed-82",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AAA",
       "name": "ilyafiltih",
       "url": "https://www.instagram.com/ilyafiltih",
       "platform": "Instagram",
@@ -2138,7 +2318,7 @@
       "id": "seed-85",
       "kind": "artist",
       "rating": "AAA+",
-      "name": "SOLAR.W 🐉",
+      "name": "SOLAR.W",
       "url": "https://t.me/solar_w",
       "platform": "Telegram",
       "section": "runet",
@@ -2174,7 +2354,7 @@
       "id": "seed-88",
       "kind": "collective",
       "rating": "AAA",
-      "name": "No title yet . AI",
+      "name": "No title yet. AI",
       "url": "https://t.me/notitleyetai",
       "platform": "Telegram",
       "section": "runet",
@@ -2336,12 +2516,13 @@
       "publishedAt": "0012-12-12",
       "dateSource": "manual",
       "dateUrl": "",
-      "image": "",
+      "image": "./public/avatars/upload-9be09c5eaac5067b.jpg",
       "description": "",
       "platform": "VK",
       "videoId": "",
-      "fetchUrl": "",
-      "reference": true
+      "fetchUrl": "https://vk.com/necrofuturism",
+      "reference": true,
+      "isVideo": false
     },
     {
       "id": "video-2",
@@ -2353,7 +2534,7 @@
       "publishedAt": "2023-10-12",
       "dateSource": "source",
       "dateUrl": "https://t.me/plachunatechno/13781?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/Fo-tn0newA0ZZdOWjzBSaBuRkvSHYAntV2Sni6j1DH7rlGUsPgtTyQgbjaU_rE4gk1Ukq7M0MC-FMc6nck2-7gRageGjLfTz7CDIQ8bdawS8ti7J1VRGJn8o2YqjWu1yHWjZDUTnvJuNcYhPKqF2moJdJD5ua80r_ZrVzJfcveWCW-Sqm126UcaxfCQYw8tyOQucvgdBp98CuUeYa_XeaHgoeq5V-4B1eQkIi9RtisXy7Z_1bpqJs-TVFoGr7C1WleNnRmr9kZ2mQ0CdQCButEE2NBSeuumbtiAFkLAZHBdUTeeX0CK9fQASd7jz7_UgY5m2e8ULFQPkojQ94zzHFA.jpg",
+      "image": "./public/avatars/upload-02c9923b0f2cb658.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
@@ -2422,12 +2603,13 @@
       "publishedAt": "2025-02-13",
       "dateSource": "source",
       "dateUrl": "https://t.me/trollnormis/866?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/cjX0VbSUju8oezysSeS1qxkxorCqPmf6zsL7UMBh4cS9_skeRlElbaiMnVsOie6dgiid9_4pJr6oJs2Di_nKD79zmR1EL56GH3zpvnd6aYi_mGZFNXkZRBaoxisQ7xZ32D1BZ0ntaXy9nSewtlhL2GW0douFKj1lQ8FfUiOpGD-o3dl0R5RzroykRlYWjNeU2SpD6wAiMSbb25zPbu_-TN-6X14_ohPn_fta9mlYt9Hqnns0MVlijjVxhVESMfjFTxTo_UEx8dl5MzF3Ed81qds6mj_ySzSPyqU9JdbU2YWBJykHt_NqssmbRkTzreT7rhqunhpzLxD9lJKovp1a1w.jpg",
+      "image": "./public/avatars/upload-f652630fe4061c8d.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/trollnormis/866?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-7",
@@ -2473,12 +2655,13 @@
       "publishedAt": "",
       "dateSource": "unknown",
       "dateUrl": "",
-      "image": "",
+      "image": "https://www.genxsis.faith/assets/img/pmginev1973.png",
       "description": "",
       "platform": "Сайт",
       "videoId": "",
       "fetchUrl": "",
-      "reference": true
+      "reference": true,
+      "isVideo": false
     },
     {
       "id": "video-10",
@@ -2490,29 +2673,31 @@
       "publishedAt": "2024-11-13",
       "dateSource": "source",
       "dateUrl": "https://t.me/hypernormis/313?embed=1&mode=tme",
-      "image": "",
+      "image": "./public/avatars/upload-9e62df057d2db0e0.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/hypernormis/313?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-11",
       "name": "ash koosha",
-      "url": "https://youtu.be/dGOslaqkeIA?si=V06iMlBNtxU4uef3",
+      "url": "https://t.me/trollnormis/3387",
       "alternateUrls": [],
       "sourceOrder": 10,
       "title": "",
       "publishedAt": "",
       "dateSource": "unknown",
       "dateUrl": "",
-      "image": "",
+      "image": "./public/avatars/upload-0ad5b826e9c14a84.png",
       "description": "",
-      "platform": "YouTube",
-      "videoId": "dGOslaqkeIA",
-      "fetchUrl": "https://www.youtube.com/watch?v=dGOslaqkeIA",
-      "reference": false
+      "platform": "Telegram",
+      "videoId": "",
+      "fetchUrl": "https://t.me/trollnormis/3387?embed=1&mode=tme",
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-12",
@@ -2524,12 +2709,13 @@
       "publishedAt": "2024-11-29",
       "dateSource": "source",
       "dateUrl": "https://t.me/hypernormis/1957?embed=1&mode=tme",
-      "image": "",
+      "image": "./public/avatars/upload-fcf797e106adc261.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/hypernormis/1957?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-13",
@@ -2575,12 +2761,13 @@
       "publishedAt": "2024-10-30",
       "dateSource": "source",
       "dateUrl": "https://t.me/thequietplace/9352?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/tWJsbIrKoSm8nLax8-ckjawBigraofX30iysn418tBerjYo1VBIUelp3Ouawo5-NlrndvcL_15DZec6ukog2dbWJVhMTcDVlesoud1rmJy7M_cwXI6XFiEg6W_8z2HF0Avs64tIOlwGwtqPUfBOMAJydThtAxBg6cBRH7wAsgblFQWpyKAo36tjrpjulUBTAMYEK7dktPMj_5IsK88E2eWoBFrklAgbXBIk6_B-LTA017S1rOXYuNjiugz1HKYaEKyGGV2LCrNpUVWkeuDF1WG6oFh9JWUdwaciMqWHhvwBWw_aNW_3j6jPpl7o0VzJGDsla480jUmE-MbymdmjHWA.jpg",
+      "image": "./public/avatars/upload-75894e190419092e.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/thequietplace/9352?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-16",
@@ -2592,12 +2779,13 @@
       "publishedAt": "2024-12-02",
       "dateSource": "source",
       "dateUrl": "https://t.me/hypernormis/2060?embed=1&mode=tme",
-      "image": "",
+      "image": "./public/avatars/upload-a76b746a41b259e7.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/hypernormis/2060?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-17",
@@ -2626,12 +2814,13 @@
       "publishedAt": "2024-11-19",
       "dateSource": "source",
       "dateUrl": "https://t.me/hypernormis/1389?embed=1&mode=tme",
-      "image": "",
+      "image": "./public/avatars/upload-6de59426b03c6350.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/hypernormis/1389?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-19",
@@ -2643,12 +2832,13 @@
       "publishedAt": "2024-12-12",
       "dateSource": "source",
       "dateUrl": "https://t.me/hypernormis/2460?embed=1&mode=tme",
-      "image": "",
+      "image": "./public/avatars/upload-aeab3d79995b69b3.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/hypernormis/2460?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-20",
@@ -2660,12 +2850,13 @@
       "publishedAt": "2025-01-08",
       "dateSource": "source",
       "dateUrl": "https://t.me/hypernormis/2843?embed=1&mode=tme",
-      "image": "",
+      "image": "./public/avatars/upload-e74787b988545042.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/hypernormis/2843?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-21",
@@ -2694,12 +2885,13 @@
       "publishedAt": "",
       "dateSource": "unknown",
       "dateUrl": "",
-      "image": "",
+      "image": "./public/avatars/upload-b62aced57da10b86.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/quietspam/285?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-23",
@@ -2711,12 +2903,13 @@
       "publishedAt": "2024-12-14",
       "dateSource": "source",
       "dateUrl": "https://t.me/scmusiccc/1410?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/trdlMGfau_c99wWPgF67ZiBVENr5-deO3hRAPdw7kgq6jw5NWNWQ5kTPGivVYBiN3wTUinOO2c3MhvbQBElvLY0f9iO8yr8vwHtTRFPXV6e6nk1Cg2unHj1KVvqITy8SBM1LId6nWagOhWpgimRkOatG2AGvSPULEd9ebPO6qTCLvpigERL4EiBQHTbUwfwZcAlRh1zkaABsu3auAWSXUKiFfK4brqD58udg96TWbdYSXWAE-mytBMpMtVZ81nomUKSdywAnFsHjVeypnBxGUmxVKWRzl3C2RNXYTCBVIhZURAlm7rUqsHRiU3dWVLnIFJ-MtypXfQqM_G6W3I8-2A",
+      "image": "./public/avatars/upload-35e9cf401ad917d7.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/scmusiccc/1410?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-24",
@@ -2728,12 +2921,13 @@
       "publishedAt": "2024-12-23",
       "dateSource": "source",
       "dateUrl": "https://t.me/hypernormis/2719?embed=1&mode=tme",
-      "image": "",
+      "image": "./public/avatars/upload-c0b2f1d8efccff32.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/hypernormis/2719?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-25",
@@ -2745,12 +2939,13 @@
       "publishedAt": "2025-01-01",
       "dateSource": "source",
       "dateUrl": "https://t.me/used2sdmns/57?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/QoGGlS2_Srf4wUfL3Spty4crugT9_5lDy9yACpQLlcgR_2Umb1C7PsEUfDigeetW0AhOj-h9lPXmZH5WN4rQxYlaXGjdK1DdkLrgpLjRW8Ml9nfXuWdZ1uCmNfFwxZhLV4dCEVmDQpSEVfbul89FjQj8vSHlpC_dwevh1Grlh22HCM8h5CDLmFwn25wi6lGZoYqSr3bxsk6SV2cVyhSXX9AanqyDBXJVLAUlwXLEZzv3S1os6_-IURF58HigimgYMEJ3iyOnn7QLhPESj8K5syLJF71ypQXv0wsbMAgACRiegorwaBDJ6ufHBr8APDTIYyl2Tj_N9b-M_uqJ8o52Yg",
+      "image": "./public/avatars/upload-36d2c0d9ec769780.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/used2sdmns/57?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-26",
@@ -2762,12 +2957,13 @@
       "publishedAt": "",
       "dateSource": "unknown",
       "dateUrl": "",
-      "image": "",
+      "image": "./public/avatars/upload-4db44197face33de.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/diklor/376?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-27",
@@ -2779,12 +2975,13 @@
       "publishedAt": "2025-01-14",
       "dateSource": "source",
       "dateUrl": "https://t.me/hypernormis/2971?embed=1&mode=tme",
-      "image": "",
+      "image": "./public/avatars/upload-4ff49c92d71f47d2.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/hypernormis/2971?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-28",
@@ -2796,12 +2993,13 @@
       "publishedAt": "2025-01-10",
       "dateSource": "source",
       "dateUrl": "https://t.me/triplesixdelete/712?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/I7IyBwXx4L8EdVvm5bX3d-pSct0ZHHxzHAiWd7QlP9mqtgQQTtuz47KbXOu-4LXsFP4zyS8ErFEZs6-WhQB2cqRKs-UbAQeN3bAa4DXP6RTYTKOtnHr2MaRFwQTNK4YMSr86FGUjSVr_Yo8xqTKVXlxrRb9nABR-ag2NF3c4DAd4VEvDTyCk9JKNKudW4XebBc5fFMD2LVgzBbVXEFb9idqW2FQ0SJbAYjNCalPbRvhFItHPl5_PJgVF9xWvq8wi_lSOBBAmxgFqT47tailajTF8D7L6qmwUjHYLboVvQxETEgYNcIcD617y6iacY3hHPPRW8cJP2KP8ELt-v5zdUQ",
+      "image": "./public/avatars/upload-f92a8c09c94ccfe6.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/triplesixdelete/712?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-29",
@@ -2813,12 +3011,13 @@
       "publishedAt": "2025-01-19",
       "dateSource": "source",
       "dateUrl": "https://t.me/Loqiemeantg/1628?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/DyS82CrBsHZXkU5Hc2Meqk5mYLE5ppHYfoOd0o-y1DrAyzA4qwqpLMWwapyLxiTEp4B_vllmiYuAoEcB0lkdtKwikIpaAyb1kcVgPjsLDmznnTPIooNGnqIWJ8mAF62Ik36JM5JyH3y8TBTL7f0MUizZJwnRMfmnpzFuCccU1HFQ8-PSTp_kLFhKP2rc2AEzWT3jiVgbh6iUplfudziEzui55NvEC4xXThmWroxIIc6dgkODxa8rPL9BP-Iy1QAkgQ5IuOoLyMFKWM2SQchKuxwawu9JyEvz_W2bdlIrpuD5ibUHJWoxaltIz6H8g8mlErr-gGYVpFO-vuxWerIctg",
+      "image": "./public/avatars/upload-366fac1c93034481.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/Loqiemeantg/1628?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-30",
@@ -2830,12 +3029,13 @@
       "publishedAt": "2025-01-23",
       "dateSource": "source",
       "dateUrl": "https://t.me/hypernormis/3030?embed=1&mode=tme",
-      "image": "",
+      "image": "./public/avatars/upload-d885ed72ef8a4fe1.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/hypernormis/3030?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-31",
@@ -2849,12 +3049,13 @@
       "publishedAt": "2025-02-10",
       "dateSource": "source",
       "dateUrl": "https://t.me/system108/11072?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/QtDs5EJqH4OmWSQQE9AlfGkwYQppt7CLmzaRqfOJtX3v04mQHuvp1GqTyn4ZSlIHGPoazZL3XwxziO4G_5LbQ2vgdTeuJmepa4mco9bK30O1hBM7KtkmGdWUrJ4X6xFIV5CEE65PAL4KO2sXrJVzbrnZ5Vb-i2YBPQgVJY1tP3f81PbWNBLdqIrAlLHnO3rB8qgxsVaQnw4Xn0ulZub_tiVhzAB_WaDtam3p6tjkOoShmT5sFKChk9zwwGF-AuEy1GPaFk-YJLD_DYJF0fa1HNYQNF6u-JRVtFpI0n7QwD7jIa9HQ3A5-jnnq8rEsliSTpcCLf_GrtoV5636ELdoiw",
+      "image": "./public/avatars/upload-578135321728c836.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/system108/11072?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-32",
@@ -2917,12 +3118,13 @@
       "publishedAt": "2025-02-05",
       "dateSource": "source",
       "dateUrl": "https://t.me/chernoburkv_official/839?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/jI8lkdboSnFxDo-Acyuxh-Sa6yY1cbNL28mxX4DjBib4p4MLK2zP961yHs9r2N7XyfzVkwKy8Dnb_pfb5fVaYb0bq7XFOKyy9rj80PcTjbTOgX47qzVYqTPaRENVoQ67KnR9fAQew3664bmaqrxsVTb3F7vcsiuOf1ChQfR9sLKOjz0-kHlVZWgeCSYDN7G_uO1xS7HrnBhXZ9l-iy4Sn0Z10TWTbiiXVmjjhd4Cn2UB6lXU4XQdTetlUd8VFwQAGOCA98LQxQh7j3Porot6leAM2PuftyGPbMHP6F8Fil894F5ynzInlqjApyqeeYp4OiqSRoFNGafVuZPQFkKiSg.jpg",
+      "image": "./public/avatars/upload-1ef8d0ec99a22153.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/chernoburkv_official/839?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-36",
@@ -2949,16 +3151,17 @@
       "url": "https://www.instagram.com/p/DF4ytvJsbJT/?hl=en",
       "alternateUrls": [],
       "sourceOrder": 36,
-      "title": "&#x1d440;&#x1d45c;&#x1d459;&#x1d45c;&#x1d451;&#x1d45c;&#x1d466; &#x1d440;&#x1d44e;&#x1d459;&#x2019;&#x1d450;&#x210e;&#x1d456;&#x1d458; &#x1d437;&#x1d452;&#x1d45b;&#x2019;&#x1d454;&#x1d456; on Instagram: \"&#x41c;&#x43e;&#x43b;&#x43e;&#x434;&#x43e;&#x439; &#x43c;&#x430;&#x43b;&#x44c;&#x447;&#x438;&#x43a; &#x434;&#x435;&#x43d;&#x44c;&#x433;&#x438;! &#x1f919;&#x1f3fb;\"",
-      "publishedAt": "",
-      "dateSource": "unknown",
-      "dateUrl": "",
-      "image": "https://scontent.cdninstagram.com/v/t51.75761-15/476729577_18485364562059503_4551067151796677218_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&_nc_cat=111&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=1ynXpfmQRe8Q7kNvwHUArj9&_nc_oc=Ado_mOC31qrhozVtjzBg2BMkRmYNyjHee2pj_mIQAFb1ZuNCbk4ekN2BIG2BeeWbRhE&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&_nc_gid=7vTqXuKPfMxcgiJmiQ0K-w&_nc_ss=7d689&oh=00_AQKzJl45bFmKSY5DGJ2yLAUQRfOc2P1WUCMnaDA74cypow&oe=6AAFB95D",
+      "title": "Молодой мальчик деньги! 🤙🏻",
+      "publishedAt": "2025-02-10",
+      "dateSource": "source",
+      "dateUrl": "https://www.instagram.com/p/DF4ytvJsbJT/",
+      "image": "./public/avatars/upload-6fd6a2fb3a16942f.jpg",
       "description": "",
       "platform": "Instagram",
       "videoId": "",
       "fetchUrl": "https://www.instagram.com/p/DF4ytvJsbJT/",
-      "reference": false
+      "reference": false,
+      "isVideo": true
     },
     {
       "id": "video-38",
@@ -2970,12 +3173,13 @@
       "publishedAt": "2025-02-24",
       "dateSource": "source",
       "dateUrl": "https://t.me/jedydeady/763?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/W_gYQe0RED-tjOlnBL1kMfX5fIIY8T0lBVaLZ5NvvVwIuki6RidoQhG6X0AxKrgRBvz6suVvuueXRDiVoz1yFT75qdu0qGVw1IDRz3vOzvSZcYqBHO70nMuUS3Bm5RVh-Xrx5IFZv7Q-L-5BkwDXwJVpc7e_66rwO_fmV6XS_nAP97nR3rpCTi9eY6hLB5nX3cHK6I1AA1k8O95TnUcwfAlv8_Zix3i2HpvUfjo_11WtopwtVBxbAxFkLX5nNRtPeDGgdABEEWlv-ijXM7mpjXL2VRahJs7FQycAGfIVQht_wJjL2A2Q-k3kqfsIUMNdOFHQpN_WoyNZOGoRZmzXOA.jpg",
+      "image": "./public/avatars/upload-fb172db3a2954186.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/jedydeady/763?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-39",
@@ -2987,12 +3191,13 @@
       "publishedAt": "2025-02-20",
       "dateSource": "source",
       "dateUrl": "https://t.me/hypernormis/3626?embed=1&mode=tme",
-      "image": "",
+      "image": "./public/avatars/upload-a76b746a41b259e7.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/hypernormis/3626?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-40",
@@ -3004,12 +3209,13 @@
       "publishedAt": "2025-02-26",
       "dateSource": "source",
       "dateUrl": "https://t.me/scallymilanogram/1539?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/f4_4HKgArfIVYTrmWxTg33I6mL4qU4u5k4Gdgw0xkVPmMqpu7HnfzGyAkVeZU_FoIFQz-wGjYIYH5NNQuboTI0oButCaN509FCKrHRwHMvJ2cUKfVzzniHt0Z4RQsA5JJJnuU5XDchB0eLlF2J2k2V4x3UKuCuW0YfY6DRDtdwlHkVokAp2a_HfmP9qL9kHNcMj7qSifZgz5U0GX84BxSieh3Kx-YqgAcAC9UQCF4gdR77NGmlxpDmV1rt1Rsk5kyCRi6_EpDOTNMcn53ouUAbj5LFSsCESKUI-VptdjHN30BXHPEWLwarKQ-YsfM7JIdfLwSCukU74soD7JZoCl5Q",
+      "image": "./public/avatars/upload-e39ddd7def577e90.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/scallymilanogram/1539?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-41",
@@ -3021,12 +3227,13 @@
       "publishedAt": "2025-03-01",
       "dateSource": "source",
       "dateUrl": "https://t.me/thequietplace/9778?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/pHd9-CROkdVqQJZsg73Nf-0LKJGwA_eOygGfykSZFsi50Me4p6USuBL_Mmlem9MOQTtLfXSVdeDcNWZYeo1Eex0NMNIRlbSvYNj25E1uJwsYUtpKyu411pFMaDejLaiEZqvQsR1Mq1epqVnpj9g0o8aXsESStMag4IbNk8dCPXqexS98GRUEn1eht4U0H8gN5OE5V13-XNwUwU0MO813ji2G0uY3a7sGKL20oclsG35235NSH977e6DJMXU1S_a8pSpVcUmEGRT0TqFLyYjgafcXRDJlBd56rrE_AqI4PIoOZQ45nfSbaiPKvFaP360fd_dOTAeagmiPMyeY_lz4Jg.jpg",
+      "image": "./public/avatars/upload-6d43d13e633e8124.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/thequietplace/9778?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-42",
@@ -3055,12 +3262,13 @@
       "publishedAt": "2025-03-24",
       "dateSource": "source",
       "dateUrl": "https://t.me/used2sdmnsbusiness/103?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/F_nqo4p92Mzd6XwzimLonUfU66qJhA6OS6vz5vETkB4SmPDxoyGMuU89iGnLyoqqISYgEOKk9bAw8eK4ZNALW-W-mBvvJOIFSc5qtXDuKVUkAA8Vn1aPVi7R9G10N-SsvjG1u8v-EMiKRZf3oPc4eblLiVILpB14KX1VVlH_78AlZA2vcW5FbXZyeDaDrzm5LBILAengcPpgQh_Gu6A8P6uY3k--6Pj01Ax-y9BkxqWs_lLlLiyLFEb5XT-7NXU_uyrNB-DjWrHtzYMLvAEq_bTJgXE7DiKovj7t3JqFpKNSR_02q5AT8z6WahUAz7YWQ92tKcU-GAl_7xpyrerMVg",
+      "image": "./public/avatars/upload-3718a410c8519015.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/used2sdmnsbusiness/103?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-44",
@@ -3072,12 +3280,13 @@
       "publishedAt": "2025-03-21",
       "dateSource": "source",
       "dateUrl": "https://t.me/vtoroika/607?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/JCWnBEsZrJOQJBUOTGdZbN83AB9GwvOmaXIPAEn7jMX1ToEQGGjmqL1lRkM2OFJArdWxuQyBL9635EfgAnpVm4yPsGc-n0K1ekqeagLIRtbPKcKvCmanZ6W0xUFY73tKG--pdxcTpwRsHi3abIwv1o1RUPdmN_7SQVoQjs70cLpfx0bqv8De9QP4wB1A3E8V_la_RaBDrLqkrx_PZe5QbpyhT74hLn4YlZ2T2YoaI7ry7o5GBEhe5_LD15RLOOr02LEg3kZLPpE_-9Ny2StHUTDPK1yGejGU3FHNrepVt9TJNDaa8nXlPRPh09UyKITLqTciLwZEPhtNi55IZTt-AQ",
+      "image": "./public/avatars/upload-3637864fcd531286.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/vtoroika/607?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-45",
@@ -3089,12 +3298,13 @@
       "publishedAt": "2025-03-25",
       "dateSource": "source",
       "dateUrl": "https://t.me/bad_zu/965?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/fyDAGt0aXrPr3oI4EulIQrCqK6pqHiSi5AXX6T2w2aHvUD0J_OFcMTvjkYNpF7sLqsuNe85ySnMo5yFHZZ_EMfXw_surGhNUueekQiECghDUo76YBLyV_CIbzr9Y5C1Wr0Z8cFFif2GtQeYHAyLQ49tDi5DE3LZGOPExU_QqYOAsoKAmrvECjVk_nPNZWlH4dHNAJ7d8cc2oQDCTqrgNRso25OetdAM-kEuSYSw2imcxvsynyhLgXpEYtFFRebmrqJeLqpDqLIpc7Mw5TDcaRPIiDCp6RWJCEMvoKYCbGN5-n5Hlw2KZXXe-8IqxOUVyDcGLQya9-q3Jfujw2F6QGQ",
+      "image": "./public/avatars/upload-390f804e42a4d26e.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/bad_zu/965?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-46",
@@ -3123,12 +3333,13 @@
       "publishedAt": "2025-04-02",
       "dateSource": "source",
       "dateUrl": "https://t.me/hypernormis/4047?embed=1&mode=tme",
-      "image": "",
+      "image": "./public/avatars/upload-eca4b3f910cfb129.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/hypernormis/4047?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-48",
@@ -3170,16 +3381,17 @@
       "url": "https://www.instagram.com/p/DH_g4RRvE5l",
       "alternateUrls": [],
       "sourceOrder": 49,
-      "title": "Voda on Instagram: \"@rockstargames\"",
-      "publishedAt": "",
-      "dateSource": "unknown",
-      "dateUrl": "",
-      "image": "https://scontent.cdninstagram.com/v/t51.75761-15/488449686_18493347685003692_1798734739649701409_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&_nc_cat=104&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=N7wn2cgWkBAQ7kNvwG-LgQM&_nc_oc=AdqF-QCpGgOAgoA0HOoA0DmFggluc0PBv45uOJ-9XCJCI36VPptf2sLiQWgfWjWrp7w&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&_nc_gid=v3lpJG94s4VP7a3RwWCUSg&_nc_ss=7d689&oh=00_AQJ5cFQHfCN93hVoxo0ZUfGxOXhkrtbr_hHLGWjkl5cvlw&oe=6AAFD95E",
+      "title": "@rockstargames",
+      "publishedAt": "2025-04-03",
+      "dateSource": "source",
+      "dateUrl": "https://www.instagram.com/p/DH_g4RRvE5l/",
+      "image": "./public/avatars/upload-7110b38cb47b4a8d.jpg",
       "description": "",
       "platform": "Instagram",
       "videoId": "",
       "fetchUrl": "https://www.instagram.com/p/DH_g4RRvE5l/",
-      "reference": false
+      "reference": false,
+      "isVideo": true
     },
     {
       "id": "video-51",
@@ -3191,12 +3403,13 @@
       "publishedAt": "",
       "dateSource": "unknown",
       "dateUrl": "",
-      "image": "https://cdn4.telesco.pe/file/TophHQ6L4_o4VY95PokALBZf78demHrnTdbWBXjbGGduDIfFPtPFnX9bxPwCfOvbE_uH_2eUvfAU_iqYrZuY-TfOER0jNLkC3aDX0HZ0bW4fkf2ulo9_q9L7OCqdu3EwWa6vIIA1g_nqws6XBPI2O5MheWd8r8w109ELk6vYTOYGrYCRfGGqQcgSgK5fU8b_SR6VwYbsegKooW4kfrJPGIR4pvITGMZ9mCzMKI30gT2QBJVGhfeu0GrkK4uMxnYY-2Ud8zB0qUJwYJ-LPC418z6reOZnJR5zS1pAAfk6UaGJUhZ4g1B-BaXbapRcc_qJmY9cEx1cHjZcRp0N4Mc0zA",
+      "image": "./public/avatars/upload-6f98e893fe96e0e2.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/ocbdark/806?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-52",
@@ -3225,12 +3438,13 @@
       "publishedAt": "2025-04-15",
       "dateSource": "source",
       "dateUrl": "https://t.me/strangedalle/1175?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/Kth2LNxAaiPtoxZ842eimAEM6frWNcXcoAe1SnlcBqs09Um22AgeYsQtlmkFPb9zfOBq0W-RRIujPZabS-mioGqccVNcIRpj1w-enNliEvZ0LQVz2qiZX3KES4_8FxX_B0OdDhf_gRIt9Yf45CHRneK02KxTTRnF4Q6dPgZ7WOg7-otlcPwXDp--lkfWe3J4Z6mS9fXbW6HyLK9mYmYSs-gvYMEPYeS1Vie0JIYwRYETfsKIjIRVfqO9U0Ckd8RTPKIirG3Hwy080gCO-dsdVPLcG1mRyPipu0iNCIK3ahjNM4DJNx9xMWCxyEcQNrr2h7MynGpo3HO1wFhmcFLOxw.jpg",
+      "image": "./public/avatars/upload-aebae741c88a21fa.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/strangedalle/1175?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-54",
@@ -3310,12 +3524,13 @@
       "publishedAt": "2025-04-27",
       "dateSource": "source",
       "dateUrl": "https://t.me/boulevardepo/482?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/Uxp9JTMgNgH2mWNtfxxStN38H6G2EAKTnvWobPIl8pWm1395hDTI0NqD3pVMLj_-sNM02gvJ0EwrRCR1jPQykCKU_E0J7zDnmqa398DoPUHOdr6NUHbIPB19Kp835X2qGHN9zTdHNVhQPOOuhZhTfE7tV93XrHRz7gck9QRclZLptOkRfJCI5EyUm8qdm_WFTxWVngtPoAvTnEu9HbC7x9JORs6KgZP6dIGc79IDWtn_yZGoBe_ha4635WzhETh9YvqeG3L_5fTlTt2HCCt5_wZavsEAUBN0Lfk2DhME1aS3cDbX7873CIYKMpg9MuBlO_0PyPqPDaLmgYDsSUwS-w",
+      "image": "./public/avatars/upload-b273dd84a63074cb.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/boulevardepo/482?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-59",
@@ -3327,12 +3542,13 @@
       "publishedAt": "2025-04-29",
       "dateSource": "source",
       "dateUrl": "https://t.me/rudolfstrausov/1885?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/fQOAfMs3Pd2IUMwAYmVhawPilXm0G9awDWtnzDBc4sP0LyzEaDcQyaV1w8iZjtkrumf3-8woeD8eKXYZQpV5xi-d669RXc45MBKOQgrRDzkxXCmgqu8GZFVVbvCmjSIPN9Owt3vULpPs8amWVcGzCzI_orweJWBDkICKvYfk9rSH26ssRJ5plo4r3T82LFCfj2FMGAoc-sIiyKOH5PYELJruhw-dOkSfDhy_xcdMrOfQazbJcr40AGwSFlvb_6Es3ZIb8wQOWen2NEXcz3uZIsDR0jYWc6vJvtIjOdhohgZgmL1ykIP1gpNDqbbTQdGaVf25Woww-yCF9mroAIW4lQ",
+      "image": "./public/avatars/upload-5d031af5a6a8d46e.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/rudolfstrausov/1885?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-60",
@@ -3344,12 +3560,13 @@
       "publishedAt": "2025-05-17",
       "dateSource": "source",
       "dateUrl": "https://t.me/trollnormis/2410?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/bU6nFd7o7rnI2LUl4g4V3NmP7tILy0YfyNKEvs7SGb-UqwVPJimND1lwQqrneR3sxjWeY6nybl9e4zjDh_wZERJJH-djwR24lNIXANmY_s37efDMDVuvKUb81e16oW0Uk8QwaflSj4rcxfYHG9MIm29Ynef48od92WfrQKJfgVndez-9icX0EzddQxeHicJXbnZH5DVkUhv6ZUpPZqh2WtGfpXfqKpv0QeRN9MUvZ3rkdsiqsU8qAcCk4sWe5ogo9JPqAdYDlxM1FVfUACmM_9CR0zGwgGwqp3p5F4t1supUKCfG40SCH0L1HlVuvqsoYMzifgVJPPywrfV8IN7egg",
+      "image": "./public/avatars/upload-eed6047c21c57746.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/trollnormis/2410?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-61",
@@ -3378,12 +3595,13 @@
       "publishedAt": "2025-06-13",
       "dateSource": "source",
       "dateUrl": "https://t.me/vilchinski1/219?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/q4t5t-Jj5waBwDB2FyvTv6kXUv8Ws6E0SodVQY-kjT4yQfav71G53SiAw4TuoCiz_1mxwoU92ugKOTB_R1HFzbokQ_RUqoPrdUp5K2Hdl5AnOZcy0-NOsts6B0vjC30n_A44IgOD-UrZCcWg9AJvQ6AR8Ty4ABtYe0NkSu2Qrrb0R39i9VZ7GnVW-K9UuqHrloUQsA3P5uDtOQ0ymNzcrcSQi8kzr18Q753t-FJbXckC9WXiZGDTTPQb8rBtjb1tV2K-g1VF7IOysF9FK2QyE1KSouzM_4HMF7SvwPawQuv7jjkLU9-iPRuRekO5rLt2yQFBSNai3aXVKdE-ExZasA",
+      "image": "./public/avatars/upload-724cb46ed9afeeb0.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/vilchinski1/219?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-63",
@@ -3429,12 +3647,13 @@
       "publishedAt": "2025-06-20",
       "dateSource": "source",
       "dateUrl": "https://t.me/toxisslime4/2898?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/s4x25ntSjnVYcqaiB5JSBZqjyQlBARd-IHqwSyozHJxX8hnqQdlT7iJToR9FZeVoV93S9Hji3P7a3aTa96NGcYloEI7oZ-fD_ZUzI8h2Z-DGbqeKRrWIsPotSid9F-HGi8DUqOcTWd-v9Ek6y_MtVFPxYerL46DTcuVAqfjCJRjgGxPCKVuSgaKrempSVE6SAXQsA0JFj1-KFG2I-G80LEbjCsl1VNiGnLu42ryOnim2-fpMS0TseIRf8eCvPKzr94UAWFko0tayQPRaDEWV2BvhMqgwNwfjgMvYNDHKzAud8SP9KTTbACJCOjgGzEBf9pxIXYX9a3xdE03f44sqzw",
+      "image": "./public/avatars/upload-a6c8d91759572238.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/toxisslime4/2898?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-66",
@@ -3459,16 +3678,17 @@
       "url": "https://www.instagram.com/p/DLP80pXNcZe/",
       "alternateUrls": [],
       "sourceOrder": 66,
-      "title": "YAJAIRA LA BEYACA on Instagram: \"\"CARACTER 4NAL\" mi nuevo albun disponivle el 26 de junio.\"",
-      "publishedAt": "",
-      "dateSource": "unknown",
-      "dateUrl": "",
-      "image": "https://scontent.cdninstagram.com/v/t51.82787-15/526535230_18090974245676515_4567850843179470934_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&_nc_cat=110&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=av3D6VQ0lTwQ7kNvwHY8C4N&_nc_oc=AdrS-VSLMxm1q0W7PRi57TSKqdtG6o4HwYxPie17-D0c3rmZ2qv2t9TxPziaMpInPTA&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&_nc_gid=8y1kjguW6GsL3TA99S_7kQ&_nc_ss=7d689&oh=00_AQIBnAKfMeIAJYf_jTFAI1t0pVGQEzSlk3dirMhVUEgBMg&oe=6AAFAB3A",
+      "title": "\"CARACTER 4NAL\" mi nuevo albun disponivle el 26 de junio.",
+      "publishedAt": "2025-06-23",
+      "dateSource": "source",
+      "dateUrl": "https://www.instagram.com/p/DLP80pXNcZe/",
+      "image": "./public/avatars/upload-caf34ab90a22fd6a.jpg",
       "description": "",
       "platform": "Instagram",
       "videoId": "",
       "fetchUrl": "https://www.instagram.com/p/DLP80pXNcZe/",
-      "reference": false
+      "reference": false,
+      "isVideo": true
     },
     {
       "id": "video-68",
@@ -3548,12 +3768,13 @@
       "publishedAt": "2025-07-06",
       "dateSource": "source",
       "dateUrl": "https://t.me/hofmannitahateyou/6267?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/MsMOHDA0OlJmNYBzWQprbJ7TQdYRT8Lu_WMp6ZIZpPrzlZeWYpEShu4yjcMt52GDcGSFtk8FtRJLPcetaC-tHt4sI1UAxo9-78wg7qxF3XkstnVKsiSTsNJ_efjCvvNHd3XflXEGPBEn_Pl1S7C0Agb8VqAeJWMvwNWab3GMW9icpsUkQFw6r9pYJQGEGKblzGA4ozDnfFiMbuSsYvnKC_EFzOPDJNg-3FZH6XOJy2It9dJtAJ8MfRALhzdJabL5TYHLt36t92WATjwMOf5OW3bdkyoswB4Hj81ZpAPRX6VyobYp9uAe-CzSxwlcLQPQWIarjGiouqWvGNASFxy6cw",
+      "image": "./public/avatars/upload-518e7b4369072188.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/hofmannitahateyou/6267?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-73",
@@ -3561,16 +3782,17 @@
       "url": "https://www.instagram.com/p/DMFRdmniVqZ/",
       "alternateUrls": [],
       "sourceOrder": 72,
-      "title": "",
-      "publishedAt": "",
-      "dateSource": "unknown",
-      "dateUrl": "",
-      "image": "https://scontent.cdninstagram.com/v/t51.71878-15/519003062_679886098364229_2767380184632812177_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&_nc_cat=106&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=eB7Got-V9BwQ7kNvwHfpfQv&_nc_oc=AdqELaozjgXBlXI5hASBETcM_FMiAgOh5rC5cXABh_yZXymkO4Dg4x-S9fyQpg77Ze0&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&_nc_gid=sNABhiS6dxTsDwKX1SGxQg&_nc_ss=7d689&oh=00_AQIqgwZvtr11351xpKmQPdMQydfsQLanwJQAfHrTlP5QIA&oe=6AAFAF53",
+      "title": "Они хотят меня сожрать\n\nВидео: @sever.neuro",
+      "publishedAt": "2025-07-14",
+      "dateSource": "source",
+      "dateUrl": "https://www.instagram.com/p/DMFRdmniVqZ/",
+      "image": "./public/avatars/upload-93c23caa212a97bc.jpg",
       "description": "",
       "platform": "Instagram",
       "videoId": "",
       "fetchUrl": "https://www.instagram.com/p/DMFRdmniVqZ/",
-      "reference": false
+      "reference": false,
+      "isVideo": true
     },
     {
       "id": "video-74",
@@ -3616,12 +3838,13 @@
       "publishedAt": "2025-07-29",
       "dateSource": "source",
       "dateUrl": "https://t.me/durka_public/7274?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/V-oA_9pBIUXGVRy4mfEY_fWE947G4t2NQYJFIS3i-uUf5zmajeyuaIiSNrHIzReLAGVkiosFKkzAd41vL2f98NzLrVZV2NJGmKt33--pvtZw0sfCMU75U7rVUA3t8J90swH4OXiGyJM-vM97qj4i5k2bHTKrJzRHnKhjg3qTmjhaO-gXwa8ndbJ8wkE2b88tZ9Ep8xGKNUXYEYRVtnKBIfXNLQhQDWOUvd1oMO7SkzXSu1A92Hd6Lfv1OqCPqtngWkaCHTyA7WdAUGgjpQvmJOkNtUPLi8i7a82g1kHDPgXoeOwjQ2Dh2mnZ2nby4ipeg_KgO2SvPbCYfNAjQZGZbw",
+      "image": "./public/avatars/upload-b36dff22872d0c0c.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/durka_public/7274?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-77",
@@ -3633,12 +3856,13 @@
       "publishedAt": "2025-08-01",
       "dateSource": "source",
       "dateUrl": "https://t.me/lawa_gg/291?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/kggkE2ruyTuQlVxGcpwUAmdbd5x5311Cv8TrPgC-YFj116VyzU1xfRsdU_YsnNn6L_GtUG1IdRoHx4Z5B3LCOBbBDVxJwmT49uPVAaiOka3nV2LpUkj_iDaXxoz-61HmSNMCy7xWbEXagXsDcklC2JhgWkIi47qCWwaD2hqdVE2sE5za8lh7k1qTZNmVtNm7WfCsSf23eZtssPz9vuz3TJzZD_TbhuHsYS-aK3gJwLDWPt4l25H_KObETWKkryj77rMpb9WUmZ5jGSZdryzL1yMp92F0_NRwRStymQ3sBeiToDXDrZ12HtrYpXKMgeH7FYe29TNW_rN1MFyBYltvzw",
+      "image": "./public/avatars/upload-272b67664e8bf80c.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/lawa_gg/291?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-78",
@@ -3684,12 +3908,13 @@
       "publishedAt": "2025-08-14",
       "dateSource": "source",
       "dateUrl": "https://t.me/sqwore/906?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/iXdRl-6C5Y0_rF8aU3kEMHZ88lrF3FAD8TDJp5lhdh31O0R7efEFEmOWfnK6Ugh06ExiQ0ugWLcc_GLI4stTR_sJ0n-L65crHwaLxWCyNG83YhJhR2SVjkvUm0HTynMe6thoFLvg-cXS072dqK1VqDG4yjQClqIfk3i9iNHtwhn37w6QmvtGf6VjgxGyrwK35onW6wGaxwiHBDb5O5jz0QY5ADMjnxEJX1CNfMCtexJXQ40dmC-cnYZ4ctLMFZ-NV7rxVZkwXnKDj_qFx4qORGbGtL7NrB-YoS3mQaNzaxV_8n65bjeeH7YgOa4jLKFa_Z9BtsSgJTI3BNP3xVC0DQ",
+      "image": "./public/avatars/upload-2b5faa9645a903bd.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/sqwore/906?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-81",
@@ -3701,12 +3926,13 @@
       "publishedAt": "2025-08-25",
       "dateSource": "source",
       "dateUrl": "https://t.me/ainreimusic/310?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/ad0fQmAgb0uGfuURmH735lT7NX0qmagxqUbN3FaW7bRcoaavWOpzIcvzfT4FEK3-MTwAhuUD7WpgVnPjwFOyNPeTi6W-zb610FTLa8EbXtNN7zdPbh0tssT3iKWCfdmn7kJTZVpQEBcW6p4D8Blp81HwRFu9nL2MTGxvd1Pil-2_kBupstRldZ-MGeAdn75QNXnghK0mqBgSRLcnM-8sMM-wiavoXkvat_KclPLdbbIUcZvJI7WtfI27RForknOOIDCi_UYrx22WysJfb1Eyz9gbmsBPs5BaRsil1Vhl0hJlQ4LJLA_TFpHt2AWNZEy6By6C_E-o7X1Oy9QP1Le9CQ",
+      "image": "./public/avatars/upload-56447d65b46d8067.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/ainreimusic/310?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-82",
@@ -3714,16 +3940,17 @@
       "url": "https://www.instagram.com/p/DNyQYwp2ivN/",
       "alternateUrls": [],
       "sourceOrder": 81,
-      "title": "",
-      "publishedAt": "",
-      "dateSource": "unknown",
-      "dateUrl": "",
-      "image": "https://scontent.cdninstagram.com/v/t51.82787-15/539284768_18520354789002352_7083243571591080816_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&_nc_cat=105&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=tzyQLgbnFKYQ7kNvwGXV4p4&_nc_oc=AdqdJgYu0fN-6q0d7HPvy2pmuyy4MPop89O9PVeHKO3bY3er6FKxHN0o1Zbwp-GFxZA&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&_nc_gid=wTDunLZmWrgRN9CJOyBqew&_nc_ss=7d689&oh=00_AQKR9QOhVfXi0VzoCV5RoKNVNkRThCOkhngyrX2Ga1nctw&oe=6AAFAD70",
+      "title": "Soundcloud premiere \nBillain x Magnetude - Glass Fortress -\nThe long-awaited collab is a surprise drop on Mirror LP\nGo to Soundcloud or the story link and enjoy.",
+      "publishedAt": "2025-08-25",
+      "dateSource": "source",
+      "dateUrl": "https://www.instagram.com/p/DNyQYwp2ivN/",
+      "image": "./public/avatars/upload-1eb48dad0a08d077.jpg",
       "description": "",
       "platform": "Instagram",
       "videoId": "",
       "fetchUrl": "https://www.instagram.com/p/DNyQYwp2ivN/",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-83",
@@ -3735,12 +3962,13 @@
       "publishedAt": "",
       "dateSource": "unknown",
       "dateUrl": "",
-      "image": "",
+      "image": "./public/avatars/upload-ff58dfb65d5b98f3.jpg",
       "description": "",
       "platform": "Instagram",
       "videoId": "",
       "fetchUrl": "",
-      "reference": true
+      "reference": true,
+      "isVideo": false
     },
     {
       "id": "video-84",
@@ -3752,12 +3980,13 @@
       "publishedAt": "2025-09-05",
       "dateSource": "source",
       "dateUrl": "https://t.me/stereopolina_offical/2344?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/EzL11npOuEmvKnqQkRIBHtZaRJ4LljMK2A5Ax6GY-q7AIEpbNJfLaXSq-oRBfbCoh5399Lmnts9Io-2m6R9c04VTrYiVGIcyZisIzPK8T_FBA8kDGb8tsT_D9FKyB7C-XNYHluA6yCZv_1rkdCc0JLi252C3KlBH9F6C6W6p1eleU05NMNpqOM-f_FBHWdtHE7zZosMs3QkbDopkcorKys5GQ3uUU8VmT_GIIkXLBMuxBjeuU4YyAfQQFSJWIRd1tOLRkR1QTCsminfNjcBWC-F5AnvbDNdZmQOnqxPoUNSNsSgk2ksJUastqfuvXl6yzLKDX0EEtOVMInrjKOtMVg.jpg",
+      "image": "./public/avatars/upload-f5d54edc0033ef22.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/stereopolina_offical/2344?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-85",
@@ -3769,12 +3998,13 @@
       "publishedAt": "2025-09-19",
       "dateSource": "source",
       "dateUrl": "https://t.me/trollnormis/3509?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/v-h43y0MORlEKZwaQ2FScgYaXyMlsBEbYwBwmn4LZuSolrbHf4RbgaOK1gJ76IH6_4pzxVyDtHQttpfB6G2fwIbdjxRUsbkjY5jDulMMoaJXGeF9VAWAxKzi2aok4iFjOXjlFSvJdvaiIR6fXLQYMMSw7TEq_EWgV00CoQuDipIxHlIqDygusGUWfY2vk_W4r8poe2_j7l38oj02te9j3JQq-QI7nA81tspXQZykR7yiy_yviyXEd3uu3j6lSg2nbZCb2VRF5bpZlAkIxrnWoh4K4HFD-K2XPviUogZgcvCujPgzCFOZ9SgZZHxhArKuseXd4cZO2aJVEn1qhKSLTw",
+      "image": "./public/avatars/upload-adf171611484ec84.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/trollnormis/3509?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-86",
@@ -3854,12 +4084,13 @@
       "publishedAt": "2025-10-03",
       "dateSource": "source",
       "dateUrl": "https://t.me/aginormis/1060?embed=1&mode=tme",
-      "image": "",
+      "image": "./public/avatars/upload-956766677fdc028c.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/aginormis/1060?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-91",
@@ -3888,12 +4119,13 @@
       "publishedAt": "2025-10-14",
       "dateSource": "source",
       "dateUrl": "https://t.me/hypernormis/4632?embed=1&mode=tme",
-      "image": "",
+      "image": "./public/avatars/upload-1173c9f1772c1b74.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/hypernormis/4632?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-93",
@@ -3956,12 +4188,13 @@
       "publishedAt": "2025-10-23",
       "dateSource": "source",
       "dateUrl": "https://t.me/instasamkacore/6165?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/LWDKEWXjFdq4mKM0L8EeZJby8_adY61-v5GbMJ-T2Es8y6TtFoTmE4wvOoiF24iGPm9LJvfWlcRGsuMdMw025MW5g3kRdq3iS8wKAtmqof62h-GqXYv4lFwn6Qig46fV8zq9e396NdKPZrJc_TI9G58akETQhIzUUfabS91jHHBwUF6s6u1uKHwdBKv02QV3186NXzIPwU66HbJlN7ZqSyGujIH8WxvZHBAOtWOfGX2yyult29jCA7eo5ii7jAdQY8H5XMZrTTIqHcWnsZJkeicpaOcXpyKPZeJCaSXyMLX0QS2JS3DkA-p3TL4_Dpwn3kRrXXlaxa43iatr7xd6hg.jpg",
+      "image": "./public/avatars/upload-5c718dd688676eb1.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/instasamkacore/6165?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-97",
@@ -3973,12 +4206,13 @@
       "publishedAt": "2025-11-02",
       "dateSource": "source",
       "dateUrl": "https://t.me/cartelgunwest/5350?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/dkIdhtr3W6aX200Pi7I0BgYPDVu44QaVJQnghPMqELoAhDQnBqSWYHZ0p91JjB96QnSRbK14diZYdtGIJ1rCZ7n8D0HVOkiC4B2Sd-UWhCNTvh0BzxOzSl2vYLf5sHI5mQqeCCvO0EWqMkKDWtxHAVpHm2tmu7HD0-ozWqQHP2N6OKrOE36OMF6MpXOutUPyY1QYXBxXyCF7o2BoxwFA2cTVQx4E0KsvWswPrTm85LJpWPLTbqAF--DcFZiB7u6hJixJER97xHZ2ecsqbw324OQPrqiZOUYctAPgyYoynebL5CL7dSzZBHt8O2DYs4-6rOcn7frkP-oTp_g2M68KJg",
+      "image": "./public/avatars/upload-586023db4b135857.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/cartelgunwest/5350?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-98",
@@ -4007,12 +4241,13 @@
       "publishedAt": "2025-11-15",
       "dateSource": "source",
       "dateUrl": "https://t.me/slimegangg/927?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/uR4xgMsfKo45Y5FFvMQhrzpIzNJ0g5CgKSW-NvcEYKcI82POY5dGffbnbAh0pxRjFcKcIgmt9XhCLP--4joC1IWqQmrA01FrL8Md6QmTGPJl6VyrhKXocqUW7kmVw5UGKs4YqJXpk-6I4MgtEzzBauiLvYG6ZKUXyRZgYNu_WTmRNv6I6ZdbljWnsly4rhVZtC1XPuLl0UqmbePc5x56RlGhm8Yq-CPwGfSZ3nVzbqpatbBPTmf8Oyoh2ZydpzPKSRXkMMjKD_vJ7QIcwD0kRIl8SmCjRrH-KiadVmGvazlC1lB3YqNxJsP17xLAlrRmUdaIr11myEiQcN5J0atSpA",
+      "image": "./public/avatars/upload-0247832739905b31.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/slimegangg/927?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-100",
@@ -4075,12 +4310,13 @@
       "publishedAt": "2025-12-11",
       "dateSource": "source",
       "dateUrl": "https://t.me/archivenormis/4914?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/gQeuFXIXd-MTd-vno_zg4wl2sUdcreG33Xv7SCxiNlq9yMiZrgEi1VqhhL6mXT7iAbm-C5kQMBGQ1egktBBznaDHA0p1d0AHTgUQffP3w8_ChVi6YYf945JHV8-5Cbvy7sylTj-GUrwCgWp1rYRxOt3jO8Oo3f-Mm3gkmZGE6ZeyFVHwJ8ax6_TgZcmU9bOGO7EhbBW5kg5iQ_YjQ_auDkZkLvAYG9MhPYubUfDtUMwmMU4qGL5urnz158fL299f5bvH_Py_7qfg-9xXep83ghREFo2GgaRkh8XAfI1e7VOHSZI_cs7gKe75bxpwjlr9ZoFzDX2KVkEW_4aUoxC01g",
+      "image": "./public/avatars/upload-a75a154bf1cf8fd2.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/archivenormis/4914?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-104",
@@ -4109,12 +4345,13 @@
       "publishedAt": "2026-01-14",
       "dateSource": "source",
       "dateUrl": "https://t.me/stereoNWS/19026?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/Y4WxxamqQMnDQWuXHmWAFn-uDhzbeceExPkwy09Mwj4JkbpaDQe85RVtNDxStfE_NIxWAhavjjw3SLNK1yshCjhAAnUVUiRz8j0jd10vJ8tBl3ROaxsBd3-XbNW3Q-cv9OwsswtfR_tRUcMM9LiGDSnXU8OxX5bzQXH2MEjtiTQk8kp6iVFfIN2PIy9K2YLI6J2-ZoW9X09D2IWHsXxMUtv1kwiv3PstGeTu77TACxrN0KZEjeDfUZ3P5S1fqt_8mldVsjCM1pj28T7R-bJ8AhgGlpcpOyjcKlSOpJfnARkl4m8TzvSfzrYuKbVWg1rqq8e2zQVDTPBSZUzCFUuG4A",
+      "image": "./public/avatars/upload-a7c8e302c84653a7.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/stereoNWS/19026?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-106",
@@ -4126,12 +4363,13 @@
       "publishedAt": "2026-01-27",
       "dateSource": "source",
       "dateUrl": "https://t.me/Psy_Eyes/3452?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/vvovYuQ89TqF5ZtV8q4nhj9xgO998JkDJ-JmRvbRxoBCRSqUkpUUfTQEfA56j90J6l6qvHMI78FrH30ga8rf9bRCR6_QQM792S8VINdceFcthODJxIxwgFn0jkmODdleakiWZdTc4bcLK6OW-QWEMWAh7wHaQUhEY-c9OsVe5ehIsdySQjQ4YnUyh03z2_NGwLFSpopiIXn1gAk7vzlbNUtBseTWfVmvoUyHH0XYpoUIYiDhPflYRVmVacCR0m2QqbSrNUZ2aAbEDlqDTi7P3AoidcHPUJ_Qj9oB2uVMvsLLWYudae4lNKhu5FHpqbqncCNZRpItjU1nkvyZ2NGkrA",
+      "image": "./public/avatars/upload-d7f7877316f2f6bd.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/Psy_Eyes/3452?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-107",
@@ -4143,12 +4381,13 @@
       "publishedAt": "2026-01-16",
       "dateSource": "source",
       "dateUrl": "https://t.me/prodbystudmire/2465?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/YJHwyrSaIWn-NkCN0gJYQIXzk6KaLQ7QlxTZqUuER45xU0JXVTwTX2ZTyg0mbR-9XeY6XudOuZtoeL1PqVQyxfh9fJysxo1uwRSLbO52GjNyba-4FXel3fVqkxN7yuWHLdeu8B9fEkW4eUmlia1mS81V5i1xfy9SNmQrOdU4kJwOsAAedq-KGpXZ67YJEteNGOXsfMgAMiLGQhiXZi37YHn7CLy3R_LmMfun3Q2GApy_4NMrV2275ZL1asfAjYsKL6g45qcSYcxmwq4yepvIwBEkFVU0kbWgy0DRDgGhl5aOmfrWHYJEnG_0UDHUyuoQQ32SFbXuySdsPEtnfUyQgw",
+      "image": "./public/avatars/upload-dda5ef5866620a99.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/prodbystudmire/2465?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-108",
@@ -4194,12 +4433,13 @@
       "publishedAt": "2026-01-31",
       "dateSource": "source",
       "dateUrl": "https://t.me/fastfoodmusictg/25313?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/AbatEv1m55UstuWFhzLMSEQZZee0vPHdGnARXSKiVHmAwDEtZIabzs6dsUVO9x8hKpKtN4qedNnDuTuQ-BzPlag634S1CEKBEbgybDygMpY-EyF-qNq4thmqWwz_7_6UyL1CUTobUlqJF7s9ukVIC0hMUsB3R8e9AABe_0-8dakP1SNhcDLEw7FMVYtc_Ah8Nl9WAz_-OJj95nHAzU2vsnTJZ5lcE0PKrmuRAKGDJcYzAE1sHblLqtFcH5ZV_8yy8iUmGDMAEmjULLf3DWvVihKHHqS0lGnmsbcyaaJtW6vCCcvkdTmr_cgFTGteTXe6wF7JboDhWVk1lcxCSuh0WQ",
+      "image": "./public/avatars/upload-268ed04a74d05b80.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/fastfoodmusictg/25313?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-111",
@@ -4211,12 +4451,13 @@
       "publishedAt": "2026-01-31",
       "dateSource": "source",
       "dateUrl": "https://t.me/mnmnrec/8372?embed=1&mode=tme",
-      "image": "",
+      "image": "./public/avatars/upload-761c3d315f9966b7.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/mnmnrec/8372?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-112",
@@ -4228,12 +4469,13 @@
       "publishedAt": "2026-02-06",
       "dateSource": "source",
       "dateUrl": "https://t.me/system108/13576?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/N-Y-P3vi3JqM0DxTmq0PptzpobE5e6-mzt5OgAsh3mJRptAdyibJqf1tcoVj9X-mdHE2joZkwuEdkFh8qb-z757YKyaqWsuSuON5-qWvHhdkdOsMtMv-oEYjwvqkq4oYnCHYvO_nqgZNuUR8seP46dbQFhBs2fkbl4nkBwQuoukuPtZJErf1GZUmUtmnJep1vfzv5PQx5dyKj139UsqSDB92KZJCIfTGW-jQV2VVj41P5XU0LrcbWLiD4DV1UlV6hBCKsvr_owKWWod7re30HL7x8JqDyAOX-bMMA5xD9zrZsJK8eN1TFbeiatbutxpaDGUZjx_bWB2j9R2v71wCpw",
+      "image": "./public/avatars/upload-3ce359f87abc2c56.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/system108/13576?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-113",
@@ -4245,12 +4487,13 @@
       "publishedAt": "2026-02-20",
       "dateSource": "source",
       "dateUrl": "https://t.me/hypernormis/4868?embed=1&mode=tme",
-      "image": "",
+      "image": "./public/avatars/upload-fea1b6751c6d23ba.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/hypernormis/4868?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-114",
@@ -4262,12 +4505,13 @@
       "publishedAt": "2026-03-11",
       "dateSource": "source",
       "dateUrl": "https://t.me/mnmnrec/8600?embed=1&mode=tme",
-      "image": "",
+      "image": "./public/avatars/upload-761c3d315f9966b7.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/mnmnrec/8600?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-115",
@@ -4279,12 +4523,13 @@
       "publishedAt": "2026-03-20",
       "dateSource": "source",
       "dateUrl": "https://t.me/wtfshryne/4267?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/njwrcmqLv03zHyGvYz96-DSpTxVrW-_-dYGJ-IWtNMYVFXE_T6FVU7eaaNHFuGSXFXUIICXPdHNbhkf43viqYkHpCGx8VL8TWB993W4Su9Bwne8cQd8GdIe8Htc7obayxx4e6M1s4Ix59tNKPR-Q2BwOogcj_L-1fPVkyycXjUbT8qxmndZnHBesJ1qeJ74mscJU7SfV6n1TjWq8pI0yWZDWAYvkIPOJCvI4zBbn8-XarhyUkGBJyZ7FXiGq_5h-cOp2wVUuWU5I6ab7fVO2S4I3hjwcn7rsW1RdlOOKvRLasK2Gq5C6F4VBlmCA-Nqry4LVZPpqsph7Fb3rqRNsOg",
+      "image": "./public/avatars/upload-6337d2b5cd1076ec.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/wtfshryne/4267?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-116",
@@ -4296,12 +4541,13 @@
       "publishedAt": "",
       "dateSource": "unknown",
       "dateUrl": "",
-      "image": "",
+      "image": "./public/avatars/upload-8b09d7ad47a6b71e.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/cloudeluxe/23748?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-117",
@@ -4313,12 +4559,13 @@
       "publishedAt": "2026-03-20",
       "dateSource": "source",
       "dateUrl": "https://t.me/EVIL_JANE/1482?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/uVGZO8NUnmsKAKKqNch5Oe6MoehekJrvg210Z3jKHasDc0pV92-JAJmcFnjd7QCI8MBMEubWe5bSLAyIzm9-X0GtMSJeD3wDHuYEMUFtd7FMsmI47zr5rRN1j4hGqd5YHXGhAxAjuVZsUlXT5N5_jWwo7YJIxSQ1qa47y5KvYom0r3Bd6YYUOWl1agdjc5DbK35bt4fbYHvYZPt2Y-XWyMY8epuqGGaPnA_AzHror2_4oAEmPXq93a_HV_czifH6LzZ5Cuug78Ze7BNsnUjA2G2pOHlnE7wOfyJKWt_FVO54qjDwfIbHh7Sv-M3iNeOKBW-eJkgZHAh3jg8efSBHkQ.jpg",
+      "image": "./public/avatars/upload-e0c32984f3b0e266.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/EVIL_JANE/1482?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-118",
@@ -4330,12 +4577,13 @@
       "publishedAt": "2026-04-03",
       "dateSource": "source",
       "dateUrl": "https://t.me/trollnormis/3980?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/kTHexXsG6BzgjGlKP0P1VfewYH5fBxRLKH3CMCSLY4x866neSYW7d0kscKe-t4qBe4NwM-zzkLMX9SlEab5LR_rjtrgOyDP4qbbhOQx4_B-bSwFDuPRUBISOkvXcXjG7yaqUYPJPFd00OJuawIFahM3wmGPzS5eAxGC9Yyhwle2jstZrvhcn2MqhJgE9p8wwhKjUb_0uEmrcfSykZOpUYTUDCltJvhwwYBTTl6hY3U16XAMnoYCu-QI7PLr5t5XrM2g3hNrMV6YPIEJ1i1VOTb-cybnKlUP2vui0qEdsXRt2xuEWQbbXuFQSEL0GaBPqoExz-XAcKgSNTwbd17uqvw.jpg",
+      "image": "./public/avatars/upload-e4d544b2c06292e8.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/trollnormis/3980?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-119",
@@ -4347,12 +4595,13 @@
       "publishedAt": "2026-04-03",
       "dateSource": "source",
       "dateUrl": "https://t.me/aginormis/1253?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/DCGne8JUl03J-xjH7gJmrnqqvE8D9G9-sk1lFVfQo21EEVU3tAmQRwJYXJVNH0WUFym9d9fiV7Stw_plRKNbYAfBzDYE2KpMu_Xc9afjUJBHTOBIX0ZPd5zNq-Du8pLUCDlBmRglRPhiXk48EI92lOMmjIGzwY7LGVoGf9pMn3nUN_kX9Rm2HUpIzk51j2yt4hgLn3kuS3FEV5zALXMFG2Uz8LizV2_L1mrMnKlBNwvl2J8Tafq2M_YvG3TGoWscoaN0p29ci9HsLsxq9U8EKVS48oVeU8mTTc6FXZ_2CY6G0Qi0bDDsUkw3M5enlKwJdcZsqq93jM-ZKVidzE6A1Q",
+      "image": "./public/avatars/upload-bac478a408a637f8.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/aginormis/1253?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-120",
@@ -4364,12 +4613,13 @@
       "publishedAt": "2026-04-22",
       "dateSource": "source",
       "dateUrl": "https://t.me/slopnormis/2845?embed=1&mode=tme",
-      "image": "",
+      "image": "./public/avatars/upload-59c298fee2c88b10.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/slopnormis/2845?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-121",
@@ -4398,12 +4648,13 @@
       "publishedAt": "",
       "dateSource": "unknown",
       "dateUrl": "",
-      "image": "",
+      "image": "./public/avatars/upload-48c7564b8f14b62f.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/r4tc4t_exe/234?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-123",
@@ -4415,12 +4666,13 @@
       "publishedAt": "2026-05-10",
       "dateSource": "source",
       "dateUrl": "https://t.me/spamnormis/1217?embed=1&mode=tme",
-      "image": "",
+      "image": "./public/avatars/upload-f2bcb9b4fc211093.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/spamnormis/1217?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-124",
@@ -4432,12 +4684,13 @@
       "publishedAt": "2026-05-13",
       "dateSource": "source",
       "dateUrl": "https://t.me/slopnormis/2949?embed=1&mode=tme",
-      "image": "",
+      "image": "./public/avatars/upload-6b700d6f78544f41.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/slopnormis/2949?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-125",
@@ -4449,12 +4702,13 @@
       "publishedAt": "2026-05-16",
       "dateSource": "source",
       "dateUrl": "https://t.me/aginormis/1266?embed=1&mode=tme",
-      "image": "",
+      "image": "./public/avatars/upload-956766677fdc028c.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/aginormis/1266?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-126",
@@ -4466,12 +4720,13 @@
       "publishedAt": "2026-05-16",
       "dateSource": "source",
       "dateUrl": "https://t.me/aginormis/1263?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/O03MvrnKwMa8mz8WWZAeccEvRUK60JvUOZ121Ox2E-PWxTEHbs9QZ6d8WiPTuBxC-w0eAxGjNGNkdO1Q-n6VYRWqUlJ_WAdWAoTHLrICsa6xJ_SWmvYyRwVVMzLB1dYxZTZ6d6_V5MhCtKIDu1b7jJl8ugIWGn9IdxYkQJFROD3XxlUq3P6-Pos_d5zheF9X3wJ4aeTJwhtBsXZVa7MdXqy3y2WZDsIUfiuK9MMo0Q3T1Y-6QnJt9dPAtESz6LVniEA6ODE01i85_6kb3yVYqdJ2wkkPFDNJvXJaXQKGsEbmFCzTBrwEvd0yii0C6ocSTD_WkiVfr8ocgyuRvoaSrQ",
+      "image": "./public/avatars/upload-7a59f0378e68bb09.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/aginormis/1263?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-127",
@@ -4483,12 +4738,13 @@
       "publishedAt": "2026-05-16",
       "dateSource": "source",
       "dateUrl": "https://t.me/aginormis/1267?embed=1&mode=tme",
-      "image": "",
+      "image": "./public/avatars/upload-062d15300464586d.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/aginormis/1267?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-128",
@@ -4500,12 +4756,13 @@
       "publishedAt": "2026-05-08",
       "dateSource": "source",
       "dateUrl": "https://t.me/ghyenaband/376?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/DEuxOO-gbLHVKPA2m0m9L1reE1EPGN5LzHrIjU5lnfn-IQNu9E6EsPu3g2afT60o5RaVnh4RwueLaBMjLjtdP1KkoseOq_gFNr8zimAm9NIxBGt9MfwP4RkGMAFNQP3kbik7k58eVHV2xFZBy_kBRjb06bFJZapIdzsxB8c3UdAaLLDuvK1fzmWzzsT9X8bzCatY_5MF75rsr9Hxorj2Yw8HUZRjLc8KN26h_ad_ueT8P1PAdiF65tvZGNZpN6jew6kXtN4gFNi2RPkJQiPtjV6PK-WirAAWyMe-tV7bScD40TS4eJd2dpIM7zC_91etMbiRrXYVvhiFrlgi_RFjtQ",
+      "image": "./public/avatars/upload-284ec0a8186d0bdc.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/ghyenaband/376?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-129",
@@ -4517,12 +4774,13 @@
       "publishedAt": "2026-05-28",
       "dateSource": "source",
       "dateUrl": "https://t.me/aginormis/1286?embed=1&mode=tme",
-      "image": "",
+      "image": "./public/avatars/upload-58abd87daecc8b6a.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/aginormis/1286?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-130",
@@ -4581,16 +4839,17 @@
       "url": "https://www.instagram.com/p/DacVO3wsUAH/",
       "alternateUrls": [],
       "sourceOrder": 132,
-      "title": "",
-      "publishedAt": "",
-      "dateSource": "unknown",
-      "dateUrl": "",
-      "image": "https://scontent.cdninstagram.com/v/t51.71878-15/733448308_1547974993581325_1234361846097900958_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&_nc_cat=106&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=ihkIBlU_ZP0Q7kNvwFx9sYi&_nc_oc=AdqXVJOoeQD6bZzhcg647mqmcX2_fVQRtt6ZO5FnvEC6nvS2bciVOgNOxRNvbvvQWYk&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&_nc_gid=cyOaQDJ48gB7TnaoSq1Eiw&_nc_ss=7d689&oh=00_AQLkX4-bOQSOYXEDxVnmdkwXp5Hg3dZTlEwyWpfz4LcnZA&oe=6AAFB8D5",
+      "title": "FIRE AND RAIN OUT NOW 🧯\n\nССЫЛКА НА ВСЕ ПЛОЩАДКИ В БИО ПРОФИЛЯ\n\nPT.8 HILLS*\n\nFISHER VISION+*\n\npowered by @higgsfield.ai @higgsfield.creators \n\n#ai #ye #tylerthecreator #wesanderson #igor",
+      "publishedAt": "2026-07-06",
+      "dateSource": "source",
+      "dateUrl": "https://www.instagram.com/p/DacVO3wsUAH/",
+      "image": "./public/avatars/upload-f502ddf58ee94ca5.jpg",
       "description": "",
       "platform": "Instagram",
       "videoId": "",
       "fetchUrl": "https://www.instagram.com/p/DacVO3wsUAH/",
-      "reference": false
+      "reference": false,
+      "isVideo": true
     },
     {
       "id": "video-134",
@@ -4602,12 +4861,13 @@
       "publishedAt": "2026-07-27",
       "dateSource": "source",
       "dateUrl": "https://t.me/aginormis/1322?embed=1&mode=tme",
-      "image": "",
+      "image": "./public/avatars/upload-956766677fdc028c.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/aginormis/1322?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-135",
@@ -4619,12 +4879,13 @@
       "publishedAt": "2026-08-02",
       "dateSource": "source",
       "dateUrl": "https://t.me/aginormis/1324?embed=1&mode=tme",
-      "image": "",
+      "image": "./public/avatars/upload-465288d72077b024.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/aginormis/1324?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-136",
@@ -4653,12 +4914,13 @@
       "publishedAt": "",
       "dateSource": "unknown",
       "dateUrl": "",
-      "image": "",
+      "image": "./public/avatars/upload-bacde44d5a2c6e95.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/cloudeluxe/26191?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     },
     {
       "id": "video-138",
@@ -4666,16 +4928,17 @@
       "url": "https://www.instagram.com/p/Db0opRbO_0R/",
       "alternateUrls": [],
       "sourceOrder": 137,
-      "title": "",
-      "publishedAt": "",
-      "dateSource": "unknown",
-      "dateUrl": "",
-      "image": "https://scontent.cdninstagram.com/v/t51.82787-15/773613066_17900581074552998_9111652979906758785_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&_nc_cat=104&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=ItgoKBTVbcIQ7kNvwFMEt08&_nc_oc=AdpBAGQa7kGqvP4W0ImsCGgY8IE9OPppBEQyKPgNijUYYKbX7pEjBT9aGkyJLKhx_-U&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&_nc_gid=2NAWem1unyufS-93lUk4jA&_nc_ss=7d689&oh=00_AQJ8b5CfqmSEyb8h2u09_u8N0gcwZCZ3gr7Oug2zPKjb9A&oe=6AAFB666",
+      "title": "Sunday, an introduction to $L!M3 C!t¥ 🐍🧪⛪️🏈🩸 prod. @1stanthekid \n\nedited by me ,i haven't dropped music in so long, my beat isn't even cleared yet but i to so much faith . i wont ever give up on you guys i swear 🫂🫂 lets break the comments!! SLI",
+      "publishedAt": "2026-08-09",
+      "dateSource": "source",
+      "dateUrl": "https://www.instagram.com/p/Db0opRbO_0R/",
+      "image": "./public/avatars/upload-e429e4e3afd1d652.jpg",
       "description": "",
       "platform": "Instagram",
       "videoId": "",
       "fetchUrl": "https://www.instagram.com/p/Db0opRbO_0R/",
-      "reference": false
+      "reference": false,
+      "isVideo": true
     },
     {
       "id": "video-139",
@@ -4717,16 +4980,17 @@
       "url": "https://www.instagram.com/p/Dc02-B7CBzL/",
       "alternateUrls": [],
       "sourceOrder": 140,
-      "title": "",
-      "publishedAt": "",
-      "dateSource": "unknown",
-      "dateUrl": "",
-      "image": "https://scontent.cdninstagram.com/v/t51.82787-15/791922786_18628040215041895_963138351293688346_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&_nc_cat=109&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=uFCYaAE7G6cQ7kNvwH0EtEz&_nc_oc=Adp_xduptJiaOSbqgncX9e_T7mUAY6uO4UTYHXlJ1E2SgRjdXKSAUXKgJwLCs-3gi4M&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&_nc_gid=okT_WXjV1eSrluJbZQcOWA&_nc_ss=7d689&oh=00_AQKL2_30oajXfH_9KPR3xZpVmb51WjEnO9R3MhAFtQmC5g&oe=6AAFB31D",
+      "title": "i61 - МУЗЫКА ДЛЯ ПАЦАНОВ (feat @tuborosho )\nFOG ONLINE / LINK IN BIO\n\nvideo: @visotskiy.view",
+      "publishedAt": "2026-09-03",
+      "dateSource": "source",
+      "dateUrl": "https://www.instagram.com/p/Dc02-B7CBzL/",
+      "image": "./public/avatars/upload-cde29018a295aa4d.jpg",
       "description": "",
       "platform": "Instagram",
       "videoId": "",
       "fetchUrl": "https://www.instagram.com/p/Dc02-B7CBzL/",
-      "reference": false
+      "reference": false,
+      "isVideo": true
     },
     {
       "id": "video-142",
@@ -4738,12 +5002,13 @@
       "publishedAt": "2026-09-04",
       "dateSource": "source",
       "dateUrl": "https://t.me/slopnormis/3322?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/XYy_hi7pcGXDW3_Dk7Ds8-LyzOvwpdxJTkrFkM68wRr7JppmaB8tqh-7SgEXcmcELmTAEJpJhJV_F8K43WgD6j9hwyyVHWQOW-Xj8e_TLM9evIwkkVLsmew3qKE-ZruD2y2AYmd-a9SmTUEbMF0g2jItQ4rfjkgM6tG8sDr6nd2MA5W1YjrKkK1ZbpVNBbm1oZqvXKVS9nJloyVXESj_YHynxTx3he1YeXi32zd2UwHeS9YRegc2B6dN0Jf0zKXYwWecSUkVdn0QSpg1zLTflm1mBNUx_oNx_9EGX79ii4sCFjtmwYyYTQJr2UmOHXd_KC_uJa70kkjKpuozLU8c8A",
+      "image": "./public/avatars/upload-10b1be11b720f376.jpg",
       "description": "",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/slopnormis/3322?embed=1&mode=tme",
-      "reference": false
+      "reference": false,
+      "isVideo": false
     }
   ]
 }

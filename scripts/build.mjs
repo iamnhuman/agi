@@ -32,13 +32,14 @@ if (pages) {
     .replaceAll('./badges/','./public/badges/')
     .replaceAll('url(./fonts/','url(./public/fonts/')
     .replaceAll('./radar-world-red.webp','./public/radar-world-red.webp')
+    .replaceAll('./video-fallback.svg','./public/video-fallback.svg')
     .replaceAll('../cursor-','./public/cursor-');
   await writeFile('index.html',rootHtml);
   await copyFile(`${output}/favicon.svg`,'favicon.svg');
   const rootCatalog = structuredClone(catalog);
-  for(const artist of rootCatalog.artists || []){
-    if(typeof artist.image==='string'&&artist.image.startsWith('./avatars/'))
-      artist.image=artist.image.replace('./avatars/','./public/avatars/');
+  for(const item of [...rootCatalog.artists || [],...rootCatalog.videos || []]){
+    if(typeof item.image==='string'&&item.image.startsWith('./avatars/'))
+      item.image=item.image.replace('./avatars/','./public/avatars/');
   }
   await writeFile('catalog.json',JSON.stringify(rootCatalog,null,2)+'\n');
   await writeFile('.nojekyll','');
