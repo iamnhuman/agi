@@ -4,12 +4,12 @@ import {useEffect,useRef} from 'react';
 import {paintSignalScanlines,signalHash,signalRasterScale} from './signal-screen';
 
 const glyphs=Array.from('アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン信号電光未来断片夢影機界壊警報空網路炎星龍真偽視覚記録通信回路秘密変換転送⌁⌑⌖⌗⌘⌬⍟⎔⟁⊗╳∴≋≡<>/\\|:;ABCDEFGHJKLMNPRSTUVWXYZ');
-const colours=['#ffe3d2','#e8abb1','#ff7380','#bf7780','#ae4962','#803249'];
+const colours=['#fff1e9','#ffbdc4','#ff667a','#df3e59','#a72d47','#672039'];
 const atlasCell=32,atlasColumns=16,atlasRows=Math.ceil(glyphs.length/atlasColumns);
-const nearPlane=.85,depthRange=5.8,glyphSpacing=.071,glyphSize=.048;
+const nearPlane=.85,depthRange=5.8,glyphSpacing=.053,glyphSize=.052;
 const wrap=(value:number,range:number)=>((value%range)+range)%range;
 
-type Stream={seed:number;x:number;z:number;phase:number;speed:number;trail:number;spin:number};
+type Stream={seed:number;x:number;z:number;phase:number;speed:number;trail:number};
 type Camera={x:number;y:number;yaw:number;pitch:number;focal:number;cx:number;cy:number};
 
 function glyphAtlas(){
@@ -58,14 +58,15 @@ export default function SignalRain({active}:{active:boolean}){
    context.setTransform(signalRasterScale,0,0,signalRasterScale,0,0);
    context.imageSmoothingEnabled=false;
    focal=height*.96;
-   const count=Math.max(90,Math.min(224,Math.round(width/7)));
+   const count=Math.max(120,Math.min(280,Math.round(width/6)));
    streams=Array.from({length:count},(_,index)=>{
     const seed=signalHash(index*0x9e3779b1+317);
     const random=(salt:number)=>signalHash(seed^salt)/0xffffffff;
     const band=random(13);
     const z=band<.16?1.05+random(17)*.8:band<.58?1.85+random(17)*1.75:3.6+random(17)*2.6;
     return {seed,z,x:(random(23)-.5)*width/focal*z*1.5,
-     phase:random(31)*24,speed:.27+random(43)*.31,trail:12+Math.floor(random(47)*19),spin:random(59)*Math.PI*2};
+     phase:random(31)*24,speed:(.78+random(43)*.68)*(1+z*.11),
+     trail:26+Math.floor(random(47)*25)};
    });
   };
   const onPointerMove=(event:PointerEvent)=>{
@@ -92,7 +93,6 @@ export default function SignalRain({active}:{active:boolean}){
    if(document.visibilityState!=='visible'||now-lastFrame<(reducedMotion.matches?48:32))return;
    const delta=Math.min(64,now-lastFrame||32);lastFrame=now;
    const time=(now-start)*.001*(reducedMotion.matches?.3:1);
-   const spinTime=reducedMotion.matches?0:time;
    if(now-lastPointer>2400)clearPointer();
    const ease=1-Math.exp(-delta/180);
    cameraOffset.x+=(pointer.x-cameraOffset.x)*ease;cameraOffset.y+=(pointer.y-cameraOffset.y)*ease;
@@ -112,29 +112,23 @@ export default function SignalRain({active}:{active:boolean}){
     const head=wrap(time*stream.speed+stream.phase,cycle)-span/2-.5;
     const depthFade=Math.min(1,(z-nearPlane)/.35,(nearPlane+depthRange-z)/.5);
     const proximity=1-(z-nearPlane)/depthRange;
-    const brightness=(.28+proximity*.66)*depthFade;
-    const mutation=reducedMotion.matches?0:Math.floor(time/(.16+(stream.seed%8)*.035));
-    const worldX=stream.x+Math.sin(spinTime*.16+stream.spin)*.055;
+    const brightness=(.58+proximity*.4)*depthFade;
+    const mutation=reducedMotion.matches?0:Math.floor(time/(.08+(stream.seed%8)*.016));
     for(let step=stream.trail-1;step>=0;step--){
      const worldY=head-step*glyphSpacing;
-     const point=project(worldX,worldY,z,camera);if(!point)continue;
+     const point=project(stream.x,worldY,z,camera);if(!point)continue;
      const size=Math.round(glyphSize*point.scale/2)*2;
      if(size<4||point.x+size<0||point.x-size>width||point.y+size<0||point.y-size>height)continue;
      const fade=1-step/stream.trail;
      const glyphIndex=signalHash(stream.seed^Math.imul(step+1,0x85ebca6b)^Math.imul(mutation+1,0x27d4eb2d))%glyphs.length;
-     const colour=step===0?(z<3.6?0:1):step<3?1:step<9?2:proximity>.4?4:5;
+     const colour=step===0?0:step<4?1:step<12?2:step<25?3:step<38?4:5;
      const sx=glyphIndex%atlasColumns*atlasCell,sy=(colour*atlasRows+Math.floor(glyphIndex/atlasColumns))*atlasCell;
-     context.globalAlpha=Math.min(1,brightness*(.18+fade*.82)*(step===0?1.2:1));
-     const turn=.74+.26*Math.abs(Math.cos(stream.spin+spinTime*.4+step*.43));
-     const spriteWidth=Math.max(4,Math.round(size*turn/2)*2);
+     context.globalAlpha=Math.min(1,brightness*(.24+Math.pow(fade,1.25)*.76)*(step===0?1.3:1));
      const x=Math.round(point.x/2)*2,y=Math.round(point.y/2)*2;
-     if(z<2.3){
-      context.save();context.translate(x,y);context.rotate(Math.sin(stream.spin+spinTime*.3+step*.27)*.085);
-      context.drawImage(atlas,sx,sy,atlasCell,atlasCell,-spriteWidth/2,-size/2,spriteWidth,size);context.restore();
-     }else context.drawImage(atlas,sx,sy,atlasCell,atlasCell,x-spriteWidth/2,y-size/2,spriteWidth,size);
+     context.drawImage(atlas,sx,sy,atlasCell,atlasCell,x-size/2,y-size/2,size,size);
      if(step===0&&z<2.4){
-      context.globalAlpha=brightness*.18;context.fillStyle='#ffe3d2';
-      context.fillRect(x-2,y+size*.32,4,Math.max(2,size*.18));
+      context.globalAlpha=brightness*.25;context.fillStyle='#ffe3d2';
+      context.fillRect(x-2,y+size*.35,4,Math.max(2,size*.2));
      }
     }
    }

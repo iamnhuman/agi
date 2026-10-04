@@ -5,7 +5,7 @@ import {catalogUrl,adminUrl,showLocalAdmin} from '@/client/config';
 import ArtistMap from './artist-map';
 import ArtistCanvasDeck from './artist-canvas-deck';
 import {defaultSections,type Artist,type Section} from '@/lib/types';
-import {ArrowUpRight, Search, Grid2X2, List, Network, Layers3, Pencil, Radio, UsersRound, ZoomIn, ZoomOut, Shuffle, ListOrdered, RotateCcw, Type} from 'lucide-react';
+import {ArrowUpRight, Search, Grid2X2, List, Network, Layers3, Pencil, Radio, UsersRound, ZoomIn, ZoomOut, Shuffle, ListOrdered, RotateCcw, Type, Menu, X} from 'lucide-react';
 import SignalRain from './signal-rain';
 import {paintSignalScanlines,signalHash,signalRasterScale} from './signal-screen';
 import {createSignalScript} from './signal-script';
@@ -203,29 +203,44 @@ function PixelSignalConsole({active,revision,ip}:{active:boolean;revision:string
   if(title){context.fillStyle='#250d16';context.fillRect(0,title.y,width,title.height);context.fillStyle='#7d3241';context.fillRect(0,title.y+title.height-1,width,1);}
   if(client){context.fillStyle='#170b12';context.fillRect(0,client.y,width,client.height);context.fillStyle='#73303e';context.fillRect(0,client.y+client.height-1,width,1);}
   if(skull&&log&&skull.x>log.x){context.fillStyle='#6f2c3944';context.fillRect(skull.x-8,skull.y,1,skull.height);}
-  const write=(value:string,x:number,y:number,maxWidth:number,size:number,color:string,weight=700,align:CanvasTextAlign='left')=>{
+  const write=(value:string,x:number,y:number,maxWidth:number,size:number,color:string,weight=700,align:CanvasTextAlign='left',baseline:CanvasTextBaseline='top')=>{
    context.font=`${weight} ${size}px ui-monospace, SFMono-Regular, Menlo, monospace`;
-   context.textAlign=align;context.textBaseline='top';context.fillStyle=color;
+   context.textAlign=align;context.textBaseline=baseline;context.fillStyle=color;
+   if(maxWidth<context.measureText('…').width)return;
    let visible=value;
    if(context.measureText(visible).width>maxWidth){
     let low=0,high=visible.length;
     while(low<high){const middle=Math.ceil((low+high)/2);if(context.measureText(visible.slice(0,middle)+'…').width<=maxWidth)low=middle;else high=middle-1;}
     visible=visible.slice(0,low)+'…';
    }
-   context.fillText(visible,align==='center'?x+maxWidth/2:x,y);
+   context.fillText(visible,align==='center'?x+maxWidth/2:align==='right'?x+maxWidth:x,y);
+  };
+  const textWidth=(value:string,size:number)=>{
+   context.font=`700 ${size}px ui-monospace, SFMono-Regular, Menlo, monospace`;
+   return context.measureText(value).width;
   };
   const titleNode=panel.querySelector('.signal-console-title');
   if(title&&titleNode){
    const right=titleNode.querySelector('b');
-   write('ROOTKIT://GHOST_SESSION',title.x+14,title.y+Math.max(4,(title.height-17)/2),title.width-28,16,'#ffe1d4');
-   if(right&&getComputedStyle(right).display!=='none'){
-    const rect=box(right);if(rect)write(right.textContent||'',rect.x,rect.y,rect.width,14,'#ff6978');
-   }
+   const rightBox=right&&getComputedStyle(right).display!=='none'?box(right):null;
+   const inset=16,rowY=title.y+title.height/2;
+   const leftWidth=rightBox?Math.max(0,rightBox.x-title.x-inset-12):title.width-inset*2;
+   write('ROOTKIT://GHOST_SESSION',title.x+inset,rowY,leftWidth,16,'#ffe1d4',700,'left','middle');
+   if(rightBox)write(right?.textContent||'',title.x+title.width-inset-rightBox.width,rowY,rightBox.width,14,'#ff6978',700,'right','middle');
   }
   const bar=panel.querySelector('.signal-client-bar');
   if(client&&bar){
-   const items=Array.from(bar.children);
-   for(const item of items){const rect=box(item);if(!rect)continue;write(item.textContent||'',rect.x,rect.y+Math.max(1,(rect.height-15)/2),rect.width,14,item.tagName==='STRONG'?'#ffe0ca':'#f27683');}
+   const [label,address,live]=Array.from(bar.children);
+   const inset=16,gap=12,rowY=client.y+client.height/2;
+   const labelText=label?.textContent||'',addressText=address?.textContent||'',liveText=live?.textContent||'';
+   const labelX=client.x+inset,labelWidth=textWidth(labelText,14);
+   const liveWidth=live&&getComputedStyle(live).display!=='none'?textWidth(liveText,14):0;
+   const rightEdge=client.x+client.width-inset;
+   const addressX=labelX+labelWidth+gap;
+   const addressWidth=Math.max(0,(liveWidth?rightEdge-liveWidth-gap:rightEdge)-addressX);
+   write(labelText,labelX,rowY,labelWidth+1,14,'#f27683',700,'left','middle');
+   write(addressText,addressX,rowY,addressWidth,14,'#ffe0ca',700,'left','middle');
+   if(liveWidth)write(liveText,rightEdge-liveWidth-1,rowY,liveWidth+1,14,'#f27683',700,'right','middle');
   }
   const lineNodes=panel.querySelectorAll('.signal-console-log .console-line');
   if(log){lineNodes.forEach((element,index)=>{const rect=box(element);if(!rect)return;write(element.textContent||'',rect.x,rect.y,rect.width,Math.min(15,Math.max(12,rect.height*.82)),element.classList.contains('is-active')?'#ffe3d2':index%3===2?'#bf7780':'#e8abb1',700);});}
@@ -370,7 +385,11 @@ function ToyotaFooter(){
  },[signalOpen]);
  const firstConsoleLine=Math.max(0,consoleState.line-7);
  const consoleLines=consoleState.lines.slice(firstConsoleLine,consoleState.line+1);
- return <footer><div className="manifesto" data-open={signalOpen} onPointerLeave={event=>{if(event.pointerType==='mouse')setSignalOpen(false);}} onBlurCapture={event=>{if(!event.currentTarget.contains(event.relatedTarget as Node))setSignalOpen(false);}}>
+ return <footer className="command-footer">
+  <div className="command-footer-rail"><span>AI CULTURE // ARCHIVE SYSTEM</span><span className="command-footer-status"><i aria-hidden="true"/>СИГНАЛ ГОТОВ</span></div>
+  <div className="command-footer-hardware" aria-hidden="true"><div className="command-footer-vent"/><div className="command-footer-radar"/><div className="command-footer-vent"/></div>
+  <div className="command-footer-rail command-footer-rail--bottom"><span>КОНЕЦ АРХИВА</span><span>СЕКТОР 01 / ИИЗМ</span></div>
+  <div className="manifesto" data-open={signalOpen}>
   <div id="toyota-transmission" className="manifesto-transmission" aria-hidden={!signalOpen}>
    <SignalRain active={signalOpen}/>
    <div className="manifesto-interference">
@@ -384,7 +403,9 @@ function ToyotaFooter(){
    </div>
     <div className="manifesto-zalgo" data-play={bubbleActive} aria-hidden="true"><canvas ref={bubbleCanvasRef} className="comic-bubble-canvas" width="200" height="48"/></div>
   </div>
-  <button type="button" className="toyota-mark" aria-label="Toyota: показать сигнал" aria-controls="toyota-transmission" aria-expanded={signalOpen} onPointerEnter={event=>{if(event.pointerType==='mouse')setSignalOpen(true);}} onKeyDown={event=>{if(event.key==='Escape')setSignalOpen(false);}} onClick={()=>{if(window.matchMedia('(hover: none)').matches)setSignalOpen(open=>!open);else setSignalOpen(true);}}><svg viewBox="0 0 60 40" aria-hidden="true" shapeRendering="crispEdges">{toyotaPixelRuns.map(({x,y,width})=><rect key={`${x}-${y}`} x={x} y={y} width={width} height="1"/>)}</svg><svg className="toyota-wordmark" viewBox="0 0 60 9" aria-hidden="true" shapeRendering="crispEdges">{toyotaWordRuns.map(({x,y})=><rect key={`${x}-${y}`} x={x} y={y} width="1" height="1"/>)}</svg></button>
+  <div className="toyota-mark-frame">
+  <button type="button" className="toyota-mark" aria-label="Toyota: показать сигнал" aria-controls="toyota-transmission" aria-expanded={signalOpen} onPointerEnter={event=>{if(event.pointerType==='mouse')setSignalOpen(true);}} onPointerLeave={event=>{if(event.pointerType==='mouse')setSignalOpen(false);}} onBlur={()=>setSignalOpen(false)} onKeyDown={event=>{if(event.key==='Escape')setSignalOpen(false);}} onClick={()=>{if(window.matchMedia('(hover: none)').matches)setSignalOpen(open=>!open);else setSignalOpen(true);}}><svg viewBox="0 0 60 40" aria-hidden="true" shapeRendering="crispEdges">{toyotaPixelRuns.map(({x,y,width})=><rect key={`${x}-${y}`} x={x} y={y} width={width} height="1"/>)}</svg><svg className="toyota-wordmark" viewBox="0 0 60 9" aria-hidden="true" shapeRendering="crispEdges">{toyotaWordRuns.map(({x,y})=><rect key={`${x}-${y}`} x={x} y={y} width="1" height="1"/>)}</svg><span className="toyota-signal-prompt" aria-hidden="true">АКТИВИРОВАТЬ СИГНАЛ</span></button>
+  </div>
  </div></footer>;
 }
 
@@ -410,22 +431,43 @@ function ArtistNameFlow({artists}:{artists:Artist[]}){
  </>;
 }
 
+function CatalogSearch({query,onChange}:{query:string;onChange:(value:string)=>void}){
+ const input=useRef<HTMLInputElement>(null);
+ return <div className="input-search">
+ {query?<button type="button" className="catalog-search-clear" aria-label="Очистить поиск" title="Очистить поиск" onClick={()=>{onChange('');input.current?.focus();}}><X size={20} aria-hidden="true"/></button>:<Search size={17} aria-hidden="true"/>}
+ <input ref={input} aria-label="Поиск записи" placeholder="Поиск" value={query} onChange={event=>onChange(event.target.value)}/>
+ </div>;
+}
+
 export default function Atlas({initial}:{initial:Artist[]}){
 const [data,setData]=useState(initial),[sections,setSections]=useState<Section[]>(defaultSections),[error,setError]=useState('');
 async function refresh(){try{const r=await fetch(catalogUrl,{cache:'no-store'});const d:any=await r.json();if(!r.ok)throw Error(d.error);setData(d.artists);setSections(d.sections);setError('');}catch{setError('Связь с архивом потеряна. Показаны последние доступные досье.');}}
 useEffect(()=>{refresh();const onFocus=()=>refresh();window.addEventListener('focus',onFocus);return ()=>window.removeEventListener('focus',onFocus);},[]);
 const [section,setSection]=useState('all'),[q,setQ]=useState(''),[view,setView]=useState('names'),[kind,setKind]=useState('all'),[rating,setRating]=useState('all'),[sortMode,setSortMode]=useState<'posting'|'random'>('posting'),[shuffleSeed,setShuffleSeed]=useState(0);
-const [deckZoom,setDeckZoom]=useState(1.15);
+const [deckZoom,setDeckZoom]=useState(1.1);
 const changeDeckZoom=(step:number)=>setDeckZoom(current=>Math.round(Math.max(.4,Math.min(1.5,current+step))*100)/100);
 const [cardSize,setCardSize]=useState<'sm'|'md'|'lg'>('sm');
 const [listSize,setListSize]=useState<'sm'|'md'|'lg'>('sm');
+useEffect(()=>{
+ const mobile=window.matchMedia('(max-width:580px)');
+ const normalizeSizes=()=>{
+  if(!mobile.matches)return;
+  setCardSize(size=>size==='md'?'sm':size);
+  setListSize(size=>size==='md'?'sm':size);
+ };
+ normalizeSizes();mobile.addEventListener('change',normalizeSizes);
+ return ()=>mobile.removeEventListener('change',normalizeSizes);
+},[]);
+const [controlsOpen,setControlsOpen]=useState(false);
+const controlsToggle=useRef<HTMLButtonElement>(null);
 function changeView(next:string){if(next===view)return;setView(next);setCardSize('sm');setListSize('sm');}
-const catalogIsDefault=section==='all'&&kind==='all'&&rating==='all'&&!q&&view==='names'&&cardSize==='sm'&&listSize==='sm'&&sortMode==='posting'&&deckZoom===1.15;
+const catalogIsDefault=section==='all'&&kind==='all'&&rating==='all'&&!q&&cardSize==='sm'&&listSize==='sm'&&sortMode==='posting'&&deckZoom===1.1;
 function resetCatalog(){
  setSection('all');setKind('all');setRating('all');setQ('');
- setView('names');setCardSize('sm');setListSize('sm');
- setSortMode('posting');setShuffleSeed(0);setDeckZoom(1.15);
+ setCardSize('sm');setListSize('sm');
+ setSortMode('posting');setShuffleSeed(0);setDeckZoom(1.1);
 }
+function sortControls(position:'header'|'footer'){return <div className={'catalog-sort-switch catalog-sort-switch--'+position}><span>СОРТИРОВКА</span><div className="catalog-sort-options" role="radiogroup" aria-label="Порядок отображения"><label className={sortMode==='random'?'active':''} title="Случайный порядок" onClick={()=>{if(sortMode==='random')setShuffleSeed(Math.floor(Math.random()*0xffffffff));}}><input type="radio" name={'catalog-sort-'+position} value="random" checked={sortMode==='random'} onChange={()=>{setSortMode('random');setShuffleSeed(Math.floor(Math.random()*0xffffffff));}}/><Shuffle size={18}/><span className="sr-only">Случайный порядок</span></label><label className={sortMode==='posting'?'active':''} title="Порядок публикации"><input type="radio" name={'catalog-sort-'+position} value="posting" checked={sortMode==='posting'} onChange={()=>setSortMode('posting')}/><ListOrdered size={18}/><span className="sr-only">Порядок публикации</span></label></div></div>;}
 const matchingArtists=data.filter(a=>(section==='all'||a.section===section)&&(kind==='all'||(a.kind||'artist')===kind)&&(rating==='all'||(a.rating||'A').toUpperCase()===rating)&&(a.name+' '+a.tags+' '+a.description).toLowerCase().includes(q.toLowerCase()));
 const sourceOrder=new Map(data.map((artist,index)=>[artist.id,index]));
 const artists=[...matchingArtists].sort((a,b)=>sortMode==='posting'?(sourceOrder.get(a.id)!-sourceOrder.get(b.id)!):(orderHash(a.id,shuffleSeed)-orderHash(b.id,shuffleSeed)));
@@ -434,30 +476,34 @@ return <>
 <CommandDeck mode="catalog" total={data.length}/>
 <main>
 <section className="catalog" id="catalog">{error&&<p className="error" role="alert">{error} <button onClick={refresh}>Восстановить связь</button>
-</p>}<div className="catalog-head">
-<div className="filters">{[['all','Все досье'],...sections.map(s=>[s.id,s.name])].map(([id,title])=>
+</p>}<div className="catalog-controls" onKeyDown={event=>{if(event.key==='Escape'&&controlsOpen&&controlsToggle.current?.getClientRects().length){event.preventDefault();setControlsOpen(false);controlsToggle.current.focus();}}}>
+<div className="search-row catalog-mobile-bar">
+<CatalogSearch query={q} onChange={setQ}/>
+<button ref={controlsToggle} type="button" className="catalog-menu-toggle" aria-label={controlsOpen?'Закрыть настройки каталога':'Открыть настройки каталога'} aria-expanded={controlsOpen} aria-controls="catalog-settings" onClick={()=>setControlsOpen(open=>!open)}>{controlsOpen?<X size={22}/>:<Menu size={22}/>}</button>
+</div>
+<div id="catalog-settings" className="catalog-settings" data-open={controlsOpen}>
+<div className="catalog-head">
+<div className="filters">{[['all','Все'],...sections.map(s=>[s.id,s.name])].map(([id,title])=>
 <button key={id} className={section===id?'active':''} onClick={()=>setSection(id)}>{title}<sup>{id==='all'?data.length:data.filter(a=>a.section===id).length}</sup>
 </button>)}</div>
-<button type="button" className="catalog-reset" aria-label="Сбросить настройки каталога" title="Сбросить настройки каталога" disabled={catalogIsDefault} onClick={resetCatalog}><RotateCcw size={18} aria-hidden="true"/></button>
-<div className="catalog-view-controls">{view==='grid'&&<div className="catalog-density" role="group" aria-label="Размер карточек">
-<span>Размер</span>{(['sm','md','lg'] as const).map(value=><button key={value} type="button" aria-label={`Размер карточек: ${value.toUpperCase()}`} aria-pressed={cardSize===value} onClick={()=>setCardSize(value)}>{value.toUpperCase()}</button>)}
+<div className="catalog-actions"><div className="catalog-view-controls">{view==='grid'&&<div className="catalog-density" role="group" aria-label="Размер карточек">
+<span>Размер</span>{(['sm','md','lg'] as const).map(value=><button key={value} type="button" className={value==='md'?'catalog-size-md':undefined} aria-label={`Размер карточек: ${value.toUpperCase()}`} aria-pressed={cardSize===value} onClick={()=>setCardSize(value)}>{value.toUpperCase()}</button>)}
 </div>}{view==='list'&&<div className="catalog-density" role="group" aria-label="Размер элементов списка">
-<span>Размер</span>{(['sm','md','lg'] as const).map(value=><button key={value} type="button" aria-label={`Размер списка ${value.toUpperCase()}`} aria-pressed={listSize===value} onClick={()=>setListSize(value)}>{value.toUpperCase()}</button>)}
-</div>}<div className="catalog-sort-switch"><span>СОРТИРОВКА</span><div className="catalog-sort-options" role="radiogroup" aria-label="Порядок отображения"><label className={sortMode==='random'?'active':''} title="Случайный порядок" onClick={()=>{if(sortMode==='random')setShuffleSeed(Math.floor(Math.random()*0xffffffff));}}><input type="radio" name="catalog-sort" value="random" checked={sortMode==='random'} onChange={()=>{setSortMode('random');setShuffleSeed(Math.floor(Math.random()*0xffffffff));}}/><Shuffle size={18}/><span className="sr-only">Случайный порядок</span></label><label className={sortMode==='posting'?'active':''} title="Порядок публикации"><input type="radio" name="catalog-sort" value="posting" checked={sortMode==='posting'} onChange={()=>setSortMode('posting')}/><ListOrdered size={18}/><span className="sr-only">Порядок публикации</span></label></div></div><div className="view-switch">{[[Type,'names','Имена'],[Grid2X2,'grid','Карточки-досье'],[List,'list','Реестр'],[Network,'map','Тактическая карта'],[Layers3,'deck','Трёхмерная колода']].map(([Icon,id,label]:any)=>
+<span>Размер</span>{(['sm','md','lg'] as const).map(value=><button key={value} type="button" className={value==='md'?'catalog-size-md':undefined} aria-label={`Размер списка ${value.toUpperCase()}`} aria-pressed={listSize===value} onClick={()=>setListSize(value)}>{value.toUpperCase()}</button>)}
+</div>}{sortControls('header')}<div className="view-switch">{[[Type,'names','Имена'],[Grid2X2,'grid','Карточки-досье'],[List,'list','Реестр'],[Layers3,'deck','Трёхмерная колода'],[Network,'map','Тактическая карта']].map(([Icon,id,label]:any)=>
 <button key={id} aria-label={label} aria-pressed={view===id} className={view===id?'active':''} onClick={()=>changeView(id)}>
 <Icon size={18}/>
-</button>)}</div></div>
+</button>)}</div></div></div>
+<button type="button" className="catalog-reset" aria-label="Сбросить настройки каталога" title="Сбросить настройки каталога" disabled={catalogIsDefault} onClick={resetCatalog}><RotateCcw size={18} aria-hidden="true"/></button>
 </div>
 <div className="search-row">
-<label className="input-search">
-<Search size={17}/>
-<input aria-label="Поиск записи" placeholder="Поиск" value={q} onChange={e=>setQ(e.target.value)}/>
-</label>
+<CatalogSearch query={q} onChange={setQ}/>
+{sortControls('footer')}
 <div className="catalog-type-controls">
 <div className="catalog-type-radios" role="radiogroup" aria-label="Тип записей">{[['all','Все'],['artist','Артисты'],['media','Медиа'],['collective','Проекты']].map(([id,label])=><label key={id} className={kind===id?'is-active':''}><input type="radio" name="catalog-kind" value={id} checked={kind===id} onChange={()=>setKind(id)}/><span>{label}</span></label>)}</div>
 <div className="catalog-tag-filter"><span>ТЕГ</span><div className="catalog-type-radios" role="radiogroup" aria-label="Рейтинг тегов">{[['all','Все'],['A','A'],['AA','AA'],['AAA','AAA'],['AAA+','AAA+']].map(([id,label])=><label key={id} className={rating===id?'is-active':''}><input type="radio" name="catalog-rating" value={id} checked={rating===id} onChange={()=>setRating(id)}/><span>{label}</span></label>)}</div></div>
 </div>
- </div>{view==='names'?<ArtistNameFlow artists={artists}/>:view==='map'?<ArtistMap artists={artists} sections={sections}/>:view==='deck'?<>
+ </div></div></div>{view==='names'?<ArtistNameFlow artists={artists}/>:view==='map'?<ArtistMap artists={artists} sections={sections}/>:view==='deck'?<>
 <div className="deck-toolbar deck-toolbar--canvas"><div className="deck-zoom-controls" role="group" aria-label="Масштаб 3D-колоды"><label htmlFor="deck-zoom">ЗУМ</label><button type="button" aria-label="Уменьшить масштаб 3D-колоды" disabled={deckZoom<=.4} onClick={()=>changeDeckZoom(-.1)}><ZoomOut size={18}/></button><input id="deck-zoom" type="range" min="40" max="150" step="5" value={Math.round(deckZoom*100)} onChange={event=>setDeckZoom(Number(event.target.value)/100)} aria-label="Масштаб 3D-колоды"/><output htmlFor="deck-zoom" aria-live="polite">{Math.round(deckZoom*100)}%</output><button type="button" aria-label="Увеличить масштаб 3D-колоды" disabled={deckZoom>=1.5} onClick={()=>changeDeckZoom(.1)}><ZoomIn size={18}/></button></div></div>
 <ArtistCanvasDeck artists={artists} zoom={deckZoom} onZoomStep={changeDeckZoom}/>
 </>:<div className={view==='list'?'artist-list':'artist-grid'} data-size={view==='grid'?cardSize:listSize}>{artists.map((a,i)=>
@@ -470,7 +516,7 @@ return <>
 <span className={`rating-tag rating-${(a.rating||'A').toLowerCase()}`}>{a.rating||'A'}</span>
 </span>}
 {showLocalAdmin&&view==='grid'&&<a className="card-edit card-edit--image" aria-label={"Редактировать "+a.name} href={adminUrl+"/?edit="+encodeURIComponent(a.id)+"#catalog"}><Pencil size={15}/></a>}
-<span className="art-platform-tag" aria-hidden="true"><span className="platform-full">{a.platform}</span><span className="platform-short">{a.platform==='Instagram'?'IG':a.platform==='Telegram'?'TG':a.platform.slice(0,2)}</span><ArrowUpRight size={13}/></span>
+{view==='grid'&&<span className="art-platform-tag" aria-hidden="true"><span className="platform-short">{a.platform==='Instagram'?'IG':a.platform==='Telegram'?'TG':a.platform.slice(0,2)}</span><ArrowUpRight size={13}/></span>}
 </div>
 <div className="card-info">
 {(a.section==='world'||a.section==='runet')&&<img className="region-watermark" src={a.section==='world'?'./badges/region-en-eagle-cutout.png':'./badges/region-ru-emblem-cutout.png'} alt="" aria-hidden="true" loading="lazy" decoding="async"/>}
@@ -482,7 +528,7 @@ return <>
 </span>
 {a.kind==='collective'?<span className="list-kind-tag"><UsersRound size={11} aria-hidden="true"/>Проект</span>:a.kind==='media'?<span className="list-kind-tag"><Radio size={11} aria-hidden="true"/>Медиа</span>:null}
 </p>}
-</div></div>
+</div>{view==='grid'&&<span className="dossier-status" aria-hidden="true"><span className="dossier-status-vent"/><span className="dossier-status-lights"><i/><i/><i/></span></span>}</div>
 {view!=='deck'&&<a className="card-hit-area" href={a.url} target="_blank" rel="noopener noreferrer" aria-label={"Открыть источник: "+a.name}/>}
 {showLocalAdmin&&view!=='grid'&&<a className="card-edit" aria-label={"Редактировать "+a.name} href={adminUrl+"/?edit="+encodeURIComponent(a.id)+"#catalog"}><Pencil size={15}/></a>}
 </article>)}</div>}{!artists.length&&view!=='deck'&&<p className="empty">Сигнал не обнаружен. Измените запрос или фильтр.</p>}</section>

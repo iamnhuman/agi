@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useRef,useState,type CSSProperties} from 'react';
 import {siteUrl} from '@/client/config';
-import {Plus,Search,ArrowUpRight,Pencil,Trash2,Link2,LoaderCircle,RefreshCw,Radio,UsersRound,ChevronLeft,ChevronRight} from 'lucide-react';
+import {Plus,Search,ArrowUpRight,Pencil,Trash2,Link2,LoaderCircle,RefreshCw,Radio,UsersRound,ChevronLeft,ChevronRight,ChevronDown} from 'lucide-react';
 import AiConquerLogo from '@/client/ai-conquer-logo';
 import {Dialog,DialogContent,DialogTitle,DialogDescription} from '@/components/ui/dialog';
 import {AlertDialog,AlertDialogContent,AlertDialogHeader,AlertDialogTitle,AlertDialogDescription,AlertDialogFooter,AlertDialogCancel,AlertDialogAction} from '@/components/ui/alert-dialog';
@@ -54,10 +54,10 @@ function AdminPagination({page,pageCount,first,last,total,onChange,placement}:{p
  <span className="admin-pagination-range">{first}–{last} <span>из {total}</span></span>
  <div className="admin-pagination-controls">
  <button type="button" aria-label="Предыдущая страница" disabled={page==='all'||page===1} onClick={()=>{if(typeof page==='number')onChange(page-1);}}><ChevronLeft size={18} aria-hidden="true"/></button>
- <select aria-label="Страница коллекции" value={page} onChange={event=>onChange(event.target.value==='all'?'all':Number(event.target.value))}>
+ <span className="admin-page-select"><select aria-label="Страница коллекции" value={page} onChange={event=>onChange(event.target.value==='all'?'all':Number(event.target.value))}>
  <option value="all">Все</option>
  {Array.from({length:pageCount},(_,index)=><option key={index+1} value={index+1}>{String(index+1).padStart(2,'0')} / {String(pageCount).padStart(2,'0')}</option>)}
- </select>
+ </select><ChevronDown size={14} aria-hidden="true"/></span>
  <button type="button" aria-label="Следующая страница" disabled={page==='all'||page===pageCount} onClick={()=>{if(typeof page==='number')onChange(page+1);}}><ChevronRight size={18} aria-hidden="true"/></button>
  </div>
  </nav>;
@@ -95,13 +95,12 @@ export default function Admin(){
   requestAnimationFrame(()=>rowsRef.current?.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'}));
  }
  return <>
-<header className="topbar">
+<header className="topbar topbar--admin">
 <a className="brand" href={siteUrl} aria-label="AI & CONQUER — ASI ALERT, главная"><AiConquerLogo/></a>
 <nav className="primary-nav" aria-label="Разделы сайта">
 <a href={siteUrl+'/#catalog'} className="primary-nav-link">ИИ-артисты и медиа</a>
 <a href="#videos" className="primary-nav-link">Видео · ИИ в творчестве</a>
 </nav>
-<div className="header-actions"><span className="admin-link curator-link is-current" aria-current="page">Кураторский штаб</span></div>
 </header>
 <main className={`admin-main${columns===1?'':' admin-main--grid'}`}>
 <div className="admin-heading">
@@ -147,7 +146,7 @@ export default function Admin(){
 <div className={'mini-art art-'+i%8}>
 <div className="missing-avatar" role="img" aria-label="Аватарка отсутствует">
 <span aria-hidden="true">×</span>
-</div>{a.image&&<a className="admin-artwork-link" href={a.url||a.image} target="_blank" rel="noopener noreferrer" aria-label={`Открыть ${a.name} в новой вкладке`}><img src={a.image} alt={a.name} loading="lazy" referrerPolicy="no-referrer" onError={e=>{e.currentTarget.style.display='none';}}/></a>}{a.kind==='collective'?<span className="record-type record-type--avatar"><UsersRound size={13} aria-hidden="true"/><span className="record-type-label">Проект</span></span>:a.kind==='media'?<span className="record-type record-type--avatar"><Radio size={13} aria-hidden="true"/><span className="record-type-label">Медиа</span></span>:null}<span className="art-badges"><span className={`rating-tag rating-${(a.rating||'A').toLowerCase()}`}>{a.rating||'A'}</span></span></div>
+</div>{a.image&&<a className="admin-artwork-link" href={a.url||a.image} target="_blank" rel="noopener noreferrer" aria-label={`Открыть ${a.name} в новой вкладке`}><img src={a.image} alt={a.name} loading="lazy" referrerPolicy="no-referrer" onError={e=>{e.currentTarget.style.display='none';}}/></a>}<div className="admin-art-badges">{a.kind==='collective'?<span className="record-type record-type--avatar"><UsersRound size={13} aria-hidden="true"/><span className="record-type-label">Проект</span></span>:a.kind==='media'?<span className="record-type record-type--avatar"><Radio size={13} aria-hidden="true"/><span className="record-type-label">Медиа</span></span>:null}<span className="art-badges"><span className={`rating-tag rating-${(a.rating||'A').toLowerCase()}`}>{a.rating||'A'}</span></span></div></div>
 <div className="row-name">
 {(a.section==='world'||a.section==='runet')&&<img className="region-watermark" src={a.section==='world'?'./badges/region-en-eagle-cutout.png':'./badges/region-ru-emblem-cutout.png'} alt="" aria-hidden="true" loading="lazy" decoding="async"/>}
 <AdminCardName name={a.name} columns={columns}/>
