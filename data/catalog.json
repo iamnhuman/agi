@@ -1,6 +1,18 @@
 {
   "artists": [
     {
+      "id": "8ef6c966-5097-4ba6-b353-875b6d476aa4",
+      "kind": "artist",
+      "rating": "A",
+      "name": "abu.shalab",
+      "url": "https://www.instagram.com/abu.shalab",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./avatars/upload-ab6b7b06132a192f.jpg",
+      "description": "495K Followers, 0 Following, 23 Posts - See Instagram photos and videos from Abu Shalab (@abu.shalab)",
+      "tags": ""
+    },
+    {
       "id": "a1245770-723e-4eb6-8ec0-1e3b9aba7460",
       "kind": "artist",
       "rating": "AA",
@@ -2425,7 +2437,7 @@
     {
       "id": "seed-60",
       "kind": "artist",
-      "rating": "AA",
+      "rating": "AAA",
       "name": "nikvsio",
       "url": "https://www.instagram.com/nikvsio",
       "platform": "Instagram",

@@ -17,7 +17,7 @@ const cuneiformGlyphs=[
   ...Array.from({length:24},(_,index)=>String.fromCodePoint(0x12400+index)),
 ];
 const signalHeadline=Array.from('信号が破損しました');
-function drawPixelBubble(canvas:HTMLCanvasElement,frame=0){
+function drawPixelBubble(canvas:HTMLCanvasElement,frame=0,reducedMotion=false){
  const context=canvas.getContext('2d');if(!context)return;
  context.clearRect(0,0,canvas.width,canvas.height);
  context.save();context.scale(canvas.width/300,canvas.height/72);
@@ -37,14 +37,21 @@ function drawPixelBubble(canvas:HTMLCanvasElement,frame=0){
  const levels=[[2,4,5,3,1],[1,3,4,5,2],[2,5,3,4,1],[1,3,5,2,3]][frame%4];
  for(let column=0;column<5;column++)for(let segment=0;segment<5;segment++){
   const lit=segment<levels[column];
-  context.fillStyle=lit?(segment===levels[column]-1?'#ffe1e6':'#f66d88'):'#341b2a';
+  context.fillStyle=lit?(segment===levels[column]-1?(reducedMotion?'#fca7b8':'#ffe1e6'):'#f66d88'):'#341b2a';
   context.fillRect(15+column*3,21-segment*2,2,1);
  }
  context.fillStyle='#442331';context.fillRect(15,24,13,1);
+ context.fillStyle='#c46a80';context.fillRect(15+(frame%5)*3,24,1,1);
  context.font='7px "Press Start 2P",monospace';context.textBaseline='top';context.textAlign='left';
+ // Independent phases keep the tiny status details alive without moving the headline.
+ context.globalAlpha=reducedMotion?[1,.94,.88,.94][frame%4]:[1,.82,.94,.88][frame%4];
  context.fillStyle='#fda4af';context.fillText('SIGNAL // ERROR',38,13);
- context.fillStyle='#ff7488';context.fillRect(274,13,5,5);
- context.fillStyle='#71303e';context.fillRect(282,13,3,5);
+ context.globalAlpha=1;
+ const indicatorPhase=Math.floor(frame/2)%2;
+ const indicatorOn=reducedMotion?'#e994a7':'#ff7488';
+ const indicatorOff=reducedMotion?'#9b5064':'#71303e';
+ context.fillStyle=indicatorPhase===0?indicatorOn:indicatorOff;context.fillRect(274,13,5,5);
+ context.fillStyle=indicatorPhase===1?indicatorOn:indicatorOff;context.fillRect(282,13,3,5);
  const fontSize=20;
  const advance=24;
  context.textBaseline='middle';context.textAlign='center';
@@ -164,7 +171,7 @@ function restartDossierFeedback(card:HTMLElement){
  requestAnimationFrame(()=>{
   if(!card.isConnected||!card.matches(':hover')||typeof card.getAnimations!=='function')return;
   for(const animation of card.getAnimations({subtree:true})){
-   if(['dossier-signal-boot','dossier-lamp-boot','dossier-vhs-burst','dossier-vhs-tracking','dossier-vhs-soft'].includes((animation as CSSAnimation).animationName)){
+   if(['dossier-signal-boot','dossier-lamp-boot'].includes((animation as CSSAnimation).animationName)){
     animation.currentTime=0;animation.play();
    }
   }
@@ -345,10 +352,10 @@ export function ToyotaFooter({homeHref}:{homeHref?:string}={}){
  },[signalOpen]);
  useEffect(()=>{
   const canvas=bubbleCanvasRef.current;if(!canvas||!bubbleActive)return;
-  drawPixelBubble(canvas);
-  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  drawPixelBubble(canvas,0,reducedMotion);
   let frame=0;
-  const timer=window.setInterval(()=>drawPixelBubble(canvas,++frame),140);
+  const timer=window.setInterval(()=>drawPixelBubble(canvas,++frame,reducedMotion),reducedMotion?240:160);
   return()=>window.clearInterval(timer);
  },[bubbleActive]);
  useEffect(()=>{
@@ -481,7 +488,7 @@ function ArtistNameFlow({artists}:{artists:Artist[]}){
  const previewTags=preview?preview.artist.tags.split(/[,;#]+/).map(tag=>tag.trim()).filter(Boolean):[];
  return <><div className="artist-name-flow" aria-label="Имена в архиве">{artists.map(artist=><span key={artist.id} className="artist-name-item"><a className="artist-name-link" data-rating={artist.rating||'A'} href={artist.url} target="_blank" rel="noopener noreferrer" onMouseEnter={event=>showPreview(artist,event.currentTarget)} onMouseLeave={hidePreview} onFocus={event=>showPreview(artist,event.currentTarget)} onBlur={hidePreview}>{artist.name}</a>{showLocalAdmin&&<a className="artist-name-edit" href={`${adminUrl}/?edit=${encodeURIComponent(artist.id)}`} aria-label={`Редактировать ${artist.name}`} title="Редактировать запись"><Pencil size={15} aria-hidden="true"/></a>}</span>)}</div>
  {preview&&createPortal(<div key={preview.artist.id} className={'artist-name-preview'+(preview.below?' is-below':'')} data-rating={preview.artist.rating||'A'} data-kind={preview.artist.kind||'artist'} style={{left:preview.left,top:preview.top,width:preview.width}} aria-hidden="true"><div className="artist-name-preview-image"><span>{preview.artist.name.slice(0,1)}</span>{preview.artist.image&&<img src={preview.artist.image} alt="" referrerPolicy="no-referrer" onError={event=>{event.currentTarget.style.display='none';}}/>}</div><div className="artist-name-preview-details"><PreviewNameScreen key={preview.artist.id} name={preview.artist.name}/><div className="artist-name-preview-tags"><span className="artist-name-preview-rating">{preview.artist.rating||'A'}</span><span className="artist-name-preview-kind">{preview.artist.kind==='collective'?'Проект':preview.artist.kind==='media'?'Медиа':'Артист'}</span>{previewTags.map((tag,index)=><span key={`${tag}-${index}`}>{tag}</span>)}{(preview.artist.section==='world'||preview.artist.section==='runet')&&<span className="artist-name-preview-region" title={preview.artist.section==='world'?'США':'СССР'}><img src={preview.artist.section==='world'?'./badges/region-en-eagle-cutout.png':'./badges/region-ru-emblem-cutout.png'} alt={preview.artist.section==='world'?'США':'СССР'}/></span>}</div></div>
- <span className="artist-name-preview-status" aria-hidden="true"><span className="dossier-status-signal">{Array.from({length:6},(_,index)=><i key={index} style={{'--lamp-delay':`${index*.12}s`} as React.CSSProperties}/>)}</span><span className="dossier-status-lights"><i/><i/><i/></span></span>
+ <span className="artist-name-preview-status" aria-hidden="true"><span className="dossier-status-signal">{Array.from({length:6},(_,index)=><i key={index} style={{'--lamp-delay':`${index*.08}s`} as React.CSSProperties}/>)}</span><span className="dossier-status-lights"><i/><i/><i/></span></span>
  </div>,document.body)}
  </>;
 }
@@ -582,9 +589,8 @@ return <>
 </span>
 {a.kind==='collective'?<span className="list-kind-tag"><UsersRound size={11} aria-hidden="true"/>Проект</span>:a.kind==='media'?<span className="list-kind-tag"><Radio size={11} aria-hidden="true"/>Медиа</span>:null}
 </p>}
-</div>{view==='grid'&&<span className="dossier-status" aria-hidden="true"><span className="dossier-status-signal">{Array.from({length:6},(_,index)=><i key={index} style={{'--lamp-delay':`${index*.12}s`} as React.CSSProperties}/>)}</span><span className="dossier-status-lights"><i/><i/><i/></span></span>}</div>
+</div>{view==='grid'&&<span className="dossier-status" aria-hidden="true"><span className="dossier-status-signal">{Array.from({length:6},(_,index)=><i key={index} style={{'--lamp-delay':`${index*.08}s`} as React.CSSProperties}/>)}</span><span className="dossier-status-lights"><i/><i/><i/></span></span>}</div>
 {view==='list'&&<span className="list-source-cue" aria-hidden="true"><ArrowUpRight size={14}/></span>}
-{view==='grid'&&<span className="dossier-vhs" aria-hidden="true"/>}
 {view!=='deck'&&<a className="card-hit-area" href={a.url} target="_blank" rel="noopener noreferrer" aria-label={"Открыть источник: "+a.name}/>}
 {showLocalAdmin&&view!=='grid'&&<a className="card-edit" aria-label={"Редактировать "+a.name} href={adminUrl+"/?edit="+encodeURIComponent(a.id)+"#catalog"}><Pencil size={15}/></a>}
 </article>)}</div>}{!artists.length&&view!=='deck'&&<p className="empty">Сигнал не обнаружен. Измените запрос или фильтр.</p>}</section>

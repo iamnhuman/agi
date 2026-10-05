@@ -1,5 +1,5 @@
 import {useEffect,useRef,useState} from 'react';
-import {Plus,ArrowUpRight,Play,Pencil,Trash2,Search,ZoomIn,ZoomOut,ArrowDownWideNarrow,ArrowUpNarrowWide,CalendarDays} from 'lucide-react';
+import {Plus,ArrowUpRight,Play,Pencil,Trash2,Search,ZoomIn,ZoomOut,ArrowDownWideNarrow,ArrowUpNarrowWide,CalendarDays,GalleryHorizontal,List} from 'lucide-react';
 import {Dialog,DialogContent,DialogTitle,DialogDescription} from '@/components/ui/dialog';
 import {AlertDialog,AlertDialogContent,AlertDialogTitle,AlertDialogDescription,AlertDialogFooter,AlertDialogCancel,AlertDialogAction} from '@/components/ui/alert-dialog';
 import {catalogUrl,adminUrl,showLocalAdmin} from '@/client/config';
@@ -8,7 +8,8 @@ import {orderVideos,type VideoOrder} from './video-order';
 import type {Video} from '@/lib/types';
 const blank:Video={id:'',name:'',url:'',platform:'',videoId:'',reference:false,isVideo:false,title:'',publishedAt:'',dateSource:'unknown',dateUrl:'',image:'',description:'',alternateUrls:[],sourceOrder:0};
 const fallbackImage='./video-fallback.svg';
-function displayVideoText(value:string){let text=value;for(let i=0;i<3;i++){const decoded=text.replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;|&apos;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&#x([\da-f]+);/gi,(_,code)=>String.fromCodePoint(Math.min(parseInt(code,16),0x10ffff))).replace(/&#(\d+);/g,(_,code)=>String.fromCodePoint(Math.min(Number(code),0x10ffff)));if(decoded===text)break;text=decoded;}return text;}
+const platformShortNames:Record<string,string>={Instagram:'IG',YouTube:'YT',Telegram:'TG',VK:'VK'};
+const MIN_SCENE_ZOOM=.25,MAX_SCENE_ZOOM=1.5;
 function coverSource(video:Video){return video.image||video.videoId&&`https://i.ytimg.com/vi/${video.videoId}/hqdefault.jpg`||fallbackImage;}
 function coverError(event:React.SyntheticEvent<HTMLImageElement>,video:Video){
  const image=event.currentTarget,youtube=video.videoId&&`https://i.ytimg.com/vi/${video.videoId}/hqdefault.jpg`;
@@ -24,10 +25,12 @@ function instagramEmbedUrl(video:Video){
   return post?`https://www.instagram.com/${post[1]}/${post[2]}/embed/`:'';
  }catch{return '';}
 }
-function VideoName({name,onOpen}:{name:string;onOpen:()=>void}){
+function VideoName({name,onOpen,fitToWidth=true}:{name:string;onOpen:()=>void;fitToWidth?:boolean}){
  const ref=useRef<HTMLButtonElement>(null);
  useEffect(()=>{
   const button=ref.current;if(!button)return;
+  button.style.removeProperty('font-size');
+  if(!fitToWidth)return;
   const canvas=document.createElement('canvas'),context=canvas.getContext('2d');
   let active=true;
   const fit=()=>{
@@ -41,18 +44,18 @@ function VideoName({name,onOpen}:{name:string;onOpen:()=>void}){
   const observer=new ResizeObserver(fit);observer.observe(button);
   document.fonts.ready.then(fit);fit();
   return()=>{active=false;observer.disconnect();};
- },[name]);
- return <button ref={ref} type="button" onClick={onOpen}>{name}</button>;
+ },[name,fitToWidth]);
+ return <button ref={ref} type="button" title={name} onClick={onOpen}>{name}</button>;
 }
 export default function Videos({admin=false}:{admin?:boolean}){
  const [videos,setVideos]=useState<Video[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState(''),[q,setQ]=useState(''),[order,setOrder]=useState<VideoOrder>('desc'),[orientation,setOrientation]=useState<'vertical'|'horizontal'>('horizontal'),[draft,setDraft]=useState<Video|null>(null),[selected,setSelected]=useState<Video|null>(null),[deleting,setDeleting]=useState<Video|null>(null),[busy,setBusy]=useState(false),[formError,setFormError]=useState(''),[importMessage,setImportMessage]=useState('');
  const [sceneZoom,setSceneZoom]=useState(.65);
- const zoomProgress=(sceneZoom-.65)/.85;
+ const zoomProgress=(sceneZoom-MIN_SCENE_ZOOM)/(MAX_SCENE_ZOOM-MIN_SCENE_ZOOM);
  const timelineViewport=useRef<HTMLDivElement>(null),timelineCanvas=useRef<HTMLCanvasElement>(null);
  const timelinePointer=useRef<{x:number;y:number}|null>(null);
  const drag=useRef<{pointerId:number;startX:number;scrollLeft:number;active:boolean}|null>(null);
  const suppressDragClick=useRef(false);
- const changeSceneZoom=(amount:number)=>setSceneZoom(current=>Math.round(Math.max(.65,Math.min(1.5,current+amount))*100)/100);
+ const changeSceneZoom=(amount:number)=>setSceneZoom(current=>Math.round(Math.max(MIN_SCENE_ZOOM,Math.min(MAX_SCENE_ZOOM,current+amount))*100)/100);
  async function load(){try{setError('');const r=await fetch(catalogUrl,{cache:'no-store'});if(!r.ok)throw Error('Не удалось загрузить видео.');const items=(await r.json()).videos||[];setVideos(items);if(admin){const editId=new URLSearchParams(location.search).get("edit");if(editId){const item=items.find((v:Video)=>v.id===editId);if(item)edit(item);const url=new URL(location.href);url.searchParams.delete("edit");history.replaceState(null,"",url);}}}catch(e){setError((e as Error).message);}finally{setLoading(false);}}
  useEffect(()=>{load();},[]);
  async function mutate(body:object){const r=await fetch('/api/catalog',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const d=await r.json();if(!r.ok)throw Error(d.error);return d;}
@@ -74,13 +77,14 @@ export default function Videos({admin=false}:{admin?:boolean}){
    const cards=viewport.querySelector<HTMLElement>('.timeline-items');
    const firstCard=cards?.querySelector<HTMLElement>('.video-card');
    const canvasBounds=canvas.getBoundingClientRect();
-   const cardMargin=firstCard?parseFloat(getComputedStyle(firstCard).marginBottom)||0:0;
+   const cardMargin=firstCard?(parseFloat(getComputedStyle(firstCard).marginBottom)||0)*sceneZoom:0;
    const railY=cards?cards.getBoundingClientRect().bottom-canvasBounds.top-cardMargin+10:undefined;
    const dateTicks=[...viewport.querySelectorAll<HTMLElement>('.video-card')].flatMap(card=>{
     const date=card.querySelector('time')?.dateTime;
     if(!date)return [];
     const [year,month,day]=date.split('-');
     const bounds=card.getBoundingClientRect();
+    if(bounds.width<90)return [];
     const x=bounds.left+bounds.width/2-canvasBounds.left;
     return x < -40 || x > canvasBounds.width+40 ? [] : [{x,label:`${day}.${month}.${year.slice(-2)}`}];
    });
@@ -204,20 +208,17 @@ export default function Videos({admin=false}:{admin?:boolean}){
    <div className="video-date"><time dateTime={v.publishedAt||undefined} title={v.publishedAt?new Date(v.publishedAt+'T12:00:00').toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'}):'Дата неизвестна'}><span className="video-date-compact">{compactDate}</span><span className="video-date-full">{v.publishedAt?new Date(v.publishedAt+'T12:00:00').toLocaleDateString('ru-RU',{day:'2-digit',month:'short',...(order!=='dates'?{year:'numeric' as const}:{})}):'—'}</span></time><small>{!v.publishedAt?'Дата неизвестна':v.dateSource==='manual'?'Указана куратором':v.platform==='Telegram'?'Дата поста':'Дата публикации'}</small></div>
    <button className="video-thumb" aria-label={playable?'Открыть видео '+v.name:'Открыть материал '+v.name} onClick={()=>setSelected(v)}><img src={coverSource(v)} alt="" loading="lazy" referrerPolicy="no-referrer" onError={e=>coverError(e,v)}/>{playable&&<span className="video-play"><Play size={18}/></span>}</button>
    <div className="video-copy">
-    <a href={v.url} target="_blank" rel="noreferrer" className="video-platform" aria-label={`Открыть источник: ${v.name} · ${v.platform}`} title={`Открыть в ${v.platform}`}><span>{v.platform}{v.reference?' · ссылка на источник':''}</span><ArrowUpRight size={12} aria-hidden="true"/></a>
-    <h3><VideoName name={v.name} onOpen={()=>setSelected(v)}/></h3>
-    {v.title&&v.title!==v.name&&<p>{displayVideoText(v.title)}</p>}
+    <a href={v.url} target="_blank" rel="noreferrer" className="video-platform" aria-label={`Открыть источник: ${v.name} · ${v.platform}`} title={`Открыть в ${v.platform}`}><span className="video-platform-full">{v.platform}{v.reference?' · ссылка на источник':''}</span><span className="video-platform-short" aria-hidden="true">{platformShortNames[v.platform]||v.platform.slice(0,2).toUpperCase()}</span><ArrowUpRight size={12} aria-hidden="true"/></a>
+    <h3><VideoName name={v.name} fitToWidth={orientation!=='horizontal'} onOpen={()=>setSelected(v)}/></h3>
    </div>
-   {(admin||showLocalAdmin)&&<div className="video-card-footer">
-    {admin?<div className="video-actions"><button aria-label={'Редактировать видео '+v.name} onClick={()=>edit(v)}><Pencil size={17}/></button><button aria-label={'Удалить видео '+v.name} onClick={()=>setDeleting(v)}><Trash2 size={17}/></button></div>:<a className="card-edit video-card-edit" href={adminUrl+"/?edit="+encodeURIComponent(v.id)+"#videos"} aria-label={"Редактировать видео "+v.name} title="Редактировать материал"><Pencil size={16} aria-hidden="true"/></a>}
-   </div>}
+   {admin?<div className="video-actions"><button aria-label={'Редактировать видео '+v.name} onClick={()=>edit(v)}><Pencil size={17}/></button><button aria-label={'Удалить видео '+v.name} onClick={()=>setDeleting(v)}><Trash2 size={17}/></button></div>:showLocalAdmin&&<a className="card-edit video-card-edit" href={adminUrl+"/?edit="+encodeURIComponent(v.id)+"#videos"} aria-label={"Редактировать видео "+v.name} title="Редактировать материал"><Pencil size={16} aria-hidden="true"/></a>}
   </article>;
  }
  const instagramEmbed=selected?instagramEmbedUrl(selected):'';
  return <section className="video-section">
   <div className="video-heading"><div><div className="eyebrow">{admin?'КУРАТОРСКАЯ · УПРАВЛЕНИЕ ВИДЕО':'ПРИМЕНЕНИЕ ИИ · АРХИВ РАБОТ'}</div><h1>ИИ в творчестве<span>.</span></h1><p>{admin?'Добавляйте видео и публикации, редактируйте подписи и обложки карточек.':'Музыка, видео, визуальные работы и эксперименты с ИИ. Смотрите по дате публикации или времени добавления.'}</p></div>{admin&&<div className="video-admin-actions"><button className="primary-btn" onClick={()=>edit()}><Plus size={18}/>Добавить работу</button></div>}</div>
   <div className="video-toolbar">
-   <label className="input-search"><Search size={17}/><input aria-label="Поиск материалов" placeholder="Поиск по автору, названию или платформе…" value={q} onChange={e=>setQ(e.target.value)}/></label>
+   <label className="input-search" title="Поиск по автору или названию"><Search size={17}/><input aria-label="Поиск материалов" placeholder="Поиск работ…" value={q} onChange={e=>setQ(e.target.value)}/></label>
    <div className="video-toolbar-radios">
     <fieldset className="video-radio-group video-order-group"><legend className="sr-only">Порядок работ</legend><div>
      <span className="video-control-label" aria-hidden="true">ПОРЯДОК</span>
@@ -225,10 +226,10 @@ export default function Videos({admin=false}:{admin?:boolean}){
      <label title="Сначала ранние добавления"><input type="radio" name="video-order" value="asc" aria-label="По возрастанию" checked={order==='asc'} onChange={()=>setOrder('asc')}/><span><ArrowUpNarrowWide size={16} aria-hidden="true"/><b>По<br/>возрастанию</b></span></label>
      <label title="По датам публикации"><input type="radio" name="video-order" value="dates" aria-label="ИИ" aria-description="По датам публикации, от ранних к поздним" checked={order==='dates'} onChange={()=>setOrder('dates')}/><span><CalendarDays size={16} aria-hidden="true"/><b>ИИ<small>по датам</small></b></span></label>
     </div></fieldset>
-    <fieldset className="video-radio-group"><legend className="sr-only">ВИД</legend><div>
+    <fieldset className="video-radio-group video-view-group"><legend className="sr-only">ВИД</legend><div>
      <span className="video-control-label" aria-hidden="true">ВИД</span>
-     <label><input type="radio" name="video-orientation" value="vertical" checked={orientation==='vertical'} onChange={()=>setOrientation('vertical')}/><span>Вертикально</span></label>
-     <label><input type="radio" name="video-orientation" value="horizontal" checked={orientation==='horizontal'} onChange={()=>setOrientation('horizontal')}/><span>Горизонтально</span></label>
+     <label title="Горизонтальная лента карточек"><input type="radio" name="video-orientation" value="horizontal" aria-label="Горизонтально" checked={orientation==='horizontal'} onChange={()=>setOrientation('horizontal')}/><span><GalleryHorizontal size={16} aria-hidden="true"/><b>Лента</b></span></label>
+     <label title="Вертикальный список работ"><input type="radio" name="video-orientation" value="vertical" aria-label="Вертикально" checked={orientation==='vertical'} onChange={()=>setOrientation('vertical')}/><span><List size={16} aria-hidden="true"/><b>Список</b></span></label>
     </div></fieldset>
    </div>
   </div>
@@ -236,14 +237,16 @@ export default function Videos({admin=false}:{admin?:boolean}){
   {error&&<p role="alert" className="error">{error} <button onClick={load}>Повторить</button></p>}
   {loading?<p className="empty">Загружаем архив творческих работ…</p>:<div className={`timeline-layout timeline-layout--${orientation}${order!=='dates'?' timeline-layout--source':''}`}>
    {order==='dates'&&<nav className="timeline-years" aria-label="Годы таймлайна">{years.map(y=><a key={y} href={'#year-'+y}>{y}</a>)}{undated.length>0&&<a href="#year-unknown">Без даты <small>{undated.length}</small></a>}</nav>}
-   <div className="timeline-scene" style={orientation==='horizontal'?{
+   <div className="timeline-scene" data-compact-labels={orientation==='horizontal'&&sceneZoom<.6?true:undefined} data-mini-cards={orientation==='horizontal'&&sceneZoom<.5?true:undefined} style={orientation==='horizontal'?{
     '--timeline-zoom':sceneZoom,
-    '--timeline-stage-top':`${Math.round(20+zoomProgress*48)}px`,
-    '--timeline-stage-bottom':`${Math.round(20+zoomProgress*22)}px`,
+    '--timeline-text-scale':Math.max(1,1/sceneZoom),
+    '--timeline-card-width':`${160+zoomProgress*30}px`,
+    '--timeline-stage-top':`${Math.round(52+zoomProgress*20)}px`,
+    '--timeline-stage-bottom':`${Math.round(16+zoomProgress*16)}px`,
     '--timeline-stage-mobile-top':`${Math.round(64+zoomProgress*12)}px`,
    } as React.CSSProperties:undefined}>
    {orientation==='horizontal'&&<canvas ref={timelineCanvas} className="timeline-runway" aria-hidden="true"/>}
-   {orientation==='horizontal'&&<div className="timeline-zoom-controls"><label htmlFor="timeline-zoom">ЗУМ</label><button type="button" aria-label="Уменьшить масштаб" disabled={sceneZoom<=.65} onClick={()=>changeSceneZoom(-.1)}><ZoomOut size={18}/></button><input id="timeline-zoom" type="range" min="65" max="150" step="5" value={Math.round(sceneZoom*100)} onChange={event=>setSceneZoom(Number(event.target.value)/100)} aria-label="Масштаб видеоленты"/><output htmlFor="timeline-zoom" aria-live="polite">{Math.round(sceneZoom*100)}%</output><button type="button" aria-label="Увеличить масштаб" disabled={sceneZoom>=1.5} onClick={()=>changeSceneZoom(.1)}><ZoomIn size={18}/></button></div>}
+   {orientation==='horizontal'&&<div className="timeline-zoom-controls"><label htmlFor="timeline-zoom">ЗУМ</label><button type="button" aria-label="Уменьшить масштаб" disabled={sceneZoom<=MIN_SCENE_ZOOM} onClick={()=>changeSceneZoom(-.1)}><ZoomOut size={18}/></button><input id="timeline-zoom" type="range" min={MIN_SCENE_ZOOM*100} max={MAX_SCENE_ZOOM*100} step="5" value={Math.round(sceneZoom*100)} onChange={event=>setSceneZoom(Number(event.target.value)/100)} aria-label="Масштаб видеоленты"/><output htmlFor="timeline-zoom" aria-live="polite">{Math.round(sceneZoom*100)}%</output><button type="button" aria-label="Увеличить масштаб" disabled={sceneZoom>=MAX_SCENE_ZOOM} onClick={()=>changeSceneZoom(.1)}><ZoomIn size={18}/></button></div>}
    <div ref={timelineViewport} className="timeline-content" aria-label={orientation==='horizontal'?'Горизонтальная видеолента':undefined} tabIndex={orientation==='horizontal'?0:undefined} onPointerDown={orientation==='horizontal'?startDrag:undefined} onPointerMove={orientation==='horizontal'?moveDrag:undefined} onPointerUp={orientation==='horizontal'?stopDrag:undefined} onPointerCancel={orientation==='horizontal'?stopDrag:undefined} onClickCapture={orientation==='horizontal'?event=>{if(suppressDragClick.current){event.preventDefault();event.stopPropagation();suppressDragClick.current=false;}}:undefined} onDragStart={orientation==='horizontal'?event=>event.preventDefault():undefined} onKeyDown={orientation==='horizontal'?event=>{if(event.key==='+'||event.key==='='){event.preventDefault();changeSceneZoom(.1);}else if(event.key==='-'){event.preventDefault();changeSceneZoom(-.1);}}:undefined}>
     {order!=='dates'?<section className="timeline-year timeline-year--source"><h2>{order==='desc'?'Новые добавления':'Ранние добавления'}<sup>{ordered.length}</sup></h2><p className="undated-note">{order==='desc'?'Сначала последние добавленные работы, затем ранние.':'Сначала первые добавленные работы, затем новые.'} Дата публикации не влияет на этот порядок.</p><div className="timeline-items">{ordered.map(card)}</div></section>:<>
      {years.map(y=><section id={'year-'+y} className="timeline-year" key={y}><h2>{y}<sup>{dated.filter(v=>v.publishedAt.startsWith(y)).length}</sup></h2><div className="timeline-items">{dated.filter(v=>v.publishedAt.startsWith(y)).map(card)}</div></section>)}

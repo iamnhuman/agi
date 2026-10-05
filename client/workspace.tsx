@@ -19,5 +19,5 @@ export default function Workspace({admin=false}:{admin?:boolean}){
   <a href="#videos" className="primary-nav-link is-active" aria-current="page">Видео · ИИ в творчестве</a>
   </nav>
   <div className="header-actions">{(admin||showLocalAdmin)&&<a className="admin-link curator-link" href={(admin?siteUrl:adminUrl)+'/#videos'}>{admin?'На сайт':'Кураторский штаб'}<ArrowUpRight size={16}/></a>}</div>
- </header>:<CommandDeck mode="videos"/>}<main className="videos-main"><Videos admin={admin}/></main><ToyotaFooter homeHref={siteUrl+'/#catalog'}/></>;
+ </header>:<CommandDeck mode="videos"/>}<main className="videos-main"><Videos admin={admin}/></main><ToyotaFooter homeHref={admin?siteUrl+'/#catalog':'#catalog'}/></>;
 }

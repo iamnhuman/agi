@@ -15,7 +15,9 @@ if (pages) {
   ]);
   // GitHub Pages publishes this repository from its root, so public assets
   // are served under ./public rather than from the site's domain root.
-  styles = styles.replaceAll('url(../fonts/','url(./fonts/');
+  styles = styles
+    .replaceAll('url(../fonts/','url(./fonts/')
+    .replaceAll('url(../textures/','url(./textures/');
   if(/^\s*(import|export)\s/m.test(javascript)) throw new Error('Pages-бандл содержит import/export; ожидается обычный скрипт.');
   // A closing script tag inside React's embedded strings would terminate an inline script in HTML.
   javascript = javascript.replace(/<\/script/gi,'<\\/script');
@@ -31,6 +33,7 @@ if (pages) {
     .replaceAll('./avatars/','./public/avatars/')
     .replaceAll('./badges/','./public/badges/')
     .replaceAll('url(./fonts/','url(./public/fonts/')
+    .replaceAll('url(./textures/','url(./public/textures/')
     .replaceAll('./radar-world-red.webp','./public/radar-world-red.webp')
     .replaceAll('./video-fallback.svg','./public/video-fallback.svg')
     .replaceAll('../cursor-','./public/cursor-');
