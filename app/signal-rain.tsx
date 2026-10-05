@@ -1,9 +1,9 @@
 'use client';
 
 import {useEffect,useRef} from 'react';
-import {paintSignalScanlines,signalHash,signalRasterScale} from './signal-screen';
+import {paintSignalScanlines,signalHash,signalGlyphFrame,signalRasterScale} from './signal-screen';
 
-const glyphs=Array.from('アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン信号電光未来断片夢影機界壊警報空網路炎星龍真偽視覚記録通信回路秘密変換転送⌁⌑⌖⌗⌘⌬⍟⎔⟁⊗╳∴≋≡<>/\\|:;ABCDEFGHJKLMNPRSTUVWXYZ');
+const glyphs=Array.from('ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜｦﾝ0123456789Z:・."=*+-<>¦');
 const colours=['#fff1e9','#ffbdc4','#ff667a','#df3e59','#a72d47','#672039'];
 const atlasCell=32,atlasColumns=16,atlasRows=Math.ceil(glyphs.length/atlasColumns);
 const nearPlane=.85,depthRange=5.8,glyphSpacing=.053,glyphSize=.052;
@@ -20,9 +20,11 @@ function glyphAtlas(){
  context.textAlign='center';context.textBaseline='middle';
  colours.forEach((colour,colourIndex)=>{
   context.fillStyle=colour;
-  glyphs.forEach((glyph,index)=>context.fillText(glyph,
-   (index%atlasColumns+.5)*atlasCell,
-   (colourIndex*atlasRows+Math.floor(index/atlasColumns)+.5)*atlasCell));
+  glyphs.forEach((glyph,index)=>{
+   context.save();
+   context.translate((index%atlasColumns+.5)*atlasCell,(colourIndex*atlasRows+Math.floor(index/atlasColumns)+.5)*atlasCell);
+   context.scale(-1,1);context.fillText(glyph,0,0);context.restore();
+  });
  });
  // The atlas has solid pixel edges, including when glyphs turn or move closer.
  const pixels=context.getImageData(0,0,canvas.width,canvas.height);
@@ -77,17 +79,6 @@ export default function SignalRain({active}:{active:boolean}){
    lastPointer=performance.now();
   };
   const clearPointer=()=>{pointer.x=0;pointer.y=0;};
-  const drawFloor=(camera:Camera)=>{
-   const extent=width/height*5.5;
-   context.strokeStyle='#d54b6420';context.lineWidth=1;
-   const segment=(x1:number,z1:number,x2:number,z2:number)=>{
-    const a=project(x1,.58,z1,camera),b=project(x2,.58,z2,camera);
-    if(!a||!b)return;
-    context.beginPath();context.moveTo(a.x,a.y);context.lineTo(b.x,b.y);context.stroke();
-   };
-   for(let x=-extent;x<=extent;x+=.8)segment(x,.8,x,8);
-   for(const z of [.95,1.2,1.55,2.05,2.8,4,6.5])segment(-extent,z,extent,z);
-  };
   const draw=(now:number)=>{
    frame=requestAnimationFrame(draw);
    if(document.visibilityState!=='visible'||now-lastFrame<(reducedMotion.matches?48:32))return;
@@ -105,7 +96,6 @@ export default function SignalRain({active}:{active:boolean}){
    const backdrop=context.createRadialGradient(width*.52,height*.47,0,width*.52,height*.47,Math.max(width,height)*.72);
    backdrop.addColorStop(0,'#180c17');backdrop.addColorStop(.6,'#0d0811');backdrop.addColorStop(1,'#05070b');
    context.globalAlpha=1;context.fillStyle=backdrop;context.fillRect(0,0,width,height);
-   drawFloor(camera);
    const depthOrder=streams.map(stream=>({stream,z:nearPlane+wrap(stream.z-nearPlane-time*.045,depthRange)})).sort((a,b)=>b.z-a.z);
    for(const {stream,z} of depthOrder){
     const span=height/focal*stream.z*1.35,cycle=span+stream.trail*glyphSpacing+1;
@@ -113,19 +103,24 @@ export default function SignalRain({active}:{active:boolean}){
     const depthFade=Math.min(1,(z-nearPlane)/.35,(nearPlane+depthRange-z)/.5);
     const proximity=1-(z-nearPlane)/depthRange;
     const brightness=(.58+proximity*.4)*depthFade;
-    const mutation=reducedMotion.matches?0:Math.floor(time/(.08+(stream.seed%8)*.016));
+    const headCell=Math.floor(head/glyphSpacing);
     for(let step=stream.trail-1;step>=0;step--){
-     const worldY=head-step*glyphSpacing;
+     const cell=headCell-step,worldY=cell*glyphSpacing;
      const point=project(stream.x,worldY,z,camera);if(!point)continue;
      const size=Math.round(glyphSize*point.scale/2)*2;
      if(size<4||point.x+size<0||point.x-size>width||point.y+size<0||point.y-size>height)continue;
      const fade=1-step/stream.trail;
-     const glyphIndex=signalHash(stream.seed^Math.imul(step+1,0x85ebca6b)^Math.imul(mutation+1,0x27d4eb2d))%glyphs.length;
+     const glyph=signalGlyphFrame(stream.seed,cell,time,glyphs.length),glyphIndex=glyph.index;
      const colour=step===0?0:step<4?1:step<12?2:step<25?3:step<38?4:5;
      const sx=glyphIndex%atlasColumns*atlasCell,sy=(colour*atlasRows+Math.floor(glyphIndex/atlasColumns))*atlasCell;
      context.globalAlpha=Math.min(1,brightness*(.24+Math.pow(fade,1.25)*.76)*(step===0?1.3:1));
      const x=Math.round(point.x/2)*2,y=Math.round(point.y/2)*2;
      context.drawImage(atlas,sx,sy,atlasCell,atlasCell,x-size/2,y-size/2,size,size);
+     if(glyph.afterimage>0){
+      context.globalAlpha*=glyph.afterimage;
+      context.drawImage(atlas,glyph.previous%atlasColumns*atlasCell,(colour*atlasRows+Math.floor(glyph.previous/atlasColumns))*atlasCell,
+       atlasCell,atlasCell,x-size/2,y-size/2,size,size);
+     }
      if(step===0&&z<2.4){
       context.globalAlpha=brightness*.25;context.fillStyle='#ffe3d2';
       context.fillRect(x-2,y+size*.35,4,Math.max(2,size*.2));

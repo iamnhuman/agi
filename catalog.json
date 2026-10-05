@@ -1,6 +1,66 @@
 {
   "artists": [
     {
+      "id": "3fa5c40e-4965-4620-8a89-3333f7c1503b",
+      "kind": "artist",
+      "rating": "A",
+      "name": "universe_sigma",
+      "url": "https://www.instagram.com/universe_sigma",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-1e217250d862fb3b.jpg",
+      "description": "214K Followers, 31 Following, 91 Posts - See Instagram photos and videos from sigma universe (@universe_sigma)",
+      "tags": ""
+    },
+    {
+      "id": "6aff754b-41c1-4c0e-b684-2b15d68db006",
+      "kind": "artist",
+      "rating": "A",
+      "name": "salboukh.kw",
+      "url": "https://www.instagram.com/salboukh.kw",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-4e18da8aeb44f313.jpg",
+      "description": "15 Followers, 0 Following, 7 Posts - See Instagram photos and videos from &#x200e;&#x635;&#x644;&#x628;&#x648;&#x62e;&#x200e; (@salboukh.kw)",
+      "tags": ""
+    },
+    {
+      "id": "b9519531-f32f-487b-8d4d-889c55ab8ab3",
+      "kind": "artist",
+      "rating": "AAA",
+      "name": "eto_still",
+      "url": "https://www.instagram.com/eto_stil_tg",
+      "platform": "Instagram",
+      "section": "runet",
+      "image": "./public/avatars/upload-8efff7b2af9f5f9d.jpg",
+      "description": "28 Followers, 2 Following, 14 Posts - See Instagram photos and videos from &#x42d;&#x442;&#x43e; &#x421;&#x442;&#x438;&#x43b;&#x44c; (@eto_stil_tg)",
+      "tags": ""
+    },
+    {
+      "id": "95ae8d56-f141-44c6-8370-ea29d6cedab4",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "darkflawless",
+      "url": "https://www.instagram.com/darkflawless",
+      "platform": "Instagram",
+      "section": "runet",
+      "image": "./public/avatars/upload-d6644623d5f0f0af.jpg",
+      "description": "189K Followers, 850 Following, 365 Posts - See Instagram photos and videos from Anry Tyur&#xed;n (@darkflawless)",
+      "tags": ""
+    },
+    {
+      "id": "1c9e92de-f557-4949-b6d1-4c4c3acdf3ec",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "sanabiyigi",
+      "url": "https://www.instagram.com/sanabiyigi",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-2207635c532bd72c.jpg",
+      "description": "8,029 Followers, 1 Following, 7 Posts - See Instagram photos and videos from azat (@sanabiyigi)",
+      "tags": ""
+    },
+    {
       "id": "523d94c6-72f9-4f73-b96b-60327adf41da",
       "kind": "artist",
       "rating": "AA",

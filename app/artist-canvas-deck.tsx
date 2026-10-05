@@ -1,7 +1,7 @@
 'use client';
 
 import {useEffect,useRef} from 'react';
-import {Pencil} from 'lucide-react';
+import {Pencil,ZoomIn,ZoomOut} from 'lucide-react';
 import {adminUrl,showLocalAdmin} from '@/client/config';
 import type {Artist} from '@/lib/types';
 
@@ -149,7 +149,7 @@ function rasterPortrait(image:HTMLImageElement,portraitHeight:number){
  return portrait;
 }
 
-function cardBitmap(artist:Artist,index:number,type:CardTypography,image?:HTMLImageElement){
+function cardBitmap(artist:Artist,index:number,type:CardTypography,image?:HTMLImageElement,regionImage?:HTMLImageElement){
  const canvas=document.createElement('canvas');canvas.width=cardWidth;canvas.height=cardHeight;
  const context=canvas.getContext('2d');if(!context)return canvas;
  context.imageSmoothingEnabled=false;
@@ -195,6 +195,16 @@ function cardBitmap(artist:Artist,index:number,type:CardTypography,image?:HTMLIm
   text(artist.name.slice(0,1).toUpperCase(),96,44+imageHeight/2+16,40,'#9dba71','center');
  }
  for(const [x,y] of [[16,44],[168,44],[16,42+imageHeight],[168,42+imageHeight]])rect(x,y,8,2,accentDim);
+ // Region insignia sit in a small metal plate on the portrait, leaving the
+ // name, kind and rating their full width at every zoom level.
+ if(regionImage?.naturalWidth){
+  const plateX=134,plateY=44+imageHeight-32;
+  bevel(plateX,plateY,38,28,'#111b1d','#8d9987','#050b0d');
+  rect(plateX+2,plateY+2,34,24,'#1d2a2c');
+  const scale=Math.min(32/regionImage.naturalWidth,22/regionImage.naturalHeight);
+  const w=Math.round(regionImage.naturalWidth*scale),h=Math.round(regionImage.naturalHeight*scale);
+  context.drawImage(regionImage,plateX+Math.round((38-w)/2),plateY+Math.round((28-h)/2),w,h);
+ }
  bevel(12,labelTop,168,labelHeight,'#202a1b','#11180c','#778563');
  context.font=`${type.name}px "Press Start 2P",monospace`;
  const characters=Array.from(artist.name);let firstLine='';
@@ -241,11 +251,17 @@ export default function ArtistCanvasDeck({artists,zoom,onZoomStep}:{artists:Arti
  const editRef=useRef<HTMLAnchorElement>(null);
  const zoomRef=useRef(zoom),zoomStepRef=useRef(onZoomStep);
  zoomRef.current=zoom;zoomStepRef.current=onZoomStep;
- const signature=artists.map(artist=>`${artist.id}:${artist.image}:${artist.name}:${artist.rating}:${artist.kind}:${artist.url}`).join('|');
+ const signature=artists.map(artist=>`${artist.id}:${artist.image}:${artist.name}:${artist.rating}:${artist.kind}:${artist.section}:${artist.url}`).join('|');
  useEffect(()=>{
   const canvas=canvasRef.current;if(!canvas||!artists.length)return;
   const gl=canvas.getContext('webgl2',{alpha:false,antialias:false,powerPreference:'high-performance'});
   let cancelled=false,frame=0;
+  const regionImages=new Map<string,HTMLImageElement>();
+  const regionsReady=Promise.all(['world','runet'].map(section=>new Promise<void>(resolve=>{
+   const image=new Image();regionImages.set(section,image);
+   image.onload=()=>resolve();image.onerror=()=>resolve();
+   image.src=section==='world'?'./badges/region-en-eagle-cutout.png':'./badges/region-ru-emblem-cutout.png';
+  })));
   const initialPosition=0;
   const position={value:initialPosition,target:initialPosition,velocity:0,hover:-1,dragging:false,lastX:0,lastTime:0,moved:false,startX:0,startY:0,pressed:-1,pointerId:-1};
   let hitAreas:CardHitArea[]=[];
@@ -259,13 +275,16 @@ export default function ArtistCanvasDeck({artists,zoom,onZoomStep}:{artists:Arti
   const observer=new ResizeObserver(resize);observer.observe(canvas);resize();
   const layout=()=>{
    const level=zoomRef.current;
-   const rows=level<=.65?3:level<=1.1?2:1;
+   const rows=level<=.4?4:level<=.65?3:level<=1.1?2:1;
    // Keep card size continuous through the row-count changes. At 40–100%
    // this grows from a compact overview to readable two-row dossiers.
    const sizeY=level<=1?.25+(level-.4)*(.22/.6):level<=1.1?.47+(level-1)*.35:.505+(level-1.1)*(.345/.4);
    const sizeX=sizeY*cardWidth/cardHeight;
    const columnStep=sizeX*2.27;
-   const rowStep=rows===3?.73:rows===2?Math.min(1.04,2*sizeY+.12):0;
+   // Scale the row spacing with the visible card height, including the
+   // narrow-screen fit. A fixed row step leaves empty bands when zooming out.
+   const viewportFit=Math.min(1,width/height*.86/(sizeX*.89));
+   const rowStep=rows>1?2*sizeY*viewportFit*1.08:0;
    return {rows,sizeX,sizeY,columnStep,rowStep,columns:Math.ceil(artists.length/rows)};
   };
   const typographyForLayout=():CardTypography=>{
@@ -368,11 +387,12 @@ export default function ArtistCanvasDeck({artists,zoom,onZoomStep}:{artists:Arti
   const onEditPointerLeave=(event:PointerEvent)=>{if(event.relatedTarget===canvas)return;position.hover=-1;updateCursor();};
   const onKeyDown=(event:KeyboardEvent)=>{if(event.key==='ArrowRight'){event.preventDefault();position.hover=-1;moveTarget(1);}else if(event.key==='ArrowLeft'){event.preventDefault();position.hover=-1;moveTarget(-1);}else if(event.key==='Enter'){event.preventDefault();openArtist(position.hover>=0?position.hover:Math.round(position.target)*layout().rows);}else if(event.key==='+'||event.key==='='){event.preventDefault();zoomStepRef.current(.1);}else if(event.key==='-'){event.preventDefault();zoomStepRef.current(-.1);}};
   canvas.addEventListener('wheel',onWheel,{passive:false});canvas.addEventListener('pointerdown',onPointerDown);canvas.addEventListener('pointermove',onPointerMove);canvas.addEventListener('pointerup',onPointerUp);canvas.addEventListener('pointercancel',onPointerCancel);canvas.addEventListener('pointerleave',onPointerLeave);canvas.addEventListener('keydown',onKeyDown);editLink?.addEventListener('pointerleave',onEditPointerLeave);
-  const cleanEvents=()=>{canvas.removeEventListener('wheel',onWheel);canvas.removeEventListener('pointerdown',onPointerDown);canvas.removeEventListener('pointermove',onPointerMove);canvas.removeEventListener('pointerup',onPointerUp);canvas.removeEventListener('pointercancel',onPointerCancel);canvas.removeEventListener('pointerleave',onPointerLeave);canvas.removeEventListener('keydown',onKeyDown);editLink?.removeEventListener('pointerleave',onEditPointerLeave);canvas.style.removeProperty('cursor');observer.disconnect();};
+  const cleanEvents=()=>{canvas.removeEventListener('wheel',onWheel);canvas.removeEventListener('pointerdown',onPointerDown);canvas.removeEventListener('pointermove',onPointerMove);canvas.removeEventListener('pointerup',onPointerUp);canvas.removeEventListener('pointercancel',onPointerCancel);canvas.removeEventListener('pointerleave',onPointerLeave);canvas.removeEventListener('keydown',onKeyDown);editLink?.removeEventListener('pointerleave',onEditPointerLeave);canvas.style.removeProperty('cursor');observer.disconnect();regionImages.forEach(image=>{image.onload=null;image.onerror=null;});};
   if(!gl){
    const context=canvas.getContext('2d');const images=new Map<number,HTMLImageElement>(),bitmaps=new Map<number,HTMLCanvasElement>();
    let bitmapTypography='';
    fontReady.then(()=>{if(!cancelled)bitmaps.clear();});
+   regionsReady.then(()=>{if(!cancelled)bitmaps.clear();});
    const draw=(time:number)=>{if(cancelled||!context)return;const delta=Math.min(40,time-lastFrame||16);lastFrame=time;syncRows();position.target=clamp(position.target);position.value=clamp(position.value+(position.target-position.value)*(reducedMotion.matches?1:Math.min(1,delta*.012)));
     context.setTransform(1,0,0,1,0,0);context.imageSmoothingEnabled=false;context.fillStyle='#10170e';context.fillRect(0,0,width,height);
     const scene=layout(),step=height*scene.columnStep*.89/2;
@@ -385,7 +405,7 @@ export default function ArtistCanvasDeck({artists,zoom,onZoomStep}:{artists:Arti
      const cardHeight=height*scene.sizeY*.89*viewportFit,cardWidth=height*scene.sizeX*.89*viewportFit;
      const x=width/2+dx*step-cardWidth/2,y=height/2+((row-(scene.rows-1)/2)*scene.rowStep)*height*.89/2-cardHeight/2;
      if(!images.has(index)&&artists[index].image){const image=new Image();image.crossOrigin='anonymous';image.referrerPolicy='no-referrer';image.onload=()=>{if(!cancelled)bitmaps.delete(index);};image.src=artists[index].image;images.set(index,image);}
-     if(!bitmaps.has(index))bitmaps.set(index,cardBitmap(artists[index],index,type,images.get(index)?.complete?images.get(index):undefined));
+     if(!bitmaps.has(index))bitmaps.set(index,cardBitmap(artists[index],index,type,images.get(index)?.complete?images.get(index):undefined,regionImages.get(artists[index].section)));
      const left=Math.round(x),top=Math.round(y),w=Math.round(cardWidth),h=Math.round(cardHeight);
      hitAreas.push({index,corners:[{x:left,y:top},{x:left+w,y:top},{x:left+w,y:top+h},{x:left,y:top+h}]});
      context.fillStyle='#000';context.fillRect(left+3,top+4,w,h);context.drawImage(bitmaps.get(index)!,left,top,w,h);
@@ -407,12 +427,13 @@ export default function ArtistCanvasDeck({artists,zoom,onZoomStep}:{artists:Arti
   const backgroundUniforms={motion:gl.getUniformLocation(backgroundProgram,'uMotion'),resolution:gl.getUniformLocation(backgroundProgram,'uResolution')};
   const textures=new Map<number,TextureRecord>();
   let type=typographyForLayout();
-  function upload(index:number,image?:HTMLImageElement){const record=textures.get(index);if(!record||cancelled)return;gl!.bindTexture(gl!.TEXTURE_2D,record.texture);gl!.texImage2D(gl!.TEXTURE_2D,0,gl!.RGBA,gl!.RGBA,gl!.UNSIGNED_BYTE,cardBitmap(artists[index],index,type,image));}
+  function upload(index:number,image?:HTMLImageElement){const record=textures.get(index);if(!record||cancelled)return;gl!.bindTexture(gl!.TEXTURE_2D,record.texture);gl!.texImage2D(gl!.TEXTURE_2D,0,gl!.RGBA,gl!.RGBA,gl!.UNSIGNED_BYTE,cardBitmap(artists[index],index,type,image,regionImages.get(artists[index].section)));}
   function textureFor(index:number){const cached=textures.get(index);if(cached)return cached.texture;const texture=gl!.createTexture();if(!texture)throw Error('Texture unavailable');gl!.bindTexture(gl!.TEXTURE_2D,texture);gl!.texParameteri(gl!.TEXTURE_2D,gl!.TEXTURE_MIN_FILTER,gl!.NEAREST);gl!.texParameteri(gl!.TEXTURE_2D,gl!.TEXTURE_MAG_FILTER,gl!.NEAREST);gl!.texParameteri(gl!.TEXTURE_2D,gl!.TEXTURE_WRAP_S,gl!.CLAMP_TO_EDGE);gl!.texParameteri(gl!.TEXTURE_2D,gl!.TEXTURE_WRAP_T,gl!.CLAMP_TO_EDGE);textures.set(index,{texture});upload(index);
    if(artists[index].image){const image=new Image();image.crossOrigin='anonymous';image.referrerPolicy='no-referrer';image.onload=()=>{if(!cancelled)upload(index,image);};image.onerror=()=>{};image.src=artists[index].image;textures.get(index)!.image=image;}
    return texture;
   }
   fontReady.then(()=>{if(!cancelled)textures.forEach((record,index)=>upload(index,record.image?.complete?record.image:undefined));});
+  regionsReady.then(()=>{if(!cancelled)textures.forEach((record,index)=>upload(index,record.image?.complete?record.image:undefined));});
   const render=(time:number)=>{if(cancelled)return;frame=requestAnimationFrame(render);if(document.visibilityState==='hidden')return;
    const delta=Math.min(40,time-lastFrame||16);lastFrame=time;syncRows();position.target=clamp(position.target);position.value=clamp(position.value+(position.target-position.value)*(reducedMotion.matches?1:Math.min(1,delta*.011)));
    const aspect=width/height,scene=layout();
@@ -454,7 +475,15 @@ export default function ArtistCanvasDeck({artists,zoom,onZoomStep}:{artists:Arti
   return()=>{cancelled=true;cancelAnimationFrame(frame);cleanEvents();textures.forEach(record=>{if(record.image){record.image.onload=null;record.image.onerror=null;}gl.deleteTexture(record.texture);});gl.deleteProgram(cardProgram);gl.deleteProgram(backgroundProgram);gl.deleteVertexArray(vao);};
  },[signature]);
  return <div className="canvas-deck-shell">
-  <div className="canvas-deck-header"><span>АРХИВ ДОСЬЕ</span><span>ЗАПИСЕЙ: {artists.length}</span></div>
+  <div className="canvas-deck-header"><span>АРХИВ ДОСЬЕ</span><span className="canvas-deck-count">ЗАПИСЕЙ: {artists.length}</span>
+   <div className="deck-zoom-controls" role="group" aria-label="Масштаб 3D-колоды">
+    <label htmlFor="deck-zoom">ЗУМ</label>
+    <button type="button" aria-label="Уменьшить масштаб 3D-колоды" disabled={zoom<=.4} onClick={()=>onZoomStep(-.1)}><ZoomOut size={18}/></button>
+    <input id="deck-zoom" type="range" min="40" max="150" step="5" value={Math.round(zoom*100)} onChange={event=>onZoomStep(Number(event.target.value)/100-zoom)} aria-label="Масштаб 3D-колоды"/>
+    <output htmlFor="deck-zoom" aria-live="polite">{Math.round(zoom*100)}%</output>
+    <button type="button" aria-label="Увеличить масштаб 3D-колоды" disabled={zoom>=1.5} onClick={()=>onZoomStep(.1)}><ZoomIn size={18}/></button>
+   </div>
+  </div>
   {artists.length?<canvas ref={canvasRef} className="canvas-deck-stage" tabIndex={0} aria-label="Трёхмерная колода досье. Клик или Enter открывает источник в новом окне. Стрелки влево и вправо переключают записи, плюс и минус меняют масштаб."/>:
    <div className="canvas-deck-stage canvas-deck-empty" role="status">Сигнал не обнаружен. Измените запрос или фильтр.</div>}
   {showLocalAdmin&&artists.length>0&&<a ref={editRef} className="canvas-deck-edit" href={`${adminUrl}/#catalog`} aria-label="Редактировать досье" title="Редактировать досье" tabIndex={-1}><Pencil size={17} aria-hidden="true"/></a>}

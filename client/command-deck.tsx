@@ -14,7 +14,7 @@ export default function CommandDeck({mode,total}:{mode:'catalog'|'videos';total?
      <span className="command-kicker">AI CULTURE // ARCHIVE SYSTEM</span>
      <AiConquerLogo/>
      <strong>{videos?'ТВОРЧЕСКИЙ ИИ':'ОПЕРАЦИЯ: ВООБРАЖЕНИЕ'}</strong>
-     <span className="command-screen-subtitle">{videos?'АРХИВ РАБОТ И ЭКСПЕРИМЕНТОВ':'ИИШНИКИ · ХУДОЖНИКИ · МЕДИА'}</span>
+     <span className="command-screen-subtitle">{videos?'ХРОНОЛОГИЯ ПРИМЕНЕНИЯ ИИ В КЛИПАХ И МЕДИА':'ИИШНИКИ · ПРОЕКТЫ · МЕДИА'}</span>
     </div>
     <div className="command-screen-readout"><span>● СИСТЕМА В СЕТИ</span><span>СЕКТОР 01 / ИИЗМ</span></div>
    </div>
