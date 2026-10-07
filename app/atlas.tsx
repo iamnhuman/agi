@@ -1,5 +1,5 @@
 'use client';
-import {Fragment,useState,useEffect,useRef} from 'react';
+import {Fragment,useState,useEffect,useLayoutEffect,useRef} from 'react';
 import {createPortal} from 'react-dom';
 import {catalogUrl,adminUrl,showLocalAdmin} from '@/client/config';
 import ArtistMap from './artist-map';
@@ -344,6 +344,41 @@ export function ToyotaFooter({homeHref}:{homeHref?:string}={}){
  const telemetryRef=useRef<string[]>([]);
  const telemetryCursorRef=useRef(0);
  const [consoleState,setConsoleState]=useState<SignalConsoleState>({lines:[],line:0,chars:0,pause:0});
+ useLayoutEffect(()=>{
+  if(!signalOpen)return;
+  const root=document.documentElement,body=document.body;
+  const touch=window.matchMedia('(hover: none)').matches;
+  const scrollX=window.scrollX,scrollY=window.scrollY;
+  const properties=['position','top','left','width'] as const;
+  const savedStyles=properties.map(property=>({property,value:body.style.getPropertyValue(property),priority:body.style.getPropertyPriority(property)}));
+  const existingTheme=document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+  const theme=existingTheme||document.createElement('meta');
+  const themeContent=theme.getAttribute('content');
+  if(!existingTheme){theme.name='theme-color';document.head.append(theme);}
+  theme.content='#050609';
+  root.classList.add('toyota-signal-open');
+  if(touch){
+   // Safari's transparent chrome may sample the document outside a fixed overlay.
+   // Freeze and hide the page beneath it, retaining the original Toyota control.
+   root.classList.add('toyota-signal-touch');
+   body.style.setProperty('position','fixed');
+   body.style.setProperty('top',`${-scrollY}px`);
+   body.style.setProperty('left',`${-scrollX}px`);
+   body.style.setProperty('width','100%');
+  }
+  return()=>{
+   root.classList.remove('toyota-signal-open','toyota-signal-touch');
+   if(existingTheme){
+    if(themeContent===null)theme.removeAttribute('content');else theme.content=themeContent;
+   }else theme.remove();
+   if(touch){
+    for(const {property,value,priority} of savedStyles){
+     if(value)body.style.setProperty(property,value,priority);else body.style.removeProperty(property);
+    }
+    window.scrollTo({left:scrollX,top:scrollY,behavior:'instant'});
+   }
+  };
+ },[signalOpen]);
  useEffect(()=>{
   if(!signalOpen){setBubbleActive(false);return;}
   setBubbleActive(true);
@@ -423,12 +458,8 @@ export function ToyotaFooter({homeHref}:{homeHref?:string}={}){
   onKeyDown:(event:React.KeyboardEvent<HTMLElement>)=>{if(event.key==='Escape')setSignalOpen(false);},
  };
  const toyotaMarkContent=<><svg viewBox="0 0 60 40" aria-hidden="true" shapeRendering="crispEdges">{toyotaPixelRuns.map(({x,y,width})=><rect key={`${x}-${y}`} x={x} y={y} width={width} height="1"/>)}</svg><svg className="toyota-wordmark" viewBox="0 0 60 9" aria-hidden="true" shapeRendering="crispEdges">{toyotaWordRuns.map(({x,y})=><rect key={`${x}-${y}`} x={x} y={y} width="1" height="1"/>)}</svg><span className="toyota-signal-prompt" aria-hidden="true">{homeHref?'НА ГЛАВНУЮ':'АКТИВИРОВАТЬ СИГНАЛ'}</span></>;
- return <footer className="command-footer">
-  <div className="command-footer-rail"><span>AI CULTURE // ARCHIVE SYSTEM</span><span className="command-footer-status"><i aria-hidden="true"/>СИГНАЛ ГОТОВ</span></div>
-  <div className="command-footer-hardware" aria-hidden="true"><div className="command-footer-vent"/><div className="command-footer-backplate"/><div className="command-footer-vent"/></div>
-  <div className="command-footer-rail command-footer-rail--bottom"><span>КОНЕЦ АРХИВА</span><span>СЕКТОР 01 / ИИЗМ</span></div>
-  <div className="manifesto" data-open={signalOpen}>
-  <div id="toyota-transmission" className="manifesto-transmission" aria-hidden={!signalOpen}>
+ const transmission=signalOpen?createPortal(<div className="manifesto manifesto-overlay" data-open="true">
+  <div id="toyota-transmission" className="manifesto-transmission">
    <SignalRain active={signalOpen}/>
    <div className="manifesto-interference">
    <div className="signal-console-title">ROOTKIT://GHOST_SESSION <b>CLIENT // LIVE DATA</b></div>
@@ -440,11 +471,17 @@ export function ToyotaFooter({homeHref}:{homeHref?:string}={}){
     <PixelSignalConsole active={signalOpen} revision={`${consoleState.line}:${consoleState.chars}:${consoleState.pause}`} ip={clientIp.value}/>
    </div>
   </div>
+ </div>,document.body):null;
+ return <><footer className="command-footer">
+  <div className="command-footer-rail"><span>AI CULTURE // ARCHIVE SYSTEM</span><span className="command-footer-status"><i aria-hidden="true"/>СИГНАЛ ГОТОВ</span></div>
+  <div className="command-footer-hardware" aria-hidden="true"><div className="command-footer-vent"/><div className="command-footer-backplate"/><div className="command-footer-vent"/></div>
+  <div className="command-footer-rail command-footer-rail--bottom"><span>КОНЕЦ АРХИВА</span><span>СЕКТОР 01 / ИИЗМ</span></div>
+  <div className="manifesto" data-open={signalOpen}>
   <div className="toyota-mark-frame">
   <div className="manifesto-zalgo" data-play={bubbleActive} aria-hidden="true"><canvas ref={bubbleCanvasRef} className="comic-bubble-canvas" width="300" height="72"/></div>
   {homeHref?<a {...toyotaMarkProps} href={homeHref} aria-label="Toyota: перейти на главную">{toyotaMarkContent}</a>:<button {...toyotaMarkProps} type="button" aria-label="Toyota: показать сигнал" onClick={()=>{if(window.matchMedia('(hover: none)').matches)setSignalOpen(open=>!open);else setSignalOpen(true);}}>{toyotaMarkContent}</button>}
   </div>
- </div></footer>;
+ </div></footer>{transmission}</>;
 }
 
 function PreviewNameScreen({name}:{name:string}){
@@ -584,7 +621,7 @@ return <>
 <div>
 <h2 aria-label={a.name}>
 {view==='grid'?<ArtistTicker name={a.name}/>:<ArtistName name={a.name} fitToCard={false}/>}
-</h2>{view==='list'&&<div className="list-tags">{(a.section==='world'||a.section==='runet')&&<span className="list-region-badge" title={a.section==='world'?'Мир':'Рунет'}><img src={a.section==='world'?'./badges/region-en-eagle-cutout.png':'./badges/region-ru-emblem-cutout.png'} alt={a.section==='world'?'Мир':'Рунет'} loading="lazy" decoding="async"/></span>}<span className="list-rating-tag">{a.rating||'A'}</span>{a.kind==='collective'?<span className="list-kind-tag"><UsersRound size={11} aria-hidden="true"/>Проект</span>:a.kind==='media'?<span className="list-kind-tag"><Radio size={11} aria-hidden="true"/>Медиа</span>:null}</div>}{view!=='list'&&<p>
+</h2>{view==='list'&&<div className="list-tags">{(a.section==='world'||a.section==='runet')&&<span className="list-region-badge" title={a.section==='world'?'Мир':'Рунет'}><img src={a.section==='world'?'./badges/region-en-eagle-cutout.png':'./badges/region-ru-emblem-cutout.png'} alt={a.section==='world'?'Мир':'Рунет'} loading="lazy" decoding="async"/></span>}<span className="list-rating-tag">{a.rating||'A'}</span>{a.kind==='collective'?<span className="list-kind-tag" title="Проект"><UsersRound size={11} aria-hidden="true"/><span className="list-kind-label">Проект</span></span>:a.kind==='media'?<span className="list-kind-tag" title="Медиа"><Radio size={11} aria-hidden="true"/><span className="list-kind-label">Медиа</span></span>:null}</div>}{view!=='list'&&<p>
 <span className="artist-social">{a.platform} <ArrowUpRight size={14}/>
 </span>
 {a.kind==='collective'?<span className="list-kind-tag"><UsersRound size={11} aria-hidden="true"/>Проект</span>:a.kind==='media'?<span className="list-kind-tag"><Radio size={11} aria-hidden="true"/>Медиа</span>:null}

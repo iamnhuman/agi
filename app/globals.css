@@ -3273,43 +3273,59 @@ body{font-family:'Press Start 2P',ui-monospace,monospace}
 }
 .artist-deck .artist-card .artist-social{font-family:'Press Start 2P',ui-monospace,monospace;font-size:8px}
 .artist-grid .art-index{font-family:'Press Start 2P',ui-monospace,monospace}
-/* Registry metadata reads as one quiet line beside the portrait. */
+/* Registry metadata uses the same recessed hardware as the dossier consoles. */
 .artist-list .card-info .list-tags{
-  display:flex;align-items:center;flex-wrap:nowrap;gap:8px;
+  display:flex;align-items:center;flex-wrap:nowrap;gap:6px;
   width:100%;min-width:0;max-width:100%;padding:0;border:0;border-radius:0;
   background:none;box-shadow:none;
 }
 .artist-list .list-region-badge{
   display:inline-flex;align-items:center;justify-content:center;flex:none;
-  width:22px;height:22px;padding:0;
+  width:30px;height:26px;padding:0 1px;
 }
-.artist-list .list-region-badge img{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none}
-.artist-list .artist-card[data-section="runet"] .list-region-badge{width:22px}
+.artist-list .list-region-badge img{
+  display:block;flex:none;width:22px;height:20px;object-fit:contain;pointer-events:none;
+  filter:drop-shadow(0 1px 1px #000b);
+}
 .artist-list .list-rating-tag,
 .artist-list .list-kind-tag{
   display:inline-flex;align-items:center;justify-content:center;gap:5px;
-  height:22px;min-height:22px;padding:0;
+  height:26px;min-height:26px;padding:0;
   color:var(--card-accent);font:500 11px/1.3 'IBM Plex Mono',ui-monospace,monospace;
   white-space:nowrap;
 }
 .artist-list .list-region-badge,
 .artist-list .list-rating-tag,
 .artist-list .list-kind-tag{
-  border:0;border-radius:0;background:none;box-shadow:none;text-shadow:none;
+  --registry-badge-panel:linear-gradient(145deg,#1b2b2ef2,#030a0cf7 65%,#142226f2);
+  border:2px solid;border-color:#87938b #172024 #10171a #596e67;border-radius:1px;
+  background-image:var(--registry-badge-panel),url('/textures/worn-steel.png');
+  background-size:100% 100%,128px 128px;background-position:0 0,0 0;background-repeat:no-repeat,repeat;
+  box-shadow:inset 0 0 0 1px #0009,inset 0 1px #d9e1cc16,0 1px 2px #0009;
+  text-shadow:0 1px #000;
+}
+.artist-list .artist-card[data-section="runet"] .list-region-badge{
+  --registry-badge-panel:linear-gradient(145deg,#382621f2,#110b0df7 65%,#23191bf2);
 }
 .artist-list .list-rating-tag{
-  flex:none;min-width:0;padding:0 6px;border-radius:3px;
-  background:color-mix(in srgb,var(--card-accent) 9%,transparent);
+  flex:none;min-width:0;padding:0 5px;
+  --registry-badge-panel:linear-gradient(145deg,color-mix(in srgb,var(--card-accent) 9%,#182327),#030a0c 70%,#132023);
   font:400 7px/1.3 'Press Start 2P',ui-monospace,monospace;
 }
 .artist-list .list-rating-tag::before{
-  content:"";width:3px;height:3px;flex:none;border-radius:50%;background:currentColor;
+  content:"";width:3px;height:3px;flex:none;border-radius:0;background:currentColor;
+  box-shadow:0 0 3px color-mix(in srgb,currentColor 40%,transparent);
 }
 .artist-list .list-kind-tag{
-  justify-content:flex-start;flex:0 1 auto;min-width:0;overflow:hidden;color:#a7b9ba;
+  justify-content:flex-start;flex:0 1 auto;min-width:0;padding:0 4px;overflow:hidden;color:#e0e2c8;
+  --registry-badge-panel:linear-gradient(145deg,#2c342bf2,#0b1212f7 65%,#182321f2);
   font-family:'IBM Plex Mono',ui-monospace,monospace!important;
 }
-.artist-list .list-kind-tag svg{display:block;width:12px;height:12px;flex:none}
+.artist-list .list-kind-tag svg{display:block;width:12px;height:12px;flex:none;color:#d7c784}
+.artist-list .list-kind-label{
+  display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font:inherit!important;
+}
 .map-node text{font-size:10px}
 .map-node:hover text,.map-node:focus text{font-size:11px}
 .map-kind text{font-size:12px}
@@ -3629,7 +3645,7 @@ body,body *{font-family:'Press Start 2P',ui-monospace,monospace!important}
 }
 .search-row .catalog-type-radios .is-active .catalog-result-number{color:#fff5b4}
 
-/* Compact archive records: portrait and handle lead; hardware becomes the surface. */
+/* Compact records keep their proportions; worn command-console details stay in the paint. */
 @font-face{
   font-family:'IBM Plex Mono';src:url('/fonts/IBMPlexMono-Medium.ttf') format('truetype');
   font-style:normal;font-weight:500;font-display:swap;
@@ -3647,17 +3663,27 @@ body,body *{font-family:'Press Start 2P',ui-monospace,monospace!important}
 .artist-list[data-size="md"]{--list-avatar:64px;--list-name-size:14px;--list-column:312px}
 .artist-list[data-size="lg"]{--list-inset:14px;--list-avatar:80px;--list-name-size:15px;--list-column:390px}
 .artist-list[data-size] .artist-card[data-rating]{
+  --registry-grain-position:0px 0px;
+  --registry-panel:linear-gradient(120deg,#263034f2,#182124f4 65%,#1c272af2);
   position:relative;display:grid;grid-template-columns:var(--list-avatar) minmax(0,1fr);
   align-items:center;gap:12px;padding:var(--list-inset);
   min-height:calc(var(--list-avatar) + var(--list-inset)*2 + 2px);min-width:0;
-  border:1px solid #3a474b;border-top-color:#536267;border-bottom-color:#293438;border-radius:4px;
-  background:linear-gradient(120deg,#202b2e,#172023 65%,#1b2528);
-  box-shadow:none;isolation:isolate;
-  transition:border-color .2s ease-out,background .2s ease-out,transform .2s cubic-bezier(.22,1,.36,1);
+  border:1px solid #4b5959;border-top-color:#78827b;border-bottom-color:#131d20;border-radius:3px;
+  background-image:var(--registry-panel),url('/textures/worn-steel.png');
+  background-size:100% 100%,256px 256px;
+  background-position:0 0,var(--registry-grain-position);
+  background-repeat:no-repeat,repeat;
+  box-shadow:inset 0 1px #e0e5ce16,inset 1px 0 #ffffff08,inset 0 -1px #0008,0 2px 4px #0002;
+  isolation:isolate;
+  transition:border-color .2s ease-out,box-shadow .2s ease-out,transform .2s cubic-bezier(.22,1,.36,1);
 }
+.artist-list[data-size] .artist-card[data-rating]:nth-child(3n){--registry-grain-position:127px 61px}
+.artist-list[data-size] .artist-card[data-rating]:nth-child(3n + 2){--registry-grain-position:253px 179px}
 .artist-list[data-size] .artist-card[data-rating]>.art{
   flex:none;width:var(--list-avatar);height:var(--list-avatar);aspect-ratio:1;
-  border:0;border-radius:2px;background:#111a1e;box-shadow:none;
+  border:0;border-radius:1px;background:#111a1e;
+  outline:1px solid #81908b6b;outline-offset:-1px;
+  box-shadow:0 0 0 1px #090f12,0 1px 2px #0008;
 }
 .artist-list[data-size] .artist-card[data-rating]>.card-info{
   display:block;flex:1;min-width:0;padding:0;
@@ -3673,14 +3699,16 @@ body,body *{font-family:'Press Start 2P',ui-monospace,monospace!important}
   white-space:nowrap;overflow-wrap:normal;word-break:normal;
   font:500 var(--list-name-size)/1.35 'IBM Plex Mono',ui-monospace,monospace;
   font-family:'IBM Plex Mono',ui-monospace,monospace!important;
-  letter-spacing:0;color:#ebf1eb;text-shadow:none;
+  letter-spacing:0;color:#eeeede;text-shadow:0 1px 1px #0008;
   transition:color .2s ease-out;
 }
 .artist-list .artist-name wbr{display:none}
 .artist-list[data-size] .artist-card[data-rating]>.card-edit{
   inset:auto auto calc(var(--list-inset) - 3px) calc(var(--list-inset) + var(--list-avatar) - 22px);
   width:28px;height:28px;min-width:28px;min-height:28px;padding:0;
-  border:1px solid #657b80;border-radius:4px;background:#152024;color:#d8e9e9;
+  border:1px solid #747f75;border-top-color:#a4ad98;border-bottom-color:#222b27;border-radius:2px;
+  background:linear-gradient(145deg,#303937,#131c20);color:#ebd48a;
+  box-shadow:inset 0 1px #ffffff16,0 1px 3px #0008;
 }
 .artist-list[data-size] .artist-card[data-rating]>.card-edit svg{width:13px;height:13px}
 .artist-list .artist-card .card-hit-area:focus-visible{
@@ -3691,16 +3719,20 @@ body,body *{font-family:'Press Start 2P',ui-monospace,monospace!important}
 .artist-list .list-source-cue{
   position:absolute;top:var(--list-inset);right:var(--list-inset);
   display:flex;align-items:center;justify-content:center;width:14px;height:18px;
-  color:#9dafb0;opacity:.55;pointer-events:none;
+  border-radius:1px;background:linear-gradient(180deg,#35413b,#162024);
+  box-shadow:inset 0 1px #9da38b40,inset 0 -1px #070d10b3;
+  color:#d1bd7b;opacity:.7;pointer-events:none;
   transition:opacity .2s ease-out,color .2s ease-out,transform .2s cubic-bezier(.22,1,.36,1);
 }
 .artist-list[data-size] .artist-card[data-rating]:is(:hover,:focus-within){
-  border-color:#71898e;transform:translateY(-1px);
-  background:linear-gradient(120deg,#29383b,#1d2a2e 65%,#223034);
-  box-shadow:none;
+  --registry-panel:linear-gradient(120deg,#303c3bf2,#202c2df4 65%,#293433f2);
+  border-color:#9a9f84;border-top-color:#bec2a2;border-bottom-color:#38433d;transform:translateY(-1px);
+  box-shadow:inset 0 1px #e5e5b82b,inset 1px 0 #ffffff0d,inset 0 -1px #0008,0 3px 7px #0004;
 }
 .artist-list .artist-card[data-rating]:is(:hover,:focus-within) .list-source-cue{
-  color:#e4f4ef;opacity:1;transform:translate(1px,-1px);
+  color:#ffdf78;background:linear-gradient(180deg,#74342e,#351b20);
+  box-shadow:inset 0 1px #df9a6c80,inset 0 -1px #1a0e10,0 0 5px #ad443b33;
+  opacity:1;transform:translate(1px,-1px);
 }
 .artist-list .artist-card[data-rating]>.art img{transition:filter .2s ease-out}
 .artist-list .artist-card[data-rating]:is(:hover,:focus-within)>.art img{filter:brightness(1.08)}
@@ -4272,6 +4304,29 @@ body,body *{font-family:'Press Start 2P',ui-monospace,monospace!important}
 }
 .manifesto-transmission::before{display:none!important;background:none!important;mix-blend-mode:normal}
 .manifesto-transmission::after{display:none!important}
+
+/* Edge-to-edge Safari layout; controls stay inside the iPhone's safe area. */
+html{background-color:var(--background)}
+body{padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
+html.toyota-signal-open,html.toyota-signal-open body{background:#050609!important}
+html.toyota-signal-open .command-footer{z-index:auto}
+.manifesto.manifesto-overlay{
+  position:fixed;z-index:40;inset:0;display:block;width:auto;height:auto;
+  min-height:0;max-height:none;max-width:none;margin:0;padding:0;
+  border:0;background:none;box-shadow:none;overflow:visible;contain:none;
+  pointer-events:none;white-space:normal;
+}
+.manifesto-overlay::before{
+  content:"";position:fixed;z-index:-1;inset:0;background:#050609;
+  top:calc(0px - env(safe-area-inset-top,0px));
+  right:calc(0px - env(safe-area-inset-right,0px));
+  bottom:calc(0px - env(safe-area-inset-bottom,0px));
+  left:calc(0px - env(safe-area-inset-left,0px));
+}
+html.toyota-signal-touch{overflow:hidden;overscroll-behavior:none}
+html.toyota-signal-touch #root,html.toyota-signal-touch #root *{visibility:hidden!important}
+html.toyota-signal-touch #root .toyota-mark-frame,
+html.toyota-signal-touch #root .toyota-mark-frame *:not(.toyota-signal-prompt){visibility:visible!important}
 
 /* Keep every dossier hover response in one continuous, delay-free transition. */
 .artist-grid:not(.artist-deck) .artist-card[data-rating]{

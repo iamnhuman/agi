@@ -1,6 +1,18 @@
 {
   "artists": [
     {
+      "id": "ee64bd40-15c1-44ee-847d-e5102b3b222e",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "s_l_o_p_",
+      "url": "https://www.instagram.com/s_l_o_p_",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./avatars/upload-6867a288c4e60202.jpg",
+      "description": "124 Followers, 212 Following, 102 Posts - See Instagram photos and videos from Slop (@s_l_o_p_)",
+      "tags": ""
+    },
+    {
       "id": "8ef6c966-5097-4ba6-b353-875b6d476aa4",
       "kind": "artist",
       "rating": "A",
@@ -5405,6 +5417,24 @@
       "fetchUrl": "https://www.instagram.com/p/Dc24fq-M5-1/",
       "reference": false,
       "isVideo": true
+    },
+    {
+      "url": "https://youtube.com/watch?v=IccXumZcCRs",
+      "platform": "YouTube",
+      "videoId": "IccXumZcCRs",
+      "fetchUrl": "https://www.youtube.com/watch?v=IccXumZcCRs",
+      "reference": false,
+      "id": "b863a0e8-99e2-4234-bc64-28f8dda46183",
+      "name": "5opka, MellSher - Гуманитарие",
+      "title": "",
+      "publishedAt": "2026-09-24",
+      "dateSource": "source",
+      "dateUrl": "https://www.youtube.com/watch?v=IccXumZcCRs",
+      "image": "./avatars/upload-804d7eb563c35ef4.jpg",
+      "description": "",
+      "isVideo": true,
+      "alternateUrls": [],
+      "sourceOrder": 142
     }
   ]
 }
