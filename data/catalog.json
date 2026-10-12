@@ -1,6 +1,78 @@
 {
   "artists": [
     {
+      "id": "d7a08d3f-de61-4225-ac37-d1cd8f85cf77",
+      "kind": "artist",
+      "rating": "AAA",
+      "name": "don_elektrq",
+      "url": "https://www.instagram.com/don_elektrq",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./avatars/upload-e87fe07a2f21ecc1.jpg",
+      "description": "19K Followers, 3,504 Following, 3,025 Posts - See Instagram photos and videos from DON ELEKTRO (@don_elektrq)",
+      "tags": ""
+    },
+    {
+      "id": "4c1180ec-1c04-49b9-8727-4dce52d845b2",
+      "kind": "artist",
+      "rating": "AAA",
+      "name": "______salibi",
+      "url": "https://www.instagram.com/______salibi",
+      "platform": "Instagram",
+      "section": "runet",
+      "image": "./avatars/upload-d59dff3a74413101.jpg",
+      "description": "17K Followers, 830 Following, 445 Posts - See Instagram photos and videos from  (@______salibi)",
+      "tags": ""
+    },
+    {
+      "id": "6b97ee41-f3e1-4dac-9dc7-2284638d1173",
+      "kind": "media",
+      "rating": "AA",
+      "name": "r/aivideo",
+      "url": "https://www.reddit.com/r/aivideo",
+      "platform": "Reddit",
+      "section": "world",
+      "image": "https://img.magnific.com/premium-psd/film-clapperboard-icon-isolated-background_1042381-5483.jpg?semt=ais_hybrid&w=740&q=80",
+      "description": "",
+      "tags": ""
+    },
+    {
+      "id": "4e88c4b0-37b2-4cdd-98df-42f3adb41b28",
+      "kind": "collective",
+      "rating": "AA",
+      "name": "filtihspace",
+      "url": "https://www.instagram.com/filtihspace",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./avatars/upload-271f6784124c7027.jpg",
+      "description": "30K Followers, 1 Following, 585 Posts - See Instagram photos and videos from FILTIH SPACE - &#x41a;&#x41e;&#x41d;&#x422;&#x415;&#x41d;&#x422; | &#x41d;&#x415;&#x419;&#x420;&#x41e;&#x421;&#x415;&#x422;&#x418; | &#x41e;&#x411;&#x423;&#x427;&#x415;&#x41d;&#x418;&#x415; (@filtihspace)",
+      "tags": ""
+    },
+    {
+      "id": "c6c84c76-baa4-4757-bca0-0093757f3d82",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "jane_kovaleva",
+      "url": "https://www.instagram.com/jane_kovaleva",
+      "platform": "Instagram",
+      "section": "runet",
+      "image": "./avatars/upload-9fe27c8dca34fce3.jpg",
+      "description": "5,355 Followers, 405 Following, 408 Posts - See Instagram photos and videos from Zhenya Kovaleva | ai creator (@jane_kovaleva)",
+      "tags": ""
+    },
+    {
+      "id": "d3a3cd13-8a78-423d-a766-cc90ec253378",
+      "kind": "collective",
+      "rating": "AAA+",
+      "name": "birdgamestudios",
+      "url": "https://www.instagram.com/birdgamestudios",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./avatars/upload-83bb35bbac1e36e0.jpg",
+      "description": "2,835 Followers, 23 Following, 28 Posts - See Instagram photos and videos from Bird Game Studios (@birdgamestudios)",
+      "tags": ""
+    },
+    {
       "id": "ee64bd40-15c1-44ee-847d-e5102b3b222e",
       "kind": "artist",
       "rating": "AA",
@@ -1657,18 +1729,6 @@
       "tags": ""
     },
     {
-      "id": "79e8b038-d7dc-4000-8dfc-330e376fd582",
-      "kind": "artist",
-      "rating": "AA",
-      "name": "nickoollai",
-      "url": "https://t.me/nickoollai",
-      "platform": "Telegram",
-      "section": "runet",
-      "image": "./avatars/upload-a52b6f7d41a4ac39.jpg",
-      "description": "29K Followers, 34 Following, 261 Posts - See Instagram photos and videos from AI-creator (@nickoollai)",
-      "tags": ""
-    },
-    {
       "id": "292dd0de-4d8c-4e0e-a1a5-5b5e1d03f4aa",
       "kind": "media",
       "rating": "AAA+",
@@ -2900,6 +2960,78 @@
       "section": "runet",
       "image": "./avatars/upload-62124d85bd03741f.jpg",
       "description": "Проект о нейросетях от студии и школы Щёлочь\t\tСайт школы : https://alkali.shop\t\tСайт студии: https://alkali.design\t\tНаши каналы: https://clck.ru/3SJnv9\t\tПредложить свою генерацию: https://t.me/neuro_corner_alkali",
+      "tags": ""
+    },
+    {
+      "id": "d91a469d-1508-4974-a5bb-c93c36e4d194",
+      "kind": "media",
+      "rating": "AA",
+      "name": "rassvet_ai",
+      "url": "https://www.instagram.com/rassvet_ai",
+      "platform": "Instagram",
+      "section": "runet",
+      "image": "./avatars/upload-32316b67d96491cd.jpg",
+      "description": "90 Followers, 549 Following, 172 Posts - See Instagram photos and videos from RassvetAI (@rassvet_ai)",
+      "tags": ""
+    },
+    {
+      "id": "899e3980-da0c-4b4d-8592-56ee785eab4d",
+      "kind": "media",
+      "rating": "A",
+      "name": "Workshop AI",
+      "url": "https://t.me/workshopairu",
+      "platform": "Telegram",
+      "section": "runet",
+      "image": "./avatars/upload-3ff39fe82c439a44.jpg",
+      "description": "Пишем про нейросети, тестируем новые модели и делимся тем, что действительно показалось интересным.\t\t🌐 Сервис: workshopai.ru\t💬 Сообщество: @workshop_community🤝 Сотрудничество: @neiro_boss",
+      "tags": ""
+    },
+    {
+      "id": "daa34700-0fe9-456b-a63b-4a39cd58852c",
+      "kind": "media",
+      "rating": "AA",
+      "name": "AcidCrunch",
+      "url": "https://www.instagram.com/AcidCrunch",
+      "platform": "Instagram",
+      "section": "runet",
+      "image": "./avatars/upload-8f11578db3d229b0.jpg",
+      "description": "295 Followers, 131 Following, 84 Posts - See Instagram photos and videos from Acid Crunch (@AcidCrunch)",
+      "tags": ""
+    },
+    {
+      "id": "79e8b038-d7dc-4000-8dfc-330e376fd582",
+      "kind": "media",
+      "rating": "A",
+      "name": "nickoollai",
+      "url": "https://t.me/nickoollai",
+      "platform": "Telegram",
+      "section": "runet",
+      "image": "./avatars/upload-a52b6f7d41a4ac39.jpg",
+      "description": "29K Followers, 34 Following, 261 Posts - See Instagram photos and videos from AI-creator (@nickoollai)",
+      "tags": ""
+    },
+    {
+      "id": "67cda59d-0a0c-46b3-96f3-dfbe63423266",
+      "kind": "media",
+      "rating": "AAA",
+      "name": "Метаверсище и ИИще",
+      "url": "https://t.me/cgevent",
+      "platform": "Telegram",
+      "section": "runet",
+      "image": "./avatars/upload-f6e94be7438c1dd8.jpg",
+      "description": "Это не новости, это персональный экспертный взгляд на то, как развивается индустрия ИИ, графики, метаверса, крипты,  нейротехнологий и в каком направлении катится все это безобразие. \tДля связи: @SergTsyp",
+      "tags": ""
+    },
+    {
+      "id": "a2c81b8c-f566-43fa-927a-5443dfac44e9",
+      "kind": "media",
+      "rating": "AAA",
+      "name": "Denis Sexy IT 🤖",
+      "url": "https://t.me/denissexy",
+      "platform": "Telegram",
+      "section": "runet",
+      "image": "./avatars/upload-09c51ce1cf75cb67.jpg",
+      "description": "Личный блог Дениса Ширяева (🤍🇺🇦), про технологии, интересное или актуальное.\t\t⚜️ Реклама в канале возможна для юрлиц и физ-лиз у которых работает SWIFT оплата в Нидерланды",
       "tags": ""
     }
   ],
@@ -5435,6 +5567,60 @@
       "isVideo": true,
       "alternateUrls": [],
       "sourceOrder": 142
+    },
+    {
+      "url": "https://youtube.com/watch?v=qglxurLB52E",
+      "platform": "YouTube",
+      "videoId": "qglxurLB52E",
+      "fetchUrl": "https://www.youtube.com/watch?v=qglxurLB52E",
+      "reference": false,
+      "id": "fa4317ee-5578-439b-b92f-b86b8a1badec",
+      "name": "Grimes",
+      "title": "Eve Is Online...",
+      "publishedAt": "2026-10-07",
+      "dateSource": "source",
+      "dateUrl": "https://www.youtube.com/watch?v=qglxurLB52E",
+      "image": "./avatars/upload-e43302276aaff081.jpg",
+      "description": "",
+      "isVideo": true,
+      "alternateUrls": [],
+      "sourceOrder": 143
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=AIIZ3Nl1QRg",
+      "platform": "YouTube",
+      "videoId": "AIIZ3Nl1QRg",
+      "fetchUrl": "https://www.youtube.com/watch?v=AIIZ3Nl1QRg",
+      "reference": false,
+      "id": "d136bef3-d460-4ef5-83b2-53b00f61d479",
+      "name": "мс улыбочка",
+      "title": "Нежно&Небрежно feat. Onda Andar",
+      "publishedAt": "2026-10-09",
+      "dateSource": "source",
+      "dateUrl": "https://www.youtube.com/watch?v=AIIZ3Nl1QRg",
+      "image": "./avatars/upload-fe6f0db2e8429648.jpg",
+      "description": "",
+      "isVideo": true,
+      "alternateUrls": [],
+      "sourceOrder": 144
+    },
+    {
+      "url": "https://youtu.be/AVu5p2DMIf8?si=th8j8vvsIgwfG26l",
+      "platform": "YouTube",
+      "videoId": "AVu5p2DMIf8",
+      "fetchUrl": "https://www.youtube.com/watch?v=AVu5p2DMIf8",
+      "reference": false,
+      "id": "34fc61e2-3bd9-4b41-9f15-fd25cf650542",
+      "name": "Grimes",
+      "title": "ACCELERANDO",
+      "publishedAt": "2026-10-09",
+      "dateSource": "source",
+      "dateUrl": "https://www.youtube.com/watch?v=AVu5p2DMIf8",
+      "image": "./avatars/upload-551d28d783072bd4.jpg",
+      "description": "",
+      "isVideo": true,
+      "alternateUrls": [],
+      "sourceOrder": 145
     }
   ]
 }

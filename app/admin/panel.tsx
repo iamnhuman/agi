@@ -6,12 +6,14 @@ import AiConquerLogo from '@/client/ai-conquer-logo';
 import {Dialog,DialogContent,DialogTitle,DialogDescription} from '@/components/ui/dialog';
 import {AlertDialog,AlertDialogContent,AlertDialogHeader,AlertDialogTitle,AlertDialogDescription,AlertDialogFooter,AlertDialogCancel,AlertDialogAction} from '@/components/ui/alert-dialog';
 import {Select,SelectTrigger,SelectValue,SelectContent,SelectItem} from '@/components/ui/select';
+import {Popover,PopoverTrigger,PopoverContent} from '@/components/ui/popover';
 import type {Artist,ArtistRating,Section} from '@/lib/types';
 import {matchesArtistSearch} from '@/lib/artist-search';
+import {completedProfileUrl} from '@/lib/profile-url.mjs';
+import {cardMaterial} from '@/app/card-material';
 const blank:Artist={kind:'artist',rating:'A',id:'',name:'',url:'',section:'world',platform:'Instagram',description:'',image:'',tags:''};
 const ADMIN_PAGE_SIZE=18;
 type AdminPage=number|'all';
-function completedProfileUrl(value:string){const input=value.trim(),username=input.replace(/^@/,'');if(/^[a-zA-Z0-9._]+$/.test(username))return `https://www.instagram.com/${username}`;if(/^(?:www\.)?(?:instagram\.com|t\.me|telegram\.me)(?=\/|[?#]|$)/i.test(input))return `https://${input}`;return input;}
 function sizeFromImageUrl(src:string){const match=src.match(/[_-]s(\d+)x(\d+)(?:[_-]|$)/i);return match?`${match[1]} × ${match[2]}`:'';}
 function ArtworkPreview({src,label,fresh=false}:{src:string;label:string;fresh?:boolean}){
  const [size,setSize]=useState(()=>sizeFromImageUrl(src));
@@ -68,9 +70,29 @@ export default function Admin(){
  function changeColumns(value:number){setColumns(value);try{localStorage.setItem('iizm-admin-columns',String(value));}catch{}}
 
  const [artists,setArtists]=useState<Artist[]>([]),[sections,setSections]=useState<Section[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState(''),[notice,setNotice]=useState(''),[q,setQ]=useState('');
- const [page,setPage]=useState<AdminPage>(1);
+ const [page,setPage]=useState<AdminPage>('all');
  function resetPage(){setPage(current=>current==='all'?'all':1);}
  const rowsRef=useRef<HTMLDivElement>(null);
+ const cardRefs=useRef(new Map<string,HTMLDivElement>());
+ const positionInputRef=useRef<HTMLInputElement>(null);
+ const skipPositionFocusRestore=useRef(false);
+ const [positionDraft,setPositionDraft]=useState<Artist|null>(null),[positionValue,setPositionValue]=useState(''),[positionError,setPositionError]=useState(''),[moving,setMoving]=useState(false);
+ const [revealId,setRevealId]=useState<string|null>(null),[movedId,setMovedId]=useState<string|null>(null);
+ useEffect(()=>{
+  if(!revealId)return;
+  const frame=requestAnimationFrame(()=>{
+   const card=cardRefs.current.get(revealId);
+   card?.scrollIntoView({behavior:'instant',block:'center'});
+   card?.querySelector<HTMLButtonElement>('.admin-position-button')?.focus({preventScroll:true});
+   setRevealId(null);
+  });
+  return()=>cancelAnimationFrame(frame);
+ },[revealId]);
+ useEffect(()=>{
+  if(!movedId)return;
+  const timer=window.setTimeout(()=>setMovedId(null),2400);
+  return()=>window.clearTimeout(timer);
+ },[movedId]);
  const [groups,setGroups]=useState<string[]>([]),[kinds,setKinds]=useState<NonNullable<Artist['kind']>[]>([]);
  function toggleGroup(value:string){resetPage();setGroups(current=>current.includes(value)?current.filter(item=>item!==value):[...current,value]);}
  function toggleKind(value:NonNullable<Artist['kind']>){resetPage();setKinds(current=>current.includes(value)?current.filter(item=>item!==value):[...current,value]);}
@@ -81,17 +103,39 @@ export default function Admin(){
  function start(a?:Artist){setDraft(a?{...a,kind:a.kind||'artist',rating:(a.rating as string)==='CRINGE'?'A':a.rating||'A'}:{...blank,kind:kinds.length===1?kinds[0]:'artist',section:groups.length===1?groups[0]:'world'});setLink(a?.url||'');setArtworkBefore('');setFormError('');setImportNote('');}
  async function uploadArtwork(file:File){setFormError('');setImportNote('');if(file.size>50*1024*1024){setFormError('Файл должен быть не больше 50 МБ.');return;}const previous=draft?.image||'';setBusy(true);try{const r=await fetch('/api/avatar-upload',{method:'POST',headers:{'Content-Type':file.type},body:file});const d=await r.json();if(!r.ok)throw Error(d.error);setArtworkBefore(previous);setDraft(prev=>({...prev!,image:d.image}));setImportNote(`Обложка ${file.name} (${(file.size/1024/1024).toFixed(1)} МБ) загружена. Сохраните карточку.`);}catch(e){setFormError((e as Error).message);}finally{setBusy(false);}}
  async function downloadArtwork(){if(!draft?.image)return;const previous=draft.image;setBusy(true);setFormError('');try{const r=await fetch('/api/avatar-from-url',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:draft.image})});const d=await r.json();if(!r.ok)throw Error(d.error);setArtworkBefore(previous);setDraft(prev=>({...prev!,image:d.image}));setImportNote('Обложка скачана по ссылке и сохранена локально. Сохраните карточку.');}catch(e){setFormError((e as Error).message);}finally{setBusy(false);}}
- async function refreshArtwork(){if(!draft?.url)return;const previous=draft.image;setBusy(true);setFormError('');setImportNote('');try{const r=await fetch('/api/import',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:draft.url})});const d:any=await r.json();if(!r.ok)throw Error(d.error);if((d.profileAvatar||d.hdAvatar||d.artist?.platform==='Telegram')&&d.artist.image&&d.imageSavedLocally){setArtworkBefore(previous);setDraft(prev=>({...prev!,image:d.artist.image}));setImportNote(d.artist.platform==='Telegram'?'Аватарка Telegram найдена и сохранена локально. Проверьте новое превью и сохраните карточку.':d.hdAvatar&&d.avatarWidth?`Найдена настоящая HD-аватарка ${d.avatarWidth} × ${d.avatarHeight}. Сохраните карточку.`:d.avatarWidth?`Instagram подтвердил аватарку, но отдаёт её только ${d.avatarWidth} × ${d.avatarHeight}. Сохраните карточку, если она лучше текущей.`:'HD-аватарка профиля найдена и сохранена локально. Сохраните карточку.');}else if(d.imageNotice){setFormError(d.imageNotice);}else{setImportNote(`${d.artist?.platform||'Площадка'} не отдала доступную аватарку. Текущее фото оставлено без изменений.`);}}catch(e){setFormError((e as Error).message);}finally{setBusy(false);}}
+ async function refreshArtwork(){if(!draft?.url)return;const previous=draft.image;setBusy(true);setFormError('');setImportNote('');try{const r=await fetch('/api/import',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:draft.url})});const d:any=await r.json();if(!r.ok)throw Error(d.error);if((d.profileAvatar||d.coverLoaded||d.hdAvatar||d.artist?.platform==='Telegram')&&d.artist.image&&d.imageSavedLocally){setArtworkBefore(previous);setDraft(prev=>({...prev!,image:d.artist.image}));setImportNote(d.artist.platform==='Reddit'?'Изображение Reddit найдено и сохранено локально. Проверьте новое превью и сохраните карточку.':d.artist.platform==='Telegram'?'Аватарка Telegram найдена и сохранена локально. Проверьте новое превью и сохраните карточку.':d.hdAvatar&&d.avatarWidth?`Найдена настоящая HD-аватарка ${d.avatarWidth} × ${d.avatarHeight}. Сохраните карточку.`:d.avatarWidth?`Instagram подтвердил аватарку, но отдаёт её только ${d.avatarWidth} × ${d.avatarHeight}. Сохраните карточку, если она лучше текущей.`:'HD-аватарка профиля найдена и сохранена локально. Сохраните карточку.');}else if(d.imageNotice){setFormError(d.imageNotice);}else{setImportNote(`${d.artist?.platform||'Площадка'} не отдала доступное изображение. Текущее фото оставлено без изменений.`);}}catch(e){setFormError((e as Error).message);}finally{setBusy(false);}}
  async function importLink(refresh=false){setBusy(true);setFormError('');setImportNote('');try{const source=refresh?draft?.url:completedProfileUrl(link);const r=await fetch('/api/import',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:source})});const d:any=await r.json();if(!r.ok)throw Error(d.error);if(!refresh)setLink(d.artist.url);setDraft(prev=>refresh?{...prev!,platform:d.artist.platform,...((d.metadataLoaded||d.artist.platform==='Instagram')&&d.artist.name?{name:d.artist.name}:{}),...(d.artist.description?{description:d.artist.description}:{}),...(d.artist.image&&(!prev?.image||!d.lowResolution)?{image:d.artist.image}:{})}:{...prev!,...d.artist});if(d.imageNotice&&!d.hdAvatar)setFormError(d.imageNotice);else setImportNote(d.hdAvatar&&d.imageSavedLocally?'HD-аватарка профиля найдена и сохранена локально. Проверьте карточку перед сохранением.':d.imageSavedLocally?'Обложка найдена и сохранена локально. Проверьте карточку перед сохранением.':d.lowResolution?"Instagram отдал только уменьшенную аватарку. Можно загрузить файл вручную.":refresh?d.metadataLoaded?"Доступные данные обновлены. Проверьте их и сохраните карточку. Поля без новых данных оставлены без изменений.":"Площадка не отдала данные аккаунта. Существующие поля сохранены.":d.notice);}catch(e){setFormError((e as Error).message);}finally{setBusy(false);}}
  async function save(e:React.FormEvent){e.preventDefault();setBusy(true);setFormError('');try{const expectedRating=draft?.rating||'A';const artist=draft?{...draft,url:completedProfileUrl(draft.url)}:draft;const d=await mutate({action:'save',artist});if(d.artist.rating!==expectedRating)throw Error('Сервер не применил тег рейтинга. Перезапустите локальный сайт и повторите сохранение.');setArtists(prev=>prev.some(a=>a.id===d.artist.id)?prev.map(a=>a.id===d.artist.id?d.artist:a):[d.artist,...prev]);setDraft(null);setNotice(`Карточка сохранена с тегом ${d.artist.rating}.`);}catch(e){setFormError((e as Error).message);}finally{setBusy(false);}}
- const filtered=artists.filter(a=>(groups.length===0||groups.includes(a.section))&&(kinds.length===0||kinds.includes(a.kind||'artist'))&&matchesArtistSearch(a,q,['name','url','tags']));
+ const matchesFilters=(a:Artist)=>(groups.length===0||groups.includes(a.section))&&(kinds.length===0||kinds.includes(a.kind||'artist'))&&matchesArtistSearch(a,q,['name','url','tags']);
+ const filtered=artists.filter(matchesFilters);
+ const positions=new Map(artists.map((a,index)=>[a.id,artists.length-index]));
  const pageCount=Math.max(1,Math.ceil(filtered.length/ADMIN_PAGE_SIZE));
  const currentPage=page==='all'?'all':Math.min(page,pageCount);
  const first=filtered.length?(currentPage==='all'?1:(currentPage-1)*ADMIN_PAGE_SIZE+1):0;
  const last=currentPage==='all'?filtered.length:Math.min(currentPage*ADMIN_PAGE_SIZE,filtered.length);
  const visible=filtered.slice(first?first-1:0,last);
+ function editPosition(a:Artist){
+  skipPositionFocusRestore.current=false;
+  setMovedId(null);setPositionDraft(a);setPositionValue(String(positions.get(a.id)));setPositionError('');
+ }
+ async function applyPosition(event:React.FormEvent){
+  event.preventDefault();
+  if(!positionDraft||moving)return;
+  const value=positionValue.trim(),position=Number(value);
+  if(!/^\d+$/.test(value)||!Number.isInteger(position)||position<1||position>artists.length){setPositionError(`Укажите целую позицию от 1 до ${artists.length}.`);return;}
+  setMoving(true);setPositionError('');
+  try{
+   const d=await mutate({action:'move',id:positionDraft.id,position,reverseNumbering:true}) as {artists:Artist[];position:number};
+   const filteredIndex=d.artists.filter(matchesFilters).findIndex(a=>a.id===positionDraft.id);
+   skipPositionFocusRestore.current=true;
+   setArtists(d.artists);
+   if(currentPage!=='all')setPage(Math.floor(Math.max(0,filteredIndex)/ADMIN_PAGE_SIZE)+1);
+   setPositionDraft(null);setMovedId(positionDraft.id);setRevealId(positionDraft.id);
+   setNotice(`${positionDraft.name} — позиция ${d.position}.`);
+  }catch(e){setPositionError((e as Error).message);}finally{setMoving(false);}
+ }
  function changePage(next:AdminPage){
-  if(next===currentPage||(typeof next==='number'&&(next<1||next>pageCount)))return;
+  if(moving||next===currentPage||(typeof next==='number'&&(next<1||next>pageCount)))return;
   setPage(next);
   requestAnimationFrame(()=>rowsRef.current?.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'}));
  }
@@ -112,27 +156,27 @@ export default function Admin(){
 <p>Изменения сохраняются локально и сразу появляются на сайте.</p>
 <div className="collection-count"><strong>{artists.length}</strong><span>записей в коллекции</span></div>
 </div>
-<button className="primary-btn" onClick={()=>start()}>
+<button className="primary-btn" disabled={moving} onClick={()=>start()}>
 <Plus size={18}/> Добавить запись</button>
 </div>{notice&&<p className="notice" role="status">{notice}</p>}{error&&<div className="error" role="alert">{error} <button onClick={load}>Повторить</button>
 </div>}<div className="admin-tools">
 <label className="input-search">
 <Search size={17}/>
-<input aria-label="Поиск записи" placeholder="Поиск" value={q} onChange={e=>{resetPage();setQ(e.target.value);}}/>
+<input aria-label="Поиск записи" placeholder="Поиск" value={q} disabled={moving} onChange={e=>{resetPage();setQ(e.target.value);}}/>
 </label>
 <div className="admin-view-controls">
 <div className="density-switch" role="group" aria-label="Размер карточек">
 {[{value:1,label:'Список',aria:'Список'},{value:6,label:'SM',aria:'Мелкие карточки'},{value:4,label:'MD',aria:'Карточки среднего размера'},{value:3,label:'LG',aria:'Крупные карточки'}].map(option=>
-<button key={option.value} type="button" aria-pressed={columns===option.value} aria-label={option.aria} onClick={()=>changeColumns(option.value)}>{option.label}</button>)}
+<button key={option.value} type="button" disabled={moving} aria-pressed={columns===option.value} aria-label={option.aria} onClick={()=>changeColumns(option.value)}>{option.label}</button>)}
 </div>
 <div className="admin-filter-groups">
-<fieldset className="admin-filter-set" aria-label="Тип записей">
+<fieldset className="admin-filter-set" aria-label="Тип записей" disabled={moving}>
 <legend>ТИП</legend><div className="admin-filter-options">
 <label><input type="checkbox" checked={kinds.length===0} onChange={()=>{resetPage();setKinds([]);}}/><span>Все</span></label>
 {([['artist','Артисты'],['media','Медиа'],['collective','Проекты']] as const).map(([value,label])=><label key={value}><input type="checkbox" checked={kinds.includes(value)} onChange={()=>toggleKind(value)}/><span>{label}</span></label>)}
 </div>
 </fieldset>
-<fieldset className="admin-filter-set" aria-label="География">
+<fieldset className="admin-filter-set" aria-label="География" disabled={moving}>
 <legend>ГЕОГРАФИЯ</legend><div className="admin-filter-options">
 <label><input type="checkbox" checked={groups.length===0} onChange={()=>{resetPage();setGroups([]);}}/><span>Вся</span></label>
 {sections.map(section=><label key={section.id}><input type="checkbox" checked={groups.includes(section.id)} onChange={()=>toggleGroup(section.id)}/><span>{section.name}</span></label>)}
@@ -143,24 +187,35 @@ export default function Admin(){
 </div>
 </div>
 <div ref={rowsRef} className={`admin-rows${columns===1?'':' admin-grid'}`} data-artwork="full" data-columns={columns} style={{'--admin-columns':columns} as CSSProperties}>{loading?<p className="empty">Загружаем коллекцию…</p>:visible.map((a,i)=>
-<div className="admin-row" data-rating={a.rating||'A'} data-kind={a.kind||'artist'} data-section={a.section} key={a.id}>
+<div className="admin-row" ref={node=>{if(node)cardRefs.current.set(a.id,node);else cardRefs.current.delete(a.id);}} data-artist-id={a.id} data-moved={movedId===a.id||undefined} data-rating={a.rating||'A'} data-kind={a.kind||'artist'} data-section={a.section} style={cardMaterial(a.id)} key={a.id}>
 <div className={'mini-art art-'+i%8}>
 <div className="missing-avatar" role="img" aria-label="Аватарка отсутствует">
 <span aria-hidden="true">×</span>
-</div>{a.image&&<a className="admin-artwork-link" href={a.url||a.image} target="_blank" rel="noopener noreferrer" aria-label={`Открыть ${a.name} в новой вкладке`}><img src={a.image} alt={a.name} loading="lazy" referrerPolicy="no-referrer" onError={e=>{e.currentTarget.style.display='none';}}/></a>}<div className="admin-art-badges">{a.kind==='collective'?<span className="record-type record-type--avatar"><UsersRound size={13} aria-hidden="true"/><span className="record-type-label">Проект</span></span>:a.kind==='media'?<span className="record-type record-type--avatar"><Radio size={13} aria-hidden="true"/><span className="record-type-label">Медиа</span></span>:null}<span className="art-badges"><span className={`rating-tag rating-${(a.rating||'A').toLowerCase()}`}>{a.rating||'A'}</span></span></div></div>
+</div>{a.image&&<a className="admin-artwork-link" href={a.url||a.image} target="_blank" rel="noopener noreferrer" aria-label={`Открыть ${a.name} в новой вкладке`}><img src={a.image} alt={a.name} loading="lazy" referrerPolicy="no-referrer" onError={e=>{e.currentTarget.style.display='none';}}/></a>}<div className="admin-art-badges">{a.kind==='collective'?<span className="record-type record-type--avatar"><UsersRound size={13} aria-hidden="true"/><span className="record-type-label">Проект</span></span>:a.kind==='media'?<span className="record-type record-type--avatar"><Radio size={13} aria-hidden="true"/><span className="record-type-label">Медиа</span></span>:null}<span className="art-badges"><span className={`rating-tag rating-${(a.rating||'A').toLowerCase()}`}>{a.rating||'A'}</span></span></div>
+{a.url&&<a className="admin-card-source" href={a.url} target="_blank" rel="noopener noreferrer" title={a.url} aria-label={`Открыть ${a.name}: ${a.url}`}><Link2 size={13} aria-hidden="true"/><span>{a.url.replace(/^https?:\/\//i,'').replace(/^www\./i,'').replace(/^([^/?#]+)\.com(?:[/:?#].*)?$/i,'$1')}</span><ArrowUpRight size={13} aria-hidden="true"/></a>}
+</div>
 <div className="row-name">
 {(a.section==='world'||a.section==='runet')&&<img className="region-watermark" src={a.section==='world'?'./badges/region-en-eagle-cutout.png':'./badges/region-ru-emblem-cutout.png'} alt="" aria-hidden="true" loading="lazy" decoding="async"/>}
 <AdminCardName name={a.name} columns={columns}/>
 </div>
 <div className="admin-card-footer">
-<div className="admin-tags">
-<span className={`rating-tag rating-${(a.rating||'A').toLowerCase()}`}>{a.rating||'A'}</span>
-</div>
+<Popover open={positionDraft?.id===a.id} onOpenChange={open=>{if(moving)return;if(open)editPosition(a);else setPositionDraft(null);}}>
+<PopoverTrigger asChild><button type="button" className="admin-position-button" disabled={moving} aria-label={`Изменить позицию ${a.name}, сейчас ${positions.get(a.id)}`} title="Изменить позицию в коллекции"><span aria-hidden="true">#</span>{positions.get(a.id)}</button></PopoverTrigger>
+<PopoverContent className="admin-position-editor" align="start" side="top" aria-label={`Позиция ${a.name}`} onOpenAutoFocus={event=>{event.preventDefault();positionInputRef.current?.focus();positionInputRef.current?.select();}} onCloseAutoFocus={event=>{if(skipPositionFocusRestore.current)event.preventDefault();}} onInteractOutside={event=>{if(moving)event.preventDefault();}} onEscapeKeyDown={event=>{if(moving)event.preventDefault();}}>
+<form onSubmit={applyPosition} noValidate aria-busy={moving}>
+<label htmlFor={`position-${a.id}`}>Позиция в коллекции</label>
+<p id={`position-hint-${a.id}`}>От 1 до {artists.length}, во всей коллекции.</p>
+<input ref={positionInputRef} id={`position-${a.id}`} type="number" inputMode="numeric" min={1} max={artists.length} step={1} value={positionValue} disabled={moving} aria-invalid={!!positionError} aria-describedby={`position-hint-${a.id}${positionError?` position-error-${a.id}`:''}`} onChange={event=>{setPositionValue(event.target.value);setPositionError('');}}/>
+{positionError&&<p id={`position-error-${a.id}`} className="error" role="alert">{positionError}</p>}
+<div className="admin-position-editor-actions"><button type="button" className="secondary-btn" disabled={moving} onClick={()=>setPositionDraft(null)}>Отмена</button><button type="submit" className="primary-btn" disabled={moving}>{moving?'Сохраняем…':'Применить'}</button></div>
+</form>
+</PopoverContent>
+</Popover>
 <div className="admin-card-actions">
-<button aria-label={'Редактировать '+a.name} onClick={()=>start(a)}>
+<button disabled={moving} aria-label={'Редактировать '+a.name} onClick={()=>start(a)}>
 <Pencil size={17}/>
 </button>
-<button aria-label={'Удалить '+a.name} onClick={()=>setDeleting(a)}>
+<button disabled={moving} aria-label={'Удалить '+a.name} onClick={()=>setDeleting(a)}>
 <Trash2 size={17}/>
 </button>
 </div>
@@ -170,11 +225,11 @@ export default function Admin(){
  <Dialog open={!!draft} onOpenChange={open=>{if(!open&&!busy)setDraft(null);}}>
 <DialogContent className="editor-dialog">
 <DialogTitle>{draft?.id?'Редактировать запись':'Новая запись'}</DialogTitle>
-<DialogDescription>Вставьте ссылку на Instagram или Telegram — начнём с неё.</DialogDescription>{draft?.id&&<button type="button" className="secondary-btn" onClick={()=>importLink(true)} disabled={busy||!draft.url.trim()} aria-label="refresh — обновить данные аккаунта">{busy?<LoaderCircle className="spin" size={16}/>:null} {busy?"Сканирование…":"refresh"}</button>}<div className="import-box">
+<DialogDescription>Вставьте ссылку на Instagram, Telegram или Reddit — начнём с неё.</DialogDescription>{draft?.id&&<button type="button" className="secondary-btn" onClick={()=>importLink(true)} disabled={busy||!draft.url.trim()} aria-label="refresh — обновить данные аккаунта">{busy?<LoaderCircle className="spin" size={16}/>:null} {busy?"Сканирование…":"refresh"}</button>}<div className="import-box">
 <label htmlFor="import-link">
-<Link2 size={15}/> Ссылка на профиль или пост</label>
+<Link2 size={15}/> Ссылка на профиль, сообщество или пост</label>
 <div>
-<input id="import-link" type="text" inputMode="url" value={link} placeholder="ник, t.me/name или instagram.com/name" onChange={e=>{const value=e.target.value;setLink(value);if(!draft?.id)setDraft(prev=>({...prev!,url:completedProfileUrl(value)}));}} onBlur={()=>{const url=completedProfileUrl(link);setLink(url);if(!draft?.id)setDraft(prev=>({...prev!,url}));}} disabled={busy}/>
+<input id="import-link" type="text" inputMode="url" value={link} placeholder="ник, t.me/name, instagram.com/name или reddit.com/r/name" onChange={e=>{const value=e.target.value;setLink(value);if(!draft?.id)setDraft(prev=>({...prev!,url:completedProfileUrl(value)}));}} onBlur={()=>{const url=completedProfileUrl(link);setLink(url);if(!draft?.id)setDraft(prev=>({...prev!,url}));}} disabled={busy}/>
 <button type="button" className="primary-btn" onClick={()=>importLink()} disabled={busy||!link.trim()}>{busy?<LoaderCircle className="spin" size={18}/>:'Заполнить'}</button>
 </div>
 </div>{importNote&&<p className="notice" role="status">{importNote}</p>}{draft&&<form onSubmit={save} className="artist-form">
@@ -209,7 +264,7 @@ export default function Admin(){
 <span>{r}</span>
 </label>)}</div>
 </fieldset>
-<label>Ссылка карточки<input required type="text" inputMode="url" placeholder="t.me/name или instagram.com/name" value={draft.url} onChange={e=>setDraft({...draft,url:e.target.value})} onBlur={e=>setDraft({...draft,url:completedProfileUrl(e.currentTarget.value)})}/>
+<label>Ссылка карточки<input required type="text" inputMode="url" placeholder="t.me/name, instagram.com/name или reddit.com/r/name" value={draft.url} onChange={e=>setDraft({...draft,url:e.target.value})} onBlur={e=>setDraft({...draft,url:completedProfileUrl(e.currentTarget.value)})}/>
 </label>
 <div className="artwork-field">
 <label>Обложка <span className="optional">· ссылка, HTML или локальный файл до 50 МБ</span>

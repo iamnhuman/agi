@@ -1,10 +1,25 @@
-/** Decorative, scroll- and pointer-reactive backdrop. The interactive cards stay in the DOM. */
+export function timelineRunwayFrame(width:number,height:number,timeMs=0){
+ const seconds=Math.max(0,timeMs)/1000;
+ const maxRadius=Math.min(460,Math.max(140,width*.46));
+ return {
+  seconds,breath:Math.sin(seconds*.55),
+  horizon:height*.43+Math.sin(seconds*.42)*2.5,
+  vanishX:width*.5+Math.sin(seconds*.28)*width*.012,
+  gridShift:seconds*9%94,
+  radar:Array.from({length:4},(_,index)=>{
+   const phase=(seconds*.065+index/4)%1;
+   return {radius:38+phase*(maxRadius-38),alpha:Math.sin(phase*Math.PI)*.22};
+  }),
+  depths:Array.from({length:7},(_,index)=>(index/7+seconds*.055)%1),
+ };
+}
+
+/** Clock-driven decorative backdrop; only the date rail follows card scrolling. */
 export function drawTimelineRunway(
  canvas:HTMLCanvasElement,
  scrollLeft:number,
  railPosition?:number,
  dateTicks:Array<{x:number;label:string}>=[],
- pointer:{x:number;y:number}|null=null,
  timeMs=0,
 ){
  const bounds=canvas.getBoundingClientRect();
@@ -18,12 +33,7 @@ export function drawTimelineRunway(
  context.setTransform(ratio,0,0,ratio,0,0);
  context.clearRect(0,0,width,height);
 
- const seconds=timeMs/1000;
- const breath=Math.sin(seconds*.55);
- const pointerOffsetX=pointer?(pointer.x-width*.5)*.035:0;
- const pointerOffsetY=pointer?(pointer.y-height*.43)*.025:0;
- const horizon=height*.43+pointerOffsetY+Math.sin(seconds*.42)*2.5;
- const vanishX=width*.5+pointerOffsetX+Math.sin(seconds*.28)*width*.012;
+ const {seconds,breath,horizon,vanishX,gridShift,radar,depths}=timelineRunwayFrame(width,height,timeMs);
  const ambient=context.createRadialGradient(vanishX,horizon,12,vanishX,horizon,width*.67);
  ambient.addColorStop(0,`rgba(165, 23, 28, ${.16+breath*.025})`);
  ambient.addColorStop(.42,'rgba(75, 14, 19, .07)');
@@ -31,21 +41,12 @@ export function drawTimelineRunway(
  context.fillStyle=ambient;
  context.fillRect(0,0,width,height);
 
- if(pointer){
-  const cursorGlow=context.createRadialGradient(pointer.x,pointer.y,0,pointer.x,pointer.y,Math.min(width,height)*.34);
-  cursorGlow.addColorStop(0,'rgba(232, 47, 52, .10)');
-  cursorGlow.addColorStop(1,'rgba(232, 47, 52, 0)');
-  context.fillStyle=cursorGlow;
-  context.fillRect(0,0,width,height);
- }
-
  context.save();
  context.lineWidth=1;
- for(const [index,radius] of [70,145,235,340].entries()){
-  const pulse=Math.sin(seconds*.55-index*.75);
-  context.strokeStyle=`rgba(221, 39, 46, ${.15+pulse*.035})`;
+ for(const {radius,alpha} of radar){
+  context.strokeStyle=`rgba(221, 39, 46, ${alpha})`;
   context.beginPath();
-  context.ellipse(vanishX,horizon,radius+pulse*3,(radius+pulse*3)*.38,0,Math.PI,2*Math.PI);
+  context.ellipse(vanishX,horizon,radius,radius*.38,0,Math.PI,2*Math.PI);
   context.stroke();
  }
  context.restore();
@@ -65,7 +66,7 @@ export function drawTimelineRunway(
  context.fillStyle=sweep;
  context.fillRect(0,horizon,width,height-horizon);
 
- const spacing=94,shift=(scrollLeft*.42+(pointer?.x||0)*.025+seconds*5)%spacing;
+ const spacing=94,shift=gridShift;
  context.strokeStyle='rgba(234, 56, 62, .23)';
  context.lineWidth=1;
  for(let bottomX=-width;bottomX<width*2;bottomX+=spacing){
@@ -75,16 +76,18 @@ export function drawTimelineRunway(
   context.lineTo(x,height);
   context.stroke();
  }
- for(const depth of [.1,.17,.27,.41,.59,.81,1]){
-  const y=horizon+(height-horizon)*depth*depth+Math.sin(seconds*.48+depth*4)*1.2;
-  context.strokeStyle=`rgba(231, 57, 63, ${.09+depth*.17})`;
+ for(const depth of depths){
+  const y=horizon+(height-horizon)*depth*depth;
+  const fade=Math.min(1,depth*8,(1-depth)*8);
+  context.strokeStyle=`rgba(231, 57, 63, ${(.09+depth*.17)*fade})`;
   context.beginPath();
   context.moveTo(0,y);
   context.lineTo(width,y);
   context.stroke();
  }
 
- const railY=railPosition===undefined?height*.79:Math.max(horizon+24,Math.min(height-24,railPosition));
+ const railBottom=height-(dateTicks.length?60:24);
+ const railY=Math.min(railBottom,railPosition===undefined?height*.79:Math.max(Math.min(horizon+24,railBottom),railPosition));
  const rail=context.createLinearGradient(0,railY,0,railY+18);
  rail.addColorStop(0,`rgba(255, 239, 71, ${.55+breath*.04})`);
  rail.addColorStop(.18,'rgba(210, 27, 34, .64)');
@@ -92,7 +95,8 @@ export function drawTimelineRunway(
  context.fillStyle=rail;
  context.fillRect(0,railY,width,18);
  context.fillStyle='rgba(255, 227, 84, .64)';
- for(let x=-spacing-shift;x<width+spacing;x+=spacing){
+ const railShift=(scrollLeft*.42)%spacing;
+ for(let x=-spacing-railShift;x<width+spacing;x+=spacing){
   context.fillRect(x,railY-3,2,8);
  }
 
@@ -102,11 +106,15 @@ export function drawTimelineRunway(
  context.font='700 10px ui-monospace, SFMono-Regular, Menlo, monospace';
  for(const tick of dateTicks){
   const x=Math.max(38,Math.min(width-38,tick.x));
-  context.strokeStyle='rgba(255, 232, 91, .62)';
+  const anchorX=Math.max(1,Math.min(width-1,tick.x));
+  context.strokeStyle='rgba(255, 232, 91, .78)';
   context.beginPath();
-  context.moveTo(tick.x,railY+17);
-  context.lineTo(tick.x,railY+25);
+  context.moveTo(anchorX,railY);
+  context.lineTo(anchorX,railY+12);
+  context.lineTo(x,railY+25);
   context.stroke();
+  context.fillStyle='#f3e783';
+  context.fillRect(anchorX-1,railY-1,3,3);
   context.fillStyle='rgba(12, 14, 16, .88)';
   context.fillRect(x-34,railY+25,68,19);
   context.strokeStyle='rgba(229, 48, 53, .55)';

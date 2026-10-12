@@ -1,13 +1,6 @@
 import {parseArtistLink} from './links.mjs';
-function decode(s) { return s.replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;|&apos;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&#(\d+);/g,(_,n)=>String.fromCodePoint(Math.min(Number(n),0x10ffff))); }
-function meta(html,key) {
-  for (const tag of html.match(/<meta\b[^>]*>/gi) || []) {
-    const attrs = {};
-    for (const m of tag.matchAll(/([\w:-]+)\s*=\s*(["'])([\s\S]*?)\2/g)) attrs[m[1].toLowerCase()] = decode(m[3]);
-    if (attrs.property === key || attrs.name === key) return attrs.content || '';
-  }
-  return '';
-}
+import {decodeHtml as decode,pageMeta as meta,responseText as responseHtml} from './page-metadata.mjs';
+import {importRedditArtist} from './reddit-import.mjs';
 export function lowResolutionInstagramImage(url) { return /(?:^|[_-])s(?:100|150)x(?:100|150)(?:[_-]|$)/i.test(String(url)); }
 // Only use HD URLs explicitly published for the requested profile.
 export function instagramAvatar(html, username, fallback) {
@@ -45,14 +38,9 @@ export function instagramAvatar(html, username, fallback) {
   }
   return best;
 }
-async function responseHtml(response,limit=4000000){
-  const reader=response.body?.getReader();let html='',bytes=0;const decoder=new TextDecoder();
-  if(!reader)return html;
-  try{while(bytes<limit){const {done,value}=await reader.read();if(done)break;const chunk=value.subarray(0,limit-bytes);bytes+=chunk.byteLength;html+=decoder.decode(chunk,{stream:true});}}finally{await reader.cancel();}
-  return html;
-}
 export async function importArtist(raw, fetcher = fetch) {
   const link = parseArtistLink(raw);
+  if(link.platform==='Reddit')return importRedditArtist(link,fetcher);
   let name = link.name, description = '', image = '', loaded = false;
   try {
     const response = await fetcher(link.fetchUrl, {redirect:'manual', signal:AbortSignal.timeout(7000), headers:{'User-Agent':'Mozilla/5.0 (compatible; ArtAtlas/1.0)'}});

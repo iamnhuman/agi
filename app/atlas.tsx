@@ -4,11 +4,14 @@ import {createPortal} from 'react-dom';
 import {catalogUrl,adminUrl,showLocalAdmin} from '@/client/config';
 import ArtistMap from './artist-map';
 import ArtistCanvasDeck from './artist-canvas-deck';
+import {cardMaterial} from './card-material';
+import DossierInstruments,{trackDossierPointer,resetDossierPointer} from './dossier-instruments';
 import {defaultSections,type Artist,type Section} from '@/lib/types';
 import {matchesArtistSearch} from '@/lib/artist-search';
 import {ArrowUpRight, Search, Grid2X2, List, Network, Layers3, Pencil, Radio, UsersRound, Shuffle, ListOrdered, RotateCcw, Type, Menu, X} from 'lucide-react';
 import SignalRain from './signal-rain';
 import {paintSignalScanlines,signalHash,signalRasterScale} from './signal-screen';
+import {createPixelBubbleRenderer,PIXEL_BUBBLE_DURATION} from './pixel-bubble';
 import {resolveClientIp,type ClientIpStatus} from './client-signal';
 import CommandDeck from '@/client/command-deck';
 
@@ -16,53 +19,6 @@ const cuneiformGlyphs=[
   ...Array.from({length:96},(_,index)=>String.fromCodePoint(0x12000+index)),
   ...Array.from({length:24},(_,index)=>String.fromCodePoint(0x12400+index)),
 ];
-const signalHeadline=Array.from('信号が破損しました');
-function drawPixelBubble(canvas:HTMLCanvasElement,frame=0,reducedMotion=false){
- const context=canvas.getContext('2d');if(!context)return;
- context.clearRect(0,0,canvas.width,canvas.height);
- context.save();context.scale(canvas.width/300,canvas.height/72);
- const outline:[number,number][]=[
-  [11,4],[289,4],[296,11],[296,49],[289,56],[159,56],
-  [150,65],[141,56],[11,56],[4,49],[4,11],
- ];
- const trace=()=>{context.beginPath();outline.forEach(([x,y],index)=>index?context.lineTo(x,y):context.moveTo(x,y));context.closePath();};
- context.save();context.translate(0,2);trace();context.fillStyle='#380c18';context.fill();context.restore();
- trace();context.fillStyle='#0d1219';context.strokeStyle='#c85b6e';context.lineWidth=2;context.lineJoin='miter';context.fill();context.stroke();
- // A tiny recessed signal monitor replaces the flat status stripe.
- context.beginPath();
- [[14,9],[29,9],[31,11],[31,23],[29,25],[14,25],[12,23],[12,11]].forEach(([x,y],index)=>index?context.lineTo(x,y):context.moveTo(x,y));
- context.closePath();context.fillStyle='#18121c';context.strokeStyle='#713a4c';context.lineWidth=1;context.fill();context.stroke();
- context.fillStyle='#b06b7b';context.fillRect(15,9,13,1);
- context.fillStyle='#060b10';context.fillRect(14,11,15,12);
- const levels=[[2,4,5,3,1],[1,3,4,5,2],[2,5,3,4,1],[1,3,5,2,3]][frame%4];
- for(let column=0;column<5;column++)for(let segment=0;segment<5;segment++){
-  const lit=segment<levels[column];
-  context.fillStyle=lit?(segment===levels[column]-1?(reducedMotion?'#fca7b8':'#ffe1e6'):'#f66d88'):'#341b2a';
-  context.fillRect(15+column*3,21-segment*2,2,1);
- }
- context.fillStyle='#442331';context.fillRect(15,24,13,1);
- context.fillStyle='#c46a80';context.fillRect(15+(frame%5)*3,24,1,1);
- context.font='7px "Press Start 2P",monospace';context.textBaseline='top';context.textAlign='left';
- // Independent phases keep the tiny status details alive without moving the headline.
- context.globalAlpha=reducedMotion?[1,.94,.88,.94][frame%4]:[1,.82,.94,.88][frame%4];
- context.fillStyle='#fda4af';context.fillText('SIGNAL // ERROR',38,13);
- context.globalAlpha=1;
- const indicatorPhase=Math.floor(frame/2)%2;
- const indicatorOn=reducedMotion?'#e994a7':'#ff7488';
- const indicatorOff=reducedMotion?'#9b5064':'#71303e';
- context.fillStyle=indicatorPhase===0?indicatorOn:indicatorOff;context.fillRect(274,13,5,5);
- context.fillStyle=indicatorPhase===1?indicatorOn:indicatorOff;context.fillRect(282,13,3,5);
- const fontSize=20;
- const advance=24;
- context.textBaseline='middle';context.textAlign='center';
- context.font=`600 ${fontSize}px "Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif`;
- for(let index=0;index<signalHeadline.length;index++){
-  const x=150+(index-(signalHeadline.length-1)/2)*advance;
-  context.fillStyle='#79283c';context.fillText(signalHeadline[index],x,39);
-  context.fillStyle='#ffe1e6';context.fillText(signalHeadline[index],x,38);
- }
- context.restore();
-}
 const toyotaPixelRuns=(()=>{
  const ellipses=[
   {cx:30,cy:20,rx:28,ry:16,thickness:2.2},
@@ -167,28 +123,6 @@ const signalSkull=Array.from({length:25},(_,y)=>{
  return row.trimEnd();
 }).join('\n');
 function orderHash(value:string,seed:number){let hash=2166136261^seed;for(let i=0;i<value.length;i++)hash=Math.imul(hash^value.charCodeAt(i),16777619);return hash>>>0;}
-function restartDossierFeedback(card:HTMLElement){
- requestAnimationFrame(()=>{
-  if(!card.isConnected||!card.matches(':hover')||typeof card.getAnimations!=='function')return;
-  for(const animation of card.getAnimations({subtree:true})){
-   if(['dossier-signal-boot','dossier-lamp-boot'].includes((animation as CSSAnimation).animationName)){
-    animation.currentTime=0;animation.play();
-   }
-  }
- });
-}
-function dossierFinish(id:string):React.CSSProperties{
- const grain=orderHash(id,0x5e2d3a91);
- const light=orderHash(id,0x1a7c4f63);
- return {
-  '--dossier-sheen-x':`${18+grain%65}%`,
-  '--dossier-light-x':`${16+light%69}%`,
-  '--dossier-light-y':`${12+(light>>>8)%70}%`,
-  '--dossier-metal-angle':`${136+(grain>>>8)%23}deg`,
-  '--dossier-grain-angle':`${80+(grain>>>16)%21}deg`,
-  '--dossier-grain-step':`${5+(light>>>16)%5}px`,
- } as React.CSSProperties;
-}
 function PixelSignalConsole({active,revision,ip}:{active:boolean;revision:string;ip:string}){
  const ref=useRef<HTMLCanvasElement>(null);
  useEffect(()=>{
@@ -382,16 +316,23 @@ export function ToyotaFooter({homeHref}:{homeHref?:string}={}){
  useEffect(()=>{
   if(!signalOpen){setBubbleActive(false);return;}
   setBubbleActive(true);
-  const timer=window.setTimeout(()=>setBubbleActive(false),1200);
+  const timer=window.setTimeout(()=>setBubbleActive(false),PIXEL_BUBBLE_DURATION);
   return()=>window.clearTimeout(timer);
  },[signalOpen]);
  useEffect(()=>{
   const canvas=bubbleCanvasRef.current;if(!canvas||!bubbleActive)return;
-  const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  drawPixelBubble(canvas,0,reducedMotion);
-  let frame=0;
-  const timer=window.setInterval(()=>drawPixelBubble(canvas,++frame,reducedMotion),reducedMotion?240:160);
-  return()=>window.clearInterval(timer);
+  const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
+  const draw=createPixelBubbleRenderer(canvas),started=performance.now();
+  let frame=0,lastPaint=-Infinity;
+  const animate=(now:number)=>{
+   const elapsed=Math.min(PIXEL_BUBBLE_DURATION,now-started);
+   const paintInterval=1000/(reducedMotion.matches?8:30);
+   if(elapsed-lastPaint>=paintInterval){draw(elapsed,reducedMotion.matches);lastPaint=elapsed;}
+   if(elapsed<PIXEL_BUBBLE_DURATION)frame=requestAnimationFrame(animate);
+  };
+  const onMotionChange=()=>{cancelAnimationFrame(frame);lastPaint=-Infinity;animate(performance.now());};
+  animate(started);reducedMotion.addEventListener('change',onMotionChange);
+  return()=>{cancelAnimationFrame(frame);reducedMotion.removeEventListener('change',onMotionChange);};
  },[bubbleActive]);
  useEffect(()=>{
   if(!signalOpen)return;
@@ -478,7 +419,7 @@ export function ToyotaFooter({homeHref}:{homeHref?:string}={}){
   <div className="command-footer-rail command-footer-rail--bottom"><span>КОНЕЦ АРХИВА</span><span>СЕКТОР 01 / ИИЗМ</span></div>
   <div className="manifesto" data-open={signalOpen}>
   <div className="toyota-mark-frame">
-  <div className="manifesto-zalgo" data-play={bubbleActive} aria-hidden="true"><canvas ref={bubbleCanvasRef} className="comic-bubble-canvas" width="300" height="72"/></div>
+  <div className="manifesto-zalgo" data-play={bubbleActive} style={{'--bubble-duration':`${PIXEL_BUBBLE_DURATION}ms`} as React.CSSProperties} aria-hidden="true"><canvas ref={bubbleCanvasRef} className="comic-bubble-canvas" width="300" height="100"/></div>
   {homeHref?<a {...toyotaMarkProps} href={homeHref} aria-label="Toyota: перейти на главную">{toyotaMarkContent}</a>:<button {...toyotaMarkProps} type="button" aria-label="Toyota: показать сигнал" onClick={()=>{if(window.matchMedia('(hover: none)').matches)setSignalOpen(open=>!open);else setSignalOpen(true);}}>{toyotaMarkContent}</button>}
   </div>
  </div></footer>{transmission}</>;
@@ -524,8 +465,8 @@ function ArtistNameFlow({artists}:{artists:Artist[]}){
  function hidePreview(){activeName.current=null;setPreview(null);}
  const previewTags=preview?preview.artist.tags.split(/[,;#]+/).map(tag=>tag.trim()).filter(Boolean):[];
  return <><div className="artist-name-flow" aria-label="Имена в архиве">{artists.map(artist=><span key={artist.id} className="artist-name-item"><a className="artist-name-link" data-rating={artist.rating||'A'} href={artist.url} target="_blank" rel="noopener noreferrer" onMouseEnter={event=>showPreview(artist,event.currentTarget)} onMouseLeave={hidePreview} onFocus={event=>showPreview(artist,event.currentTarget)} onBlur={hidePreview}>{artist.name}</a>{showLocalAdmin&&<a className="artist-name-edit" href={`${adminUrl}/?edit=${encodeURIComponent(artist.id)}`} aria-label={`Редактировать ${artist.name}`} title="Редактировать запись"><Pencil size={15} aria-hidden="true"/></a>}</span>)}</div>
- {preview&&createPortal(<div key={preview.artist.id} className={'artist-name-preview'+(preview.below?' is-below':'')} data-rating={preview.artist.rating||'A'} data-kind={preview.artist.kind||'artist'} style={{left:preview.left,top:preview.top,width:preview.width}} aria-hidden="true"><div className="artist-name-preview-image"><span>{preview.artist.name.slice(0,1)}</span>{preview.artist.image&&<img src={preview.artist.image} alt="" referrerPolicy="no-referrer" onError={event=>{event.currentTarget.style.display='none';}}/>}</div><div className="artist-name-preview-details"><PreviewNameScreen key={preview.artist.id} name={preview.artist.name}/><div className="artist-name-preview-tags"><span className="artist-name-preview-rating">{preview.artist.rating||'A'}</span><span className="artist-name-preview-kind">{preview.artist.kind==='collective'?'Проект':preview.artist.kind==='media'?'Медиа':'Артист'}</span>{previewTags.map((tag,index)=><span key={`${tag}-${index}`}>{tag}</span>)}{(preview.artist.section==='world'||preview.artist.section==='runet')&&<span className="artist-name-preview-region" title={preview.artist.section==='world'?'США':'СССР'}><img src={preview.artist.section==='world'?'./badges/region-en-eagle-cutout.png':'./badges/region-ru-emblem-cutout.png'} alt={preview.artist.section==='world'?'США':'СССР'}/></span>}</div></div>
- <span className="artist-name-preview-status" aria-hidden="true"><span className="dossier-status-signal">{Array.from({length:6},(_,index)=><i key={index} style={{'--lamp-delay':`${index*.08}s`} as React.CSSProperties}/>)}</span><span className="dossier-status-lights"><i/><i/><i/></span></span>
+ {preview&&createPortal(<div key={preview.artist.id} className={'artist-name-preview'+(preview.below?' is-below':'')} data-rating={preview.artist.rating||'A'} data-kind={preview.artist.kind||'artist'} style={{...cardMaterial(preview.artist.id),left:preview.left,top:preview.top,width:preview.width}} aria-hidden="true"><div className="artist-name-preview-image"><span>{preview.artist.name.slice(0,1)}</span>{preview.artist.image&&<img src={preview.artist.image} alt="" referrerPolicy="no-referrer" onError={event=>{event.currentTarget.style.display='none';}}/>}</div><div className="artist-name-preview-details"><PreviewNameScreen key={preview.artist.id} name={preview.artist.name}/><div className="artist-name-preview-tags"><span className="artist-name-preview-rating">{preview.artist.rating||'A'}</span><span className="artist-name-preview-kind">{preview.artist.kind==='collective'?'Проект':preview.artist.kind==='media'?'Медиа':'Артист'}</span>{previewTags.map((tag,index)=><span key={`${tag}-${index}`}>{tag}</span>)}{(preview.artist.section==='world'||preview.artist.section==='runet')&&<span className="artist-name-preview-region" title={preview.artist.section==='world'?'США':'СССР'}><img src={preview.artist.section==='world'?'./badges/region-en-eagle-cutout.png':'./badges/region-ru-emblem-cutout.png'} alt={preview.artist.section==='world'?'США':'СССР'}/></span>}</div></div>
+ <DossierInstruments id={preview.artist.id} preview/>
  </div>,document.body)}
  </>;
 }
@@ -603,7 +544,7 @@ return <>
 <div className="catalog-tag-filter"><span>ТЕГ</span><div className="catalog-type-radios" role="radiogroup" aria-label="Рейтинг тегов">{[['all','Все'],['A','A'],['AA','AA'],['AAA','AAA'],['AAA+','AAA+']].map(([id,label])=><label key={id} className={rating===id?'is-active':''}><input type="radio" name="catalog-rating" value={id} checked={rating===id} onChange={()=>setRating(id)}/><span>{label}</span></label>)}</div></div>
 </div>
  </div></div></div>{view==='names'?<ArtistNameFlow artists={artists}/>:view==='map'?<ArtistMap artists={artists} sections={sections}/>:view==='deck'?<ArtistCanvasDeck artists={artists} zoom={deckZoom} onZoomStep={changeDeckZoom}/>:<div className={view==='list'?'artist-list':'artist-grid'} data-size={view==='grid'?cardSize:listSize}>{artists.map((a,i)=>
-<article className="artist-card" data-rating={a.rating||'A'} data-kind={a.kind||'artist'} data-section={a.section} style={dossierFinish(a.id)} key={a.id} onMouseEnter={view==='grid'?event=>restartDossierFeedback(event.currentTarget):undefined}>
+<article className="artist-card" data-rating={a.rating||'A'} data-kind={a.kind||'artist'} data-section={a.section} style={cardMaterial(a.id)} key={a.id} onPointerMove={view==='grid'?trackDossierPointer:undefined} onPointerLeave={view==='grid'?resetDossierPointer:undefined}>
 <div className={'art art-'+i%8}>
 <span className="art-index">{String(i+1).padStart(3,'0')}</span>
 <div className="missing-avatar" role="img" aria-label="Аватарка отсутствует">
@@ -626,7 +567,7 @@ return <>
 </span>
 {a.kind==='collective'?<span className="list-kind-tag"><UsersRound size={11} aria-hidden="true"/>Проект</span>:a.kind==='media'?<span className="list-kind-tag"><Radio size={11} aria-hidden="true"/>Медиа</span>:null}
 </p>}
-</div>{view==='grid'&&<span className="dossier-status" aria-hidden="true"><span className="dossier-status-signal">{Array.from({length:6},(_,index)=><i key={index} style={{'--lamp-delay':`${index*.08}s`} as React.CSSProperties}/>)}</span><span className="dossier-status-lights"><i/><i/><i/></span></span>}</div>
+</div>{view==='grid'&&<DossierInstruments id={a.id}/>}</div>
 {view==='list'&&<span className="list-source-cue" aria-hidden="true"><ArrowUpRight size={14}/></span>}
 {view!=='deck'&&<a className="card-hit-area" href={a.url} target="_blank" rel="noopener noreferrer" aria-label={"Открыть источник: "+a.name}/>}
 {showLocalAdmin&&view!=='grid'&&<a className="card-edit" aria-label={"Редактировать "+a.name} href={adminUrl+"/?edit="+encodeURIComponent(a.id)+"#catalog"}><Pencil size={15}/></a>}

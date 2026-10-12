@@ -56,6 +56,16 @@ export function createCatalogStore(file) {
         if (!catalog.artists.some(a => a.id === input.id)) throw new Error('Запись уже удалена.');
         catalog.artists = catalog.artists.filter(a => a.id !== input.id);
         response = {ok: true};
+      } else if (input.action === 'move') {
+        const at = catalog.artists.findIndex(a => a.id === input.id);
+        if (at < 0) throw new Error('Запись не найдена.');
+        if (!Number.isInteger(input.position) || input.position < 1 || input.position > catalog.artists.length) {
+          throw new Error(`Укажите целую позицию от 1 до ${catalog.artists.length}.`);
+        }
+        const target = input.reverseNumbering === true ? catalog.artists.length - input.position : input.position - 1;
+        const [artist] = catalog.artists.splice(at, 1);
+        catalog.artists.splice(target, 0, artist);
+        response = {artists: catalog.artists, position: input.position};
       } else if (input.action === 'save') {
         const a = input.artist;
         if (!a || typeof a.url !== 'string') throw new Error('Укажите ссылку.');

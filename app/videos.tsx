@@ -4,6 +4,8 @@ import {Dialog,DialogContent,DialogTitle,DialogDescription} from '@/components/u
 import {AlertDialog,AlertDialogContent,AlertDialogTitle,AlertDialogDescription,AlertDialogFooter,AlertDialogCancel,AlertDialogAction} from '@/components/ui/alert-dialog';
 import {catalogUrl,adminUrl,showLocalAdmin} from '@/client/config';
 import {drawTimelineRunway} from './timeline-runway';
+import {cardMaterial} from './card-material';
+import DossierInstruments,{trackDossierPointer,resetDossierPointer} from './dossier-instruments';
 import {orderVideos,type VideoOrder} from './video-order';
 import type {Video} from '@/lib/types';
 const blank:Video={id:'',name:'',url:'',platform:'',videoId:'',reference:false,isVideo:false,title:'',publishedAt:'',dateSource:'unknown',dateUrl:'',image:'',description:'',alternateUrls:[],sourceOrder:0};
@@ -47,16 +49,15 @@ function VideoName({name,onOpen,fitToWidth=true}:{name:string;onOpen:()=>void;fi
  },[name,fitToWidth]);
  return <button ref={ref} type="button" title={name} onClick={onOpen}>{name}</button>;
 }
-export default function Videos({admin=false}:{admin?:boolean}){
+export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTotalChange?:(total:number)=>void}){
  const [videos,setVideos]=useState<Video[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState(''),[q,setQ]=useState(''),[order,setOrder]=useState<VideoOrder>('desc'),[orientation,setOrientation]=useState<'vertical'|'horizontal'>('horizontal'),[draft,setDraft]=useState<Video|null>(null),[selected,setSelected]=useState<Video|null>(null),[deleting,setDeleting]=useState<Video|null>(null),[busy,setBusy]=useState(false),[formError,setFormError]=useState(''),[importMessage,setImportMessage]=useState('');
  const [sceneZoom,setSceneZoom]=useState(.65);
  const zoomProgress=(sceneZoom-MIN_SCENE_ZOOM)/(MAX_SCENE_ZOOM-MIN_SCENE_ZOOM);
  const timelineViewport=useRef<HTMLDivElement>(null),timelineCanvas=useRef<HTMLCanvasElement>(null);
- const timelinePointer=useRef<{x:number;y:number}|null>(null);
  const drag=useRef<{pointerId:number;startX:number;scrollLeft:number;active:boolean}|null>(null);
  const suppressDragClick=useRef(false);
  const changeSceneZoom=(amount:number)=>setSceneZoom(current=>Math.round(Math.max(MIN_SCENE_ZOOM,Math.min(MAX_SCENE_ZOOM,current+amount))*100)/100);
- async function load(){try{setError('');const r=await fetch(catalogUrl,{cache:'no-store'});if(!r.ok)throw Error('Не удалось загрузить видео.');const items=(await r.json()).videos||[];setVideos(items);if(admin){const editId=new URLSearchParams(location.search).get("edit");if(editId){const item=items.find((v:Video)=>v.id===editId);if(item)edit(item);const url=new URL(location.href);url.searchParams.delete("edit");history.replaceState(null,"",url);}}}catch(e){setError((e as Error).message);}finally{setLoading(false);}}
+ async function load(){try{setError('');const r=await fetch(catalogUrl,{cache:'no-store'});if(!r.ok)throw Error('Не удалось загрузить видео.');const items:Video[]=(await r.json()).videos||[];setVideos(items);onTotalChange?.(items.length);if(admin){const editId=new URLSearchParams(location.search).get("edit");if(editId){const item=items.find((v:Video)=>v.id===editId);if(item)edit(item);const url=new URL(location.href);url.searchParams.delete("edit");history.replaceState(null,"",url);}}}catch(e){setError((e as Error).message);}finally{setLoading(false);}}
  useEffect(()=>{load();},[]);
  async function mutate(body:object){const r=await fetch('/api/catalog',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const d=await r.json();if(!r.ok)throw Error(d.error);return d;}
  const filtered=videos.filter(v=>(v.name+' '+v.title).toLowerCase().includes(q.toLowerCase()));
@@ -71,32 +72,36 @@ export default function Videos({admin=false}:{admin?:boolean}){
   if(orientation!=='horizontal'||loading)return;
   const viewport=timelineViewport.current,canvas=timelineCanvas.current;
   if(!viewport||!canvas)return;
-  const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let frame=0,lastPaint=0,visible=false,dirty=true;
+  const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
+  let frame=0,lastPaint=-Infinity,visible=false,dirty=true;
+  let railY:number|undefined,dateTicks:Array<{x:number;label:string}>=[];
   const paint=(time:number)=>{
-   const cards=viewport.querySelector<HTMLElement>('.timeline-items');
-   const firstCard=cards?.querySelector<HTMLElement>('.video-card');
-   const canvasBounds=canvas.getBoundingClientRect();
-   const cardMargin=firstCard?(parseFloat(getComputedStyle(firstCard).marginBottom)||0)*sceneZoom:0;
-   const railY=cards?cards.getBoundingClientRect().bottom-canvasBounds.top-cardMargin+10:undefined;
-   const dateTicks=[...viewport.querySelectorAll<HTMLElement>('.video-card')].flatMap(card=>{
-    const date=card.querySelector('time')?.dateTime;
-    if(!date)return [];
-    const [year,month,day]=date.split('-');
-    const bounds=card.getBoundingClientRect();
-    if(bounds.width<90)return [];
-    const x=bounds.left+bounds.width/2-canvasBounds.left;
-    return x < -40 || x > canvasBounds.width+40 ? [] : [{x,label:`${day}.${month}.${year.slice(-2)}`}];
-   });
-   drawTimelineRunway(canvas,viewport.scrollLeft,railY,dateTicks,timelinePointer.current,reducedMotion?0:time);
+   // Date geometry changes on scrolling/resizing, not on every animation frame.
+   if(dirty){
+    const cards=viewport.querySelector<HTMLElement>('.timeline-items');
+    const firstCard=cards?.querySelector<HTMLElement>('.video-card');
+    const canvasBounds=canvas.getBoundingClientRect();
+    const cardMargin=firstCard?(parseFloat(getComputedStyle(firstCard).marginBottom)||0)*sceneZoom:0;
+    railY=cards?cards.getBoundingClientRect().bottom-canvasBounds.top-cardMargin+10:undefined;
+    dateTicks=[...viewport.querySelectorAll<HTMLElement>('.video-card')].flatMap(card=>{
+     const date=card.querySelector('time')?.dateTime;
+     if(!date)return [];
+     const [year,month,day]=date.split('-');
+     const bounds=card.getBoundingClientRect();
+     if(bounds.width<90)return [];
+     const x=bounds.left+bounds.width/2-canvasBounds.left;
+     return x < -40 || x > canvasBounds.width+40 ? [] : [{x,label:`${day}.${month}.${year.slice(-2)}`}];
+    });
+   }
+   drawTimelineRunway(canvas,viewport.scrollLeft,railY,dateTicks,reducedMotion.matches?0:time);
    dirty=false;
    lastPaint=time;
   };
   const tick=(time:number)=>{
    frame=0;
    if(!visible||document.visibilityState!=='visible')return;
-   if(dirty||!reducedMotion&&time-lastPaint>=65)paint(time);
-   if(!reducedMotion)frame=requestAnimationFrame(tick);
+   if(dirty||!reducedMotion.matches&&time-lastPaint>=1000/30)paint(time);
+   if(!reducedMotion.matches)frame=requestAnimationFrame(tick);
   };
   const schedulePaint=()=>{
    dirty=true;
@@ -118,13 +123,6 @@ export default function Videos({admin=false}:{admin?:boolean}){
    viewport.scrollLeft=next;
    schedulePaint();
   };
-  const onPointerMove=(event:PointerEvent)=>{
-   if(event.pointerType==='touch')return;
-   const bounds=canvas.getBoundingClientRect();
-   timelinePointer.current={x:event.clientX-bounds.left,y:event.clientY-bounds.top};
-   schedulePaint();
-  };
-  const onPointerLeave=()=>{timelinePointer.current=null;schedulePaint();};
   const observer=new ResizeObserver(schedulePaint);
   const visibilityObserver=new IntersectionObserver(entries=>{
    visible=entries[0]?.isIntersecting??false;
@@ -136,12 +134,11 @@ export default function Videos({admin=false}:{admin?:boolean}){
   viewport.querySelectorAll('.timeline-items').forEach(items=>observer.observe(items));
   viewport.addEventListener('wheel',onWheel,{passive:false});
   viewport.addEventListener('scroll',schedulePaint,{passive:true});
-  viewport.addEventListener('pointermove',onPointerMove,{passive:true});
-  viewport.addEventListener('pointerleave',onPointerLeave,{passive:true});
   document.addEventListener('visibilitychange',schedulePaint);
+  reducedMotion.addEventListener('change',schedulePaint);
   paint(performance.now());
-  return()=>{observer.disconnect();visibilityObserver.disconnect();document.removeEventListener('visibilitychange',schedulePaint);viewport.removeEventListener('wheel',onWheel);viewport.removeEventListener('scroll',schedulePaint);viewport.removeEventListener('pointermove',onPointerMove);viewport.removeEventListener('pointerleave',onPointerLeave);if(frame)cancelAnimationFrame(frame);};
- },[orientation,loading,order,filtered.length,sceneZoom]);
+  return()=>{observer.disconnect();visibilityObserver.disconnect();document.removeEventListener('visibilitychange',schedulePaint);reducedMotion.removeEventListener('change',schedulePaint);viewport.removeEventListener('wheel',onWheel);viewport.removeEventListener('scroll',schedulePaint);if(frame)cancelAnimationFrame(frame);};
+ },[orientation,loading,order,q,videos,filtered.length,sceneZoom]);
  useEffect(()=>{
   if(orientation!=='horizontal'||loading||!timelineViewport.current)return;
   const viewport=timelineViewport.current;
@@ -204,13 +201,14 @@ export default function Videos({admin=false}:{admin?:boolean}){
   const [year,month,day]=v.publishedAt?.split('-')||[];
   const compactDate=year&&month&&day?`${day}.${month}.${year.slice(-2)}`:'БЕЗ ДАТЫ';
   const playable=Boolean(v.videoId||v.isVideo);
-  return <article className="video-card" key={v.id}>
+  return <article className="video-card" style={cardMaterial(v.id)} key={v.id} onPointerMove={trackDossierPointer} onPointerLeave={resetDossierPointer}>
    <div className="video-date"><time dateTime={v.publishedAt||undefined} title={v.publishedAt?new Date(v.publishedAt+'T12:00:00').toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'}):'Дата неизвестна'}><span className="video-date-compact">{compactDate}</span><span className="video-date-full">{v.publishedAt?new Date(v.publishedAt+'T12:00:00').toLocaleDateString('ru-RU',{day:'2-digit',month:'short',...(order!=='dates'?{year:'numeric' as const}:{})}):'—'}</span></time><small>{!v.publishedAt?'Дата неизвестна':v.dateSource==='manual'?'Указана куратором':v.platform==='Telegram'?'Дата поста':'Дата публикации'}</small></div>
    <button className="video-thumb" aria-label={playable?'Открыть видео '+v.name:'Открыть материал '+v.name} onClick={()=>setSelected(v)}><img src={coverSource(v)} alt="" loading="lazy" referrerPolicy="no-referrer" onError={e=>coverError(e,v)}/>{playable&&<span className="video-play"><Play size={18}/></span>}</button>
    <div className="video-copy">
-    <a href={v.url} target="_blank" rel="noreferrer" className="video-platform" aria-label={`Открыть источник: ${v.name} · ${v.platform}`} title={`Открыть в ${v.platform}`}><span className="video-platform-full">{v.platform}{v.reference?' · ссылка на источник':''}</span><span className="video-platform-short" aria-hidden="true">{platformShortNames[v.platform]||v.platform.slice(0,2).toUpperCase()}</span><ArrowUpRight size={12} aria-hidden="true"/></a>
-    <h3><VideoName name={v.name} fitToWidth={orientation!=='horizontal'} onOpen={()=>setSelected(v)}/></h3>
+    <a href={v.url} target="_blank" rel="noreferrer" className="video-platform" aria-label={`Открыть источник: ${v.name} · ${v.platform}`} title={`Открыть в ${v.platform}`}><span className="video-platform-full">{v.platform}</span><span className="video-platform-short" aria-hidden="true">{platformShortNames[v.platform]||v.platform.slice(0,2).toUpperCase()}</span><ArrowUpRight size={12} aria-hidden="true"/></a>
+    <div className="video-name-screen"><h3><VideoName name={v.name} fitToWidth={orientation!=='horizontal'} onOpen={()=>setSelected(v)}/></h3></div>
    </div>
+   <DossierInstruments id={v.id}/>
    {admin?<div className="video-actions"><button aria-label={'Редактировать видео '+v.name} onClick={()=>edit(v)}><Pencil size={17}/></button><button aria-label={'Удалить видео '+v.name} onClick={()=>setDeleting(v)}><Trash2 size={17}/></button></div>:showLocalAdmin&&<a className="card-edit video-card-edit" href={adminUrl+"/?edit="+encodeURIComponent(v.id)+"#videos"} aria-label={"Редактировать видео "+v.name} title="Редактировать материал"><Pencil size={16} aria-hidden="true"/></a>}
   </article>;
  }
@@ -239,7 +237,7 @@ export default function Videos({admin=false}:{admin?:boolean}){
    {order==='dates'&&<nav className="timeline-years" aria-label="Годы таймлайна">{years.map(y=><a key={y} href={'#year-'+y}>{y}</a>)}{undated.length>0&&<a href="#year-unknown">Без даты <small>{undated.length}</small></a>}</nav>}
    <div className="timeline-scene" data-compact-labels={orientation==='horizontal'&&sceneZoom<.6?true:undefined} data-mini-cards={orientation==='horizontal'&&sceneZoom<.5?true:undefined} style={orientation==='horizontal'?{
     '--timeline-zoom':sceneZoom,
-    '--timeline-text-scale':Math.max(1,1/sceneZoom),
+    '--timeline-text-scale':Math.max(1,Math.min(2,1/sceneZoom)),
     '--timeline-card-width':`${160+zoomProgress*30}px`,
     '--timeline-stage-top':`${Math.round(52+zoomProgress*20)}px`,
     '--timeline-stage-bottom':`${Math.round(16+zoomProgress*16)}px`,

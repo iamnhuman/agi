@@ -75,7 +75,7 @@ function CommandSignalPanel(){
  </div>;
 }
 
-export default function CommandDeck({mode,total}:{mode:'catalog'|'videos';total?:number}){
+export default function CommandDeck({mode,total}:{mode:'catalog'|'videos';total:number}){
  const videos=mode==='videos';
  return <header className="command-deck" aria-label="Главное меню архива">
   <div className="command-monitor">
@@ -102,7 +102,7 @@ export default function CommandDeck({mode,total}:{mode:'catalog'|'videos';total?
    </nav>
    <div className="command-console-readout">
     <span className="command-console-readout-label"><span className="command-console-readout-title">{videos?'КАНАЛ / 02':'АРХИВ / 01'}</span><span className="command-console-update"><RotateCw size={12} aria-hidden="true"/>ОБНОВЛЕНИЕ</span></span>
-    <div className="command-console-readout-main"><strong>{total??'LIVE'}</strong><span>{videos?'РАБОТ\nВ АРХИВЕ':'ДОСЬЕ\nВ БАЗЕ'}</span></div>
+    <div className="command-console-readout-main"><strong>{total}</strong><span className="command-console-count-label"><span>{videos?'РАБОТ':'ДОСЬЕ'}</span><span>{videos?'В АРХИВЕ':'В БАЗЕ'}</span></span></div>
     <div className="command-console-readout-meter" aria-hidden="true"/>
     {videos?<small>МУЗЫКА · ВИДЕО · ВИЗУАЛЬНОЕ</small>:<small className="command-console-readout-note"><span>СОБРАНО ЧЕЛОВЕКОМ</span><span className="command-console-readout-divider"> / </span><span>СОЗДАНО С ИИ</span></small>}
    </div>

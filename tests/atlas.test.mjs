@@ -28,7 +28,7 @@ test('import URLs are restricted, normalized and preserve post identifiers',()=>
   for(const url of ['http://localhost:3333','https://instagram.com.evil.test/name','https://name:pass@instagram.com/name','https://t.me/+secret','https://t.me/c/123','https://t.me/s/share','https://www.instagram.com/accounts/login','https://t.me/s/']) assert.throws(()=>parseArtistLink(url));
 });
 
-test('remote covers accept only Instagram and Telegram image CDNs',()=>{
+test('remote covers accept only supported platform image CDNs',()=>{
   assert.equal(remoteAvatarUrl('https://cdn4.telesco.pe/file/photo.jpg').hostname,'cdn4.telesco.pe');
   assert.equal(remoteAvatarUrl('https://scontent.cdninstagram.com/photo.jpg').hostname,'scontent.cdninstagram.com');
   assert.equal(remoteAvatarUrl('https://instagram.fkiv9-2.fna.fbcdn.net/photo.jpg').hostname,'instagram.fkiv9-2.fna.fbcdn.net');

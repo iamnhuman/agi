@@ -4,6 +4,8 @@ import {useEffect,useRef} from 'react';
 import {Pencil,ZoomIn,ZoomOut} from 'lucide-react';
 import {adminUrl,showLocalAdmin} from '@/client/config';
 import type {Artist} from '@/lib/types';
+import {layoutDeckName} from './deck-name-layout';
+import {materialHash} from './card-material';
 
 const vertexSource=`#version 300 es
 precision highp float;
@@ -177,10 +179,15 @@ function cardBitmap(artist:Artist,index:number,type:CardTypography,image?:HTMLIm
  rect(0,0,192,272,'#10130e');
  bevel(2,2,188,268,'#454b3e','#91977d','#1b2116');
  bevel(6,6,180,260,'#363e30','#59654b','#0c100a');
- // Small, discrete metal pixels rather than a translucent screen filter.
+ // Seed the wear from the record so every physical card keeps its own casing.
+ const materialSeed=materialHash(artist.id);
+ const scratchRow=18+materialSeed%219,scratchColumn=9+(materialSeed>>>10)%168;
  for(let y=8;y<264;y+=3)for(let x=8;x<184;x+=3){
-  rect(x,y,1,1,(x*7+y*11)%5<2?'#3e4836':'#2b3426');
+  const grain=Math.imul((x+materialSeed)^Math.imul(y,173),16777619)>>>0;
+  rect(x,y,1,1,grain%7<2?'#48503c':'#2b3426');
  }
+ rect(8,scratchRow,176,1,'#5a624545');
+ rect(scratchColumn,8,1,256,'#7d856138');
  bevel(12,12,168,22,'#7d281e','#bd5944','#381710');
  text(`ДОСЬЕ ${String(index+1).padStart(3,'0')}`,18,28,type.header);
  bevel(156,19,6,6,accentDim,accent,'#242018');
@@ -206,17 +213,12 @@ function cardBitmap(artist:Artist,index:number,type:CardTypography,image?:HTMLIm
   context.drawImage(regionImage,plateX+Math.round((38-w)/2),plateY+Math.round((28-h)/2),w,h);
  }
  bevel(12,labelTop,168,labelHeight,'#202a1b','#11180c','#778563');
- context.font=`${type.name}px "Press Start 2P",monospace`;
- const characters=Array.from(artist.name);let firstLine='';
- while(characters.length&&context.measureText(firstLine+characters[0]).width<=152)firstLine+=characters.shift();
- if(characters.length){
-  const breakAt=firstLine.lastIndexOf(' ');
-  if(breakAt>firstLine.length/2){characters.unshift(...Array.from(firstLine.slice(breakAt+1)));firstLine=firstLine.slice(0,breakAt);}
- }
- let secondLine=characters.join('').trimStart();
- if(context.measureText(secondLine).width>152){while(context.measureText(secondLine+'…').width>152)secondLine=Array.from(secondLine).slice(0,-1).join('');secondLine+='…';}
- const nameBaseline=labelTop+type.name+7;
- text(firstLine,18,nameBaseline,type.name,'#fff0bb');if(secondLine)text(secondLine,18,nameBaseline+lineHeight,type.name,'#fff0bb');
+ const nameLayout=layoutDeckName(artist.name,type.name,152,(value,fontSize)=>{
+  context.font=`${fontSize}px "Press Start 2P",monospace`;
+  return context.measureText(value).width;
+ });
+ const nameBaseline=labelTop+nameLayout.fontSize+7;
+ nameLayout.lines.forEach((line,index)=>text(line,18,nameBaseline+index*(nameLayout.fontSize+3),nameLayout.fontSize,'#fff0bb'));
  text(artist.kind==='collective'?'ПРОЕКТ':artist.kind==='media'?'МЕДИА':'АРТИСТ',18,250,type.meta,'#d6ddbb');
  const ratingWidth=Math.max(42,type.rating*4+8),ratingHeight=type.rating+9;
  bevel(174-ratingWidth,254-ratingHeight,ratingWidth,ratingHeight,'#11190c','#576647','#050b03');

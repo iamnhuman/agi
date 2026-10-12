@@ -4,6 +4,10 @@ import {resolve} from 'node:path';
 
 export const MAX_AVATAR_BYTES=50*1024*1024;
 
+export function isRedditImageHost(hostname){
+  return /(^|\.)(redditmedia\.com|redditstatic\.com)$/.test(hostname)||['i.redd.it','preview.redd.it','external-preview.redd.it'].includes(hostname);
+}
+
 export function validateAvatarBytes(bytes){
   if(bytes.length<100)throw Error('Файл изображения повреждён или пуст.');
   if(bytes.length>MAX_AVATAR_BYTES)throw Error('Размер изображения должен быть не больше 50 МБ.');
@@ -23,7 +27,7 @@ export async function saveAvatarBytes(bytes,type,distDir){
 export function remoteAvatarUrl(raw){
   let url;
   try{url=new URL(String(raw).trim());}catch{throw Error('Вставьте прямую HTTPS-ссылку на изображение.');}
-  if(url.protocol!=='https:'||url.username||url.password||url.port||!/(^|\.)(cdninstagram\.com|fbcdn\.net|telesco\.pe|telegram-cdn\.org)$/.test(url.hostname))throw Error('Поддерживаются прямые ссылки на изображения Instagram и Telegram.');
+  if(url.protocol!=='https:'||url.username||url.password||url.port||!(/(^|\.)(cdninstagram\.com|fbcdn\.net|telesco\.pe|telegram-cdn\.org)$/.test(url.hostname)||isRedditImageHost(url.hostname)))throw Error('Поддерживаются прямые ссылки на изображения Instagram, Telegram и Reddit.');
   return url;
 }
 
