@@ -1,4 +1,4 @@
-import {useEffect,useRef,useState} from 'react';
+import {useEffect,useLayoutEffect,useRef,useState} from 'react';
 import {Plus,ArrowUpRight,ArrowRight,Play,Pencil,Trash2,Search,ZoomIn,ZoomOut,ArrowDownWideNarrow,ArrowUpNarrowWide,GalleryHorizontal,LayoutGrid} from 'lucide-react';
 import {Dialog,DialogContent,DialogTitle,DialogDescription} from '@/components/ui/dialog';
 import {Popover,PopoverTrigger,PopoverContent} from '@/components/ui/popover';
@@ -58,12 +58,26 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
  const positionInputRef=useRef<HTMLInputElement>(null),videoRefs=useRef(new Map<string,HTMLElement>()),skipPositionFocusRestore=useRef(false);
  const editorReturn=useRef<{videoId:string;focus:HTMLElement|null;pageX:number;pageY:number;railX:number;railY:number}|null>(null),skipEditorFocusRestore=useRef(false);
  const zoomProgress=(sceneZoom-MIN_SCENE_ZOOM)/(MAX_SCENE_ZOOM-MIN_SCENE_ZOOM);
- const timelineViewport=useRef<HTMLDivElement>(null),timelineCanvas=useRef<HTMLCanvasElement>(null);
+ const timelineScene=useRef<HTMLDivElement>(null),timelineViewport=useRef<HTMLDivElement>(null),timelineCanvas=useRef<HTMLCanvasElement>(null);
+ const previousSceneZoom=useRef(sceneZoom);
  const drag=useRef<{pointerId:number;startX:number;scrollLeft:number;active:boolean}|null>(null);
  const suppressDragClick=useRef(false);
  const changeSceneZoom=(amount:number)=>setSceneZoom(current=>Math.round(Math.max(MIN_SCENE_ZOOM,Math.min(MAX_SCENE_ZOOM,current+amount))*100)/100);
  async function load(){try{setError('');const r=await fetch(catalogUrl,{cache:'no-store'});if(!r.ok)throw Error('Не удалось загрузить видео.');const data=await r.json(),items:Video[]=data.videos||[];setVideos(items);onTotalChange?.(items.length);if(admin){const editId=new URLSearchParams(location.search).get("edit");if(editId){const item=items.find((v:Video)=>v.id===editId);if(item)edit(item,items);const url=new URL(location.href);url.searchParams.delete("edit");history.replaceState(null,"",url);}}}catch(e){setError((e as Error).message);}finally{setLoading(false);}}
  useEffect(()=>{load();},[]);
+ // Zoom changes the panel height. Keep its centre in view without moving the rail.
+ useLayoutEffect(()=>{
+  const changed=previousSceneZoom.current!==sceneZoom;
+  previousSceneZoom.current=sceneZoom;
+  if(!changed||orientation!=='horizontal')return;
+  const scene=timelineScene.current;
+  if(!scene)return;
+  const center=()=>scene.scrollIntoView({block:'center',inline:'nearest',behavior:'instant'});
+  center();
+  // Name screens finish fitting after layout; account for their final height too.
+  const frame=requestAnimationFrame(center);
+  return()=>cancelAnimationFrame(frame);
+ },[sceneZoom,orientation]);
  async function mutate(body:object){const r=await fetch('/api/catalog',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const d=await r.json();if(!r.ok)throw Error(d.error);return d;}
  const matchesVideo=(v:Video)=>v.name.toLowerCase().includes(q.toLowerCase());
  const filtered=videos.filter(matchesVideo),allOrdered=orderVideos(videos,order);
@@ -278,7 +292,7 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
   {admin&&moveNotice&&<p className="notice" role="status">{moveNotice}</p>}
   {error&&<p role="alert" className="error">{error} <button onClick={load}>Повторить</button></p>}
   {loading?<p className="empty">Загружаем архив творческих работ…</p>:<div className={`timeline-layout timeline-layout--${orientation} timeline-layout--source`}>
-   <div className="timeline-scene" data-compact-labels={orientation==='horizontal'&&sceneZoom<.6?true:undefined} data-mini-cards={orientation==='horizontal'&&sceneZoom<.5?true:undefined} style={orientation==='horizontal'?{
+   <div ref={timelineScene} className="timeline-scene" data-compact-labels={orientation==='horizontal'&&sceneZoom<.6?true:undefined} data-mini-cards={orientation==='horizontal'&&sceneZoom<.5?true:undefined} style={orientation==='horizontal'?{
     '--timeline-zoom':sceneZoom,
     '--timeline-text-scale':Math.max(1,Math.min(2,1/sceneZoom)),
     '--timeline-card-width':`${160+zoomProgress*30}px`,
