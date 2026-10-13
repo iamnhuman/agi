@@ -41,7 +41,7 @@ if (pages) {
   await writeFile('index.html',rootHtml);
   await copyFile(`${output}/favicon.svg`,'favicon.svg');
   // Social crawlers need the same absolute image URL in both Pages layouts.
-  await copyFile(`${output}/social-preview-v3.jpg`,'social-preview-v3.jpg');
+  await copyFile(`${output}/social-preview-v4.jpg`,'social-preview-v4.jpg');
   const rootCatalog = structuredClone(catalog);
   for(const item of [...rootCatalog.artists || [],...rootCatalog.videos || []]){
     if(typeof item.image==='string'&&item.image.startsWith('./avatars/'))

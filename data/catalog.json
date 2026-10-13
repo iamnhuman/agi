@@ -1,6 +1,17 @@
 {
   "artists": [
     {
+      "id": "36c20655-f1ed-42bb-b6c3-07be0399a09b",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "m8kss",
+      "url": "https://www.instagram.com/m8kss",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./avatars/upload-4fddde2f5284ea1f.jpg",
+      "tags": ""
+    },
+    {
       "id": "0667efb5-7e63-411a-8ab9-3d6fe173d04f",
       "kind": "artist",
       "rating": "AAA",
