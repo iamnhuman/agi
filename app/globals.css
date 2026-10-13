@@ -1067,15 +1067,20 @@ footer .manifesto{
 /* The video runway is canvas-backed, while cards remain accessible HTML. */
 .timeline-scene{min-width:0}
 .timeline-layout--horizontal .timeline-scene{
-  position:relative;isolation:isolate;border-radius:8px;
+  position:relative;isolation:isolate;overflow:hidden;border:1px solid #454b50;border-radius:8px;
   background:radial-gradient(ellipse at 50% 44%,#252a2e 0%,#111316 58%,#08090b 100%);
+  box-shadow:inset 0 1px #ffffff18,inset 0 -50px 85px #0008,0 18px 40px #0008;
 }
 .timeline-layout--horizontal .timeline-runway{
   position:absolute;z-index:0;inset:0;display:block;width:100%;height:100%;
   pointer-events:none;
 }
+.timeline-layout--horizontal .timeline-scene-controls{
+  position:relative;z-index:3;display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:12px;
+  padding:16px 18px 0;
+}
 .timeline-layout--horizontal .timeline-zoom-controls{
-  position:absolute;z-index:3;top:16px;right:18px;display:flex;align-items:center;gap:8px;
+  position:relative;display:flex;align-items:center;gap:8px;
   padding:6px 7px;border:1px solid #777c7e;border-top-color:#c2c5c4;border-bottom-color:#34383b;border-radius:5px;
   background:linear-gradient(180deg,#33373a,#101214);box-shadow:inset 0 1px #ffffff33,0 5px 12px #000b;
 }
@@ -1089,8 +1094,62 @@ footer .manifesto{
 .timeline-layout--horizontal .timeline-zoom-controls button:disabled{opacity:.35;cursor:default}
 .timeline-layout--horizontal .timeline-zoom-controls input[type="range"]{width:85px;height:5px;margin:0;accent-color:#e62f33;cursor:pointer}
 .timeline-layout--horizontal .timeline-zoom-controls output{min-width:40px;text-align:center;color:#ffe963;font:700 11px ui-monospace,SFMono-Regular,Menlo,monospace}
+.timeline-navigation{
+  display:grid;grid-template-columns:auto 28px minmax(68px,1fr) 28px 34px;align-items:center;gap:7px;
+  width:clamp(265px,24vw,330px);max-width:100%;min-height:48px;padding:6px 8px;
+  border:2px solid #4e625a;border-top-color:#a9b5a4;border-left-color:#879785;border-radius:2px;
+  background:linear-gradient(140deg,#2c3838,#101d1e 52%,#081113);
+  box-shadow:inset 0 0 0 1px #030a0d,inset 0 3px #c42b23,0 4px 9px #0009;
+}
+.timeline-navigation label{color:#bec9b0;font-size:8px;letter-spacing:0}
+.timeline-navigation button{
+  display:grid;place-items:center;width:28px;height:30px;padding:0;
+  border:1px solid #7f9185;border-top-color:#b6c0a4;border-right-color:#283835;border-bottom-color:#263330;border-radius:1px;
+  background:linear-gradient(180deg,#35443b,#101b19);color:#ffdf79;box-shadow:inset 0 0 0 1px #030809;
+}
+.timeline-navigation button:hover:not(:disabled){background:#35483a;border-color:#d8c17c}
+.timeline-navigation button:focus-visible{outline:2px solid #ffdf79;outline-offset:2px}
+.timeline-navigation button:disabled{opacity:.35;cursor:default}
+.timeline-navigation input[type="range"]{
+  appearance:none;-webkit-appearance:none;width:100%;min-width:0;height:30px;margin:0;background:transparent;cursor:ew-resize;touch-action:pan-y;
+}
+.timeline-navigation input[type="range"]::-webkit-slider-runnable-track{
+  height:10px;border:1px solid #020607;border-right-color:#4b625e;border-bottom-color:#60776a;
+  background:repeating-linear-gradient(90deg,#8da17b55 0 1px,transparent 1px 7px),linear-gradient(180deg,#020708,#14251e);
+  box-shadow:inset 0 2px 3px #0009;
+}
+.timeline-navigation input[type="range"]::-webkit-slider-thumb{
+  appearance:none;-webkit-appearance:none;width:var(--timeline-nav-thumb,20px);height:22px;margin-top:-7px;border-radius:1px;
+  border:2px solid #5a4726;border-top-color:#ffed9e;border-left-color:#dac27d;
+  background:repeating-linear-gradient(90deg,transparent 0 3px,#4c38266b 3px 4px) center/12px 10px no-repeat,linear-gradient(180deg,#d9bd6d,#9d793c);
+  box-shadow:0 2px #020607,inset 0 0 0 1px #f0cd7577;
+}
+.timeline-navigation input[type="range"]::-moz-range-track{
+  height:8px;border:1px solid #020607;border-right-color:#4b625e;border-bottom-color:#60776a;
+  background:repeating-linear-gradient(90deg,#8da17b55 0 1px,transparent 1px 7px),linear-gradient(180deg,#020708,#14251e);
+  box-shadow:inset 0 2px 3px #0009;
+}
+.timeline-navigation input[type="range"]::-moz-range-thumb{
+  box-sizing:border-box;width:var(--timeline-nav-thumb,20px);height:22px;border-radius:1px;
+  border:2px solid #5a4726;border-top-color:#ffed9e;border-left-color:#dac27d;
+  background:repeating-linear-gradient(90deg,transparent 0 3px,#4c38266b 3px 4px) center/12px 10px no-repeat,linear-gradient(180deg,#d9bd6d,#9d793c);
+  box-shadow:0 2px #020607,inset 0 0 0 1px #f0cd7577;
+}
+.timeline-navigation input[type="range"]:focus-visible{outline:2px solid #ffdf79;outline-offset:3px}
+.timeline-navigation input[type="range"]:disabled{opacity:.35;cursor:default}
+.timeline-navigation output{color:#ffdf79;text-align:right;font-size:8px;font-variant-numeric:tabular-nums}
+@media(max-width:460px){
+  .timeline-layout--horizontal .timeline-scene-controls{gap:8px;padding:10px 10px 0}
+  .timeline-navigation{width:270px;grid-template-columns:28px minmax(68px,1fr) 28px 34px}
+  .timeline-navigation label{display:none}
+  .timeline-layout--horizontal .timeline-zoom-controls{gap:6px}
+  .timeline-layout--horizontal .timeline-zoom-controls label{font-size:8px;padding:0}
+  .timeline-layout--horizontal .timeline-zoom-controls button{width:30px;height:30px}
+  .timeline-layout--horizontal .timeline-zoom-controls input[type="range"]{width:70px}
+  .timeline-layout--horizontal .timeline-zoom-controls output{min-width:32px;font-size:8px}
+}
 .timeline-layout--horizontal .timeline-content{
-  position:relative;z-index:1;background:transparent;overscroll-behavior-inline:contain;
+  position:relative;z-index:1;border:0;box-shadow:none;background:transparent;overscroll-behavior-inline:contain;
 }
 .timeline-layout--horizontal .timeline-content::before,
 .timeline-layout--horizontal .timeline-content::after{display:none}
@@ -6100,7 +6159,7 @@ footer{width:var(--site-panel-width);margin-inline:auto}
   gap:calc(24px * var(--timeline-zoom,.65));
 }
 .timeline-layout--horizontal .timeline-content{
-  min-height:0;padding-inline:36px;padding-bottom:max(44px,var(--timeline-stage-bottom,42px));
+  min-height:0;padding-top:18px;padding-inline:36px;padding-bottom:max(44px,var(--timeline-stage-bottom,42px));
 }
 .timeline-layout--horizontal .video-card::before{display:none}
 .video-section .video-date{

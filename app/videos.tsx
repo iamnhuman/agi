@@ -10,6 +10,7 @@ import DossierInstruments,{trackDossierPointer,resetDossierPointer} from './doss
 import {orderVideos,type VideoOrder} from './video-order';
 import type {Video} from '@/lib/types';
 import VideoPlayer from './video-player';
+import TimelineNavigator from './timeline-navigator';
 const blank:Video={id:'',name:'',url:'',platform:'',videoId:'',reference:false,isVideo:false,publishedAt:'',dateSource:'unknown',dateUrl:'',image:'',alternateUrls:[],sourceOrder:0};
 const fallbackImage='./video-fallback.svg';
 const platformShortNames:Record<string,string>={Instagram:'IG',YouTube:'YT',Telegram:'TG',VK:'VK'};
@@ -288,7 +289,10 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
     '--timeline-stage-mobile-top':`${Math.round(64+zoomProgress*12)}px`,
    } as React.CSSProperties:undefined}>
    {orientation==='horizontal'&&<canvas ref={timelineCanvas} className="timeline-runway" aria-hidden="true"/>}
-   {orientation==='horizontal'&&<div className="timeline-zoom-controls"><label htmlFor="timeline-zoom">ЗУМ</label><button type="button" aria-label="Уменьшить масштаб" disabled={sceneZoom<=MIN_SCENE_ZOOM} onClick={()=>changeSceneZoom(-.1)}><ZoomOut size={18}/></button><input id="timeline-zoom" type="range" min={MIN_SCENE_ZOOM*100} max={MAX_SCENE_ZOOM*100} step="5" value={Math.round(sceneZoom*100)} onChange={event=>setSceneZoom(Number(event.target.value)/100)} aria-label="Масштаб видеоленты"/><output htmlFor="timeline-zoom" aria-live="polite">{Math.round(sceneZoom*100)}%</output><button type="button" aria-label="Увеличить масштаб" disabled={sceneZoom>=MAX_SCENE_ZOOM} onClick={()=>changeSceneZoom(.1)}><ZoomIn size={18}/></button></div>}
+   {orientation==='horizontal'&&<div className="timeline-scene-controls">
+    <TimelineNavigator viewportRef={timelineViewport}/>
+    <div className="timeline-zoom-controls"><label htmlFor="timeline-zoom">ЗУМ</label><button type="button" aria-label="Уменьшить масштаб" disabled={sceneZoom<=MIN_SCENE_ZOOM} onClick={()=>changeSceneZoom(-.1)}><ZoomOut size={18}/></button><input id="timeline-zoom" type="range" min={MIN_SCENE_ZOOM*100} max={MAX_SCENE_ZOOM*100} step="5" value={Math.round(sceneZoom*100)} onChange={event=>setSceneZoom(Number(event.target.value)/100)} aria-label="Масштаб видеоленты"/><output htmlFor="timeline-zoom" aria-live="polite">{Math.round(sceneZoom*100)}%</output><button type="button" aria-label="Увеличить масштаб" disabled={sceneZoom>=MAX_SCENE_ZOOM} onClick={()=>changeSceneZoom(.1)}><ZoomIn size={18}/></button></div>
+   </div>}
    <div ref={timelineViewport} className="timeline-content" aria-label={orientation==='horizontal'?'Горизонтальная видеолента':undefined} tabIndex={orientation==='horizontal'?0:undefined} onPointerDown={orientation==='horizontal'?startDrag:undefined} onPointerMove={orientation==='horizontal'?moveDrag:undefined} onPointerUp={orientation==='horizontal'?stopDrag:undefined} onPointerCancel={orientation==='horizontal'?stopDrag:undefined} onClickCapture={orientation==='horizontal'?event=>{if(suppressDragClick.current){event.preventDefault();event.stopPropagation();suppressDragClick.current=false;}}:undefined} onDragStart={orientation==='horizontal'?event=>event.preventDefault():undefined} onKeyDown={orientation==='horizontal'?event=>{if(event.key==='+'||event.key==='='){event.preventDefault();changeSceneZoom(.1);}else if(event.key==='-'){event.preventDefault();changeSceneZoom(-.1);}}:undefined}>
     <section className="timeline-year timeline-year--source"><h2>{order==='desc'?'По убыванию':'По возрастанию'}<sup>{ordered.length}</sup></h2><p className="undated-note">{order==='desc'?'Сначала последние позиции архива, затем первые.':'Сначала первые позиции архива, затем последние.'} Дата публикации не влияет на этот порядок.</p><div className="timeline-items">{ordered.map(card)}</div></section>
     {!filtered.length&&<p className="empty">Материалы не найдены. Измените поисковый запрос.</p>}
