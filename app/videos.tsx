@@ -62,6 +62,7 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
  const [draftPosition,setDraftPosition]=useState(''),[initialDraftPosition,setInitialDraftPosition]=useState('');
  const [positionDraft,setPositionDraft]=useState<Video|null>(null),[positionValue,setPositionValue]=useState(''),[positionError,setPositionError]=useState(''),[moving,setMoving]=useState(false),[moveNotice,setMoveNotice]=useState(''),[revealId,setRevealId]=useState<string|null>(null);
  const positionInputRef=useRef<HTMLInputElement>(null),videoRefs=useRef(new Map<string,HTMLElement>()),skipPositionFocusRestore=useRef(false);
+ const editorReturn=useRef<{videoId:string;focus:HTMLElement|null;pageX:number;pageY:number;railX:number;railY:number}|null>(null),skipEditorFocusRestore=useRef(false);
  const zoomProgress=(sceneZoom-MIN_SCENE_ZOOM)/(MAX_SCENE_ZOOM-MIN_SCENE_ZOOM);
  const timelineViewport=useRef<HTMLDivElement>(null),timelineCanvas=useRef<HTMLCanvasElement>(null);
  const drag=useRef<{pointerId:number;startX:number;scrollLeft:number;active:boolean}|null>(null);
@@ -75,9 +76,10 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
  const ordered=allOrdered.filter(matchesVideo),positions=new Map(allOrdered.map((video,index)=>[video.id,index+1]));
  const dated=ordered.filter(v=>v.publishedAt);
  const undated=ordered.filter(v=>!v.publishedAt);
+ // Catalog refreshes must keep the reader's position in the current view.
  useEffect(()=>{
   if(timelineViewport.current){timelineViewport.current.scrollLeft=0;timelineViewport.current.scrollTop=0;}
- },[order,q,orientation,videos]);
+ },[order,q,orientation]);
  useEffect(()=>{
   if(!revealId)return;
   const frame=requestAnimationFrame(()=>{
@@ -208,6 +210,8 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
   drag.current=null;
  }
  function edit(v?:Video,items=videos){
+  editorReturn.current={videoId:v?.id||'',focus:document.activeElement instanceof HTMLElement?document.activeElement:null,pageX:window.scrollX,pageY:window.scrollY,railX:timelineViewport.current?.scrollLeft||0,railY:timelineViewport.current?.scrollTop||0};
+  skipEditorFocusRestore.current=false;
   const position=v?orderVideos(items,order).findIndex(item=>item.id===v.id)+1:order==='desc'?1:items.length+1;
   setDraft(v?{...v}:{...blank});setDraftPosition(String(position));setInitialDraftPosition(String(position));setFormError('');setImportMessage('');
  }
@@ -300,19 +304,30 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
   </div>}
  <Dialog open={!!selected} onOpenChange={open=>{if(!open)setSelected(null);}}><DialogContent className={`editor-dialog video-dialog${instagramEmbed?' video-dialog--instagram':''}`}><DialogTitle>{selected?.name}</DialogTitle><DialogDescription>{selected?.title||selected?.platform}</DialogDescription>{selected?.videoId?<iframe title={selected.name} src={'https://www.youtube-nocookie.com/embed/'+selected.videoId} referrerPolicy="strict-origin-when-cross-origin" allow="encrypted-media; picture-in-picture; fullscreen" allowFullScreen/>:instagramEmbed?<div className="instagram-player"><iframe key={instagramEmbed} title={`Instagram · ${selected?.name}`} src={instagramEmbed} scrolling="no" referrerPolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen/></div>:<p>Встроенный просмотр недоступен. Откройте материал у источника.</p>}{selected?.reference&&<p className="notice">В архиве указан профиль или сайт, а не отдельная публикация.</p>}<a className="primary-btn" href={selected?.url} target="_blank" rel="noreferrer">Открыть источник · {selected?.platform}<ArrowUpRight size={17}/></a>{selected?.alternateUrls.map((url,i)=><a key={url} href={url} target="_blank" rel="noreferrer">Резервный источник {i+1} ↗</a>)}{selected?.description&&<p>{selected.description}</p>}</DialogContent></Dialog>
  <Dialog open={!!draft} onOpenChange={open=>{if(!open&&!busy)setDraft(null);}}>
-  <DialogContent className="editor-dialog video-editor-dialog">
+  <DialogContent className="editor-dialog video-editor-dialog" onCloseAutoFocus={event=>{
+   event.preventDefault();
+   if(skipEditorFocusRestore.current)return;
+   const point=editorReturn.current;if(!point)return;
+   const focus=point.videoId?videoRefs.current.get(point.videoId)?.querySelector<HTMLButtonElement>('.video-actions button'):point.focus;
+   if(focus?.isConnected)focus.focus({preventScroll:true});
+   timelineViewport.current?.scrollTo({left:point.railX,top:point.railY,behavior:'instant'});
+   window.scrollTo({left:point.pageX,top:point.pageY,behavior:'instant'});
+  }}>
    <DialogTitle>{draft?.id?'Редактировать видео':'Добавить видео'}</DialogTitle>
    <DialogDescription>Работа появится в разделе «ИИ в творчестве» после сохранения.</DialogDescription>
    {draft&&<form className="artist-form video-editor-form" onSubmit={async event=>{
     event.preventDefault();
     const value=draftPosition.trim(),position=Number(value),total=videos.length+(draft.id?0:1);
     if(!/^\d+$/.test(value)||!Number.isInteger(position)||position<1||position>total){setFormError(`Укажите целый номер от 1 до ${total}.`);return;}
-    const changedPosition=value!==initialDraftPosition;
+    const changedPosition=position!==Number(initialDraftPosition);
     setBusy(true);setFormError('');
     try{
      const result=await mutate({action:'video-save',video:draft,...(changedPosition?{position,reverseNumbering:order==='desc'}:{})});
-     setDraft(null);await load();
-     if(changedPosition){setMoveNotice(`${result.video.name} — позиция ${position}.`);setRevealId(result.video.id);}
+     await load();
+     skipEditorFocusRestore.current=changedPosition||!draft.id;
+     setDraft(null);
+     if(changedPosition||!draft.id){setRevealId(result.video.id);}
+     if(changedPosition){setMoveNotice(`${result.video.name} — позиция ${position}.`);}
     }catch(error){setFormError((error as Error).message);}finally{setBusy(false);}
    }}>
     <label>Номер в списке<input aria-label="Номер в списке" aria-describedby="video-editor-position-hint" required type="number" inputMode="numeric" min={1} max={videos.length+(draft.id?0:1)} step={1} value={draftPosition} onChange={event=>setDraftPosition(event.target.value)}/></label>
