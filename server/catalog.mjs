@@ -23,8 +23,8 @@ export function validateCatalog(data) {
   if(data.videos!==undefined&&!Array.isArray(data.videos))throw Error('Некорректный список видео.');
   const videoIds=new Set();
   for(const v of data.videos||[]){if(!v||typeof v.id!=='string'||typeof v.name!=='string'||!validVideoDate(v.publishedAt)||videoIds.has(v.id))throw Error('Некорректная запись видео.');if(v.section!==undefined&&!['world','runet'].includes(v.section))throw Error('Неизвестный регион видео.');if(v.media!==undefined&&!localVideoPattern.test(v.media))throw Error('Некорректный видеофайл.');videoLink(v.url);videoIds.add(v.id);}
-  const withoutDescription=({description,...record})=>record;
-  return {...data,artists:data.artists.map(withoutDescription),...(data.videos?{videos:data.videos.map(withoutDescription)}:{})};
+  const withoutUnusedText=({description,title,...record})=>record;
+  return {...data,artists:data.artists.map(withoutUnusedText),...(data.videos?{videos:data.videos.map(withoutUnusedText)}:{})};
 }
 
 export function createCatalogStore(file) {
@@ -46,7 +46,7 @@ export function createCatalogStore(file) {
     const result=queue.then(async()=>{
       const original=JSON.parse(await readFile(file,'utf8'));
       const catalog=validateCatalog(original);
-      if([...original.artists,...(original.videos||[])].some(record=>Object.hasOwn(record,'description')))await persist(catalog);
+      if([...original.artists,...(original.videos||[])].some(record=>Object.hasOwn(record,'description')||Object.hasOwn(record,'title')))await persist(catalog);
       return catalog;
     });
     queue=result.catch(()=>{});
@@ -72,7 +72,7 @@ export function createCatalogStore(file) {
         const media=v.media??(old?.url===link.url?old.media:undefined);
         if(media&&!localVideoPattern.test(media))throw Error('Выберите сохранённый видеофайл.');
         if(section!==undefined&&!['','world','runet'].includes(section))throw Error('Выберите регион: «Рунет» или «Мир».');
-        const video={...old,...link,id:old?.id||randomUUID(),name:String(v.name).trim().slice(0,160),title:String(v.title||'').slice(0,250),publishedAt:v.publishedAt,dateSource:v.publishedAt?(sourceDate?'source':'manual'):'unknown',dateUrl:sourceDate?v.dateUrl:'',image:image.slice(0,4000),isVideo:typeof v.isVideo==='boolean'?v.isVideo:Boolean(link.videoId||/^(?:video|clip)-?\d+_\d+$/.test(new URL(link.url).pathname.split('/').filter(Boolean)[0]||'')||new URL(link.url).pathname.split('/').filter(Boolean)[0]==='reel'),alternateUrls:old?.alternateUrls||[],sourceOrder:old?.sourceOrder??list.length};
+        const video={...old,...link,id:old?.id||randomUUID(),name:String(v.name).trim().slice(0,160),publishedAt:v.publishedAt,dateSource:v.publishedAt?(sourceDate?'source':'manual'):'unknown',dateUrl:sourceDate?v.dateUrl:'',image:image.slice(0,4000),isVideo:typeof v.isVideo==='boolean'?v.isVideo:Boolean(link.videoId||/^(?:video|clip)-?\d+_\d+$/.test(new URL(link.url).pathname.split('/').filter(Boolean)[0]||'')||new URL(link.url).pathname.split('/').filter(Boolean)[0]==='reel'),alternateUrls:old?.alternateUrls||[],sourceOrder:old?.sourceOrder??list.length};
         if(section)video.section=section;else delete video.section;
         if(media)video.media=media;else delete video.media;
         catalog.videos=old?list.map(x=>x.id===old.id?video:x):[...list,video];

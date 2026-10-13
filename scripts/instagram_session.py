@@ -195,7 +195,7 @@ def post(shortcode: str) -> None:
         "shortcode": shortcode,
         "url": image,
         "publishedAt": media.date_utc.date().isoformat(),
-        "title": (media.caption or "").strip()[:250],
+        "name": media.owner_username,
         "isVideo": bool(media.is_video),
         "videoUrl": media.video_url if media.is_video else None,
     }))

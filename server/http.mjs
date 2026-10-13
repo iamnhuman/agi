@@ -77,7 +77,7 @@ export async function startServers({catalogFile,distDir,sitePort=3333,adminPort=
                 imported.publishedAt=imported.publishedAt||post.publishedAt;
                 imported.dateSource=imported.publishedAt?'source':'unknown';
                 imported.dateUrl=imported.publishedAt?imported.fetchUrl:'';
-                imported.title=post.title||imported.title;
+                imported.name=post.name||imported.name;
                 imported.isVideo=post.isVideo;
                 if(post.videoUrl)try{imported.media=await downloadInstagramVideo(post.videoUrl,distDir,fetcher);}
                 catch(error){imported.videoNotice=error.message;}

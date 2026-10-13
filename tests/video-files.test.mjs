@@ -12,7 +12,7 @@ async function fixture(t){
   const dir=await mkdtemp(join(tmpdir(),'atlas-video-'));
   t.after(()=>rm(dir,{recursive:true,force:true}));
   const file=join(dir,'catalog.json'),dist=join(dir,'dist');await mkdir(dist);
-  const video={id:'test-video',name:'Video',url:'https://www.instagram.com/p/ABC123456/',platform:'Instagram',videoId:'',reference:false,isVideo:true,title:'Original title',publishedAt:'2025-02-03',dateSource:'manual',dateUrl:'',image:'',sourceOrder:0,alternateUrls:[]};
+  const video={id:'test-video',name:'Video',url:'https://www.instagram.com/p/ABC123456/',platform:'Instagram',videoId:'',reference:false,isVideo:true,publishedAt:'2025-02-03',dateSource:'manual',dateUrl:'',image:'',sourceOrder:0,alternateUrls:[]};
   await writeFile(file,JSON.stringify({sections:[{id:'world',name:'Мир'}],artists:[],videos:[video]}));
   return {dir,file,dist,video};
 }
@@ -43,7 +43,7 @@ test('attaching a player preserves current card edits and stale editors cannot r
   const media='./videos/clip-0123456789abcdef.mp4';
   await store.mutate({action:'video-save',video:{...video,name:'Curator edit'}});
   const attached=await store.mutate({action:'video-media',id:video.id,url:video.url,media});
-  assert.equal(attached.video.name,'Curator edit');assert.equal(attached.video.title,video.title);
+  assert.equal(attached.video.name,'Curator edit');assert.equal(attached.video.publishedAt,video.publishedAt);
   await store.mutate({action:'video-save',video:{...video,name:'Older editor'}});
   assert.equal((await store.read()).videos[0].media,media);
   await assert.rejects(store.mutate({action:'video-media',id:video.id,url:video.url,media:'https://cdninstagram.com/temporary.mp4'}),/сохранённый видеофайл/);

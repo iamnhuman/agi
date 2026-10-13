@@ -10,7 +10,7 @@ import DossierInstruments,{trackDossierPointer,resetDossierPointer} from './doss
 import {orderVideos,type VideoOrder} from './video-order';
 import type {Video} from '@/lib/types';
 import VideoPlayer from './video-player';
-const blank:Video={id:'',name:'',url:'',platform:'',videoId:'',reference:false,isVideo:false,title:'',publishedAt:'',dateSource:'unknown',dateUrl:'',image:'',alternateUrls:[],sourceOrder:0};
+const blank:Video={id:'',name:'',url:'',platform:'',videoId:'',reference:false,isVideo:false,publishedAt:'',dateSource:'unknown',dateUrl:'',image:'',alternateUrls:[],sourceOrder:0};
 const fallbackImage='./video-fallback.svg';
 const platformShortNames:Record<string,string>={Instagram:'IG',YouTube:'YT',Telegram:'TG',VK:'VK'};
 const MIN_SCENE_ZOOM=.25,MAX_SCENE_ZOOM=1.5;
@@ -64,7 +64,7 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
  async function load(){try{setError('');const r=await fetch(catalogUrl,{cache:'no-store'});if(!r.ok)throw Error('Не удалось загрузить видео.');const data=await r.json(),items:Video[]=data.videos||[];setVideos(items);onTotalChange?.(items.length);if(admin){const editId=new URLSearchParams(location.search).get("edit");if(editId){const item=items.find((v:Video)=>v.id===editId);if(item)edit(item,items);const url=new URL(location.href);url.searchParams.delete("edit");history.replaceState(null,"",url);}}}catch(e){setError((e as Error).message);}finally{setLoading(false);}}
  useEffect(()=>{load();},[]);
  async function mutate(body:object){const r=await fetch('/api/catalog',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const d=await r.json();if(!r.ok)throw Error(d.error);return d;}
- const matchesVideo=(v:Video)=>(v.name+' '+v.title).toLowerCase().includes(q.toLowerCase());
+ const matchesVideo=(v:Video)=>v.name.toLowerCase().includes(q.toLowerCase());
  const filtered=videos.filter(matchesVideo),allOrdered=orderVideos(videos,order);
  const ordered=allOrdered.filter(matchesVideo),positions=new Map(allOrdered.map((video,index)=>[video.id,index+1]));
  const dated=ordered.filter(v=>v.publishedAt);
@@ -214,7 +214,7 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
   try{
    const response=await fetch('/api/video-import',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:draft.url})});
    const result=await response.json();if(!response.ok)throw Error(result.error);
-   setDraft(current=>({...current!,...result,name:current!.name||result.title||'',title:result.title||current!.title,publishedAt:result.publishedAt||current!.publishedAt,dateSource:result.publishedAt?result.dateSource:current!.dateSource,dateUrl:result.publishedAt?result.dateUrl:current!.dateUrl,image:result.image||current!.image}));
+   setDraft(current=>({...current!,...result,name:current!.name||result.name||'',publishedAt:result.publishedAt||current!.publishedAt,dateSource:result.publishedAt?result.dateSource:current!.dateSource,dateUrl:result.publishedAt?result.dateUrl:current!.dateUrl,image:result.image||current!.image}));
    setImportMessage((result.media?'Видео сохранено для просмотра на сайте. ':result.videoNotice?'Не удалось сохранить видео: '+result.videoNotice+' ':'')+(result.imageSavedLocally?'Обложка найдена и сохранена локально. Проверьте данные.':result.image?'Обложка найдена, но сохранить её локально не удалось. '+(result.imageNotice||''):'Источник не отдал изображение. Загрузите свой файл или укажите ссылку на обложку.'));
   }catch(error){setFormError((error as Error).message);}finally{setBusy(false);}
  }
@@ -325,11 +325,10 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
    }}>
     <label>Номер в списке<input aria-label="Номер в списке" aria-describedby="video-editor-position-hint" required type="number" inputMode="numeric" min={1} max={videos.length+(draft.id?0:1)} step={1} value={draftPosition} onChange={event=>setDraftPosition(event.target.value)}/></label>
     <p className="video-editor-position-hint" id="video-editor-position-hint">В порядке «{order==='desc'?'По убыванию':'По возрастанию'}», от 1 до {videos.length+(draft.id?0:1)}. Остальные карточки сдвинутся автоматически.</p>
-    <label>Ссылка на видео или публикацию<input required type="url" value={draft.url} onChange={event=>{setImportMessage('');setDraft({...draft,url:event.target.value,publishedAt:'',dateSource:'unknown',dateUrl:'',videoId:'',isVideo:false,media:'',image:'',title:''});}}/></label>
+    <label>Ссылка на видео или публикацию<input required type="url" value={draft.url} onChange={event=>{setImportMessage('');setDraft({...draft,url:event.target.value,publishedAt:'',dateSource:'unknown',dateUrl:'',videoId:'',isVideo:false,media:'',image:''});}}/></label>
     <button type="button" disabled={busy||!draft.url} className="secondary-btn metadata-import-btn" onClick={importDraft}>{busy?'Загрузка…':'Подгрузить данные и обложку из YouTube, VK, Telegram или Instagram'}</button>
     <label>Автор / название<input required maxLength={160} value={draft.name} onChange={event=>setDraft({...draft,name:event.target.value})}/></label>
     <label>Регион<select aria-label="Регион" value={draft.section||''} onChange={event=>setDraft({...draft,section:event.target.value as Video['section']})}><option value="">Не указан</option><option value="runet">Рунет</option><option value="world">Мир</option></select></label>
-    <label>Название работы<input maxLength={250} value={draft.title} onChange={event=>setDraft({...draft,title:event.target.value})}/></label>
     <label>Дата публикации<input type="date" value={draft.publishedAt} onChange={event=>setDraft({...draft,publishedAt:event.target.value,dateSource:'manual',dateUrl:''})}/></label>
     <div className="video-cover-editor">
      <div className="video-cover-preview"><img src={coverSource(draft)} alt="Текущая обложка видео" referrerPolicy="no-referrer" onError={event=>coverError(event,draft)}/></div>

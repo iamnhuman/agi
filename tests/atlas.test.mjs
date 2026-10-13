@@ -20,14 +20,16 @@ async function fixture(t) {
   return {dir,file};
 }
 
-test('legacy descriptions are removed durably without changing other fields or returning from stale clients',async t=>{
+test('legacy descriptions and work titles are removed without changing other fields or returning from stale clients',async t=>{
   const {file}=await fixture(t);
   const legacy=structuredClone(original);
   legacy.artists[0].description='Old artist description';
   legacy.videos[0].description='Old video description';
+  legacy.artists[0].title='Old artist work title';
+  legacy.videos[0].title='Old video work title';
   await writeFile(file,JSON.stringify(legacy));
   const expected=structuredClone(legacy);
-  for(const record of [...expected.artists,...expected.videos])delete record.description;
+  for(const record of [...expected.artists,...expected.videos]){delete record.description;delete record.title;}
   const store=createCatalogStore(file);
   assert.deepEqual(await store.read(),expected);
   await store.migrate();
@@ -35,12 +37,14 @@ test('legacy descriptions are removed durably without changing other fields or r
   const migrated=await readFile(file,'utf8');
   await store.migrate();
   assert.equal(await readFile(file,'utf8'),migrated);
-  const {artist}=await store.mutate({action:'save',artist:{...expected.artists[0],description:'Stale editor artist text'}});
-  const {video}=await store.mutate({action:'video-save',video:{...expected.videos[0],description:'Stale editor video text'}});
+  const {artist}=await store.mutate({action:'save',artist:{...expected.artists[0],description:'Stale editor artist text',title:'Stale artist title'}});
+  const {video}=await store.mutate({action:'video-save',video:{...expected.videos[0],description:'Stale editor video text',title:'Stale video title'}});
   assert.equal(Object.hasOwn(artist,'description'),false);
   assert.equal(Object.hasOwn(video,'description'),false);
+  assert.equal(Object.hasOwn(artist,'title'),false);
+  assert.equal(Object.hasOwn(video,'title'),false);
   const saved=JSON.parse(await readFile(file,'utf8'));
-  assert.ok([...saved.artists,...saved.videos].every(record=>!Object.hasOwn(record,'description')));
+  assert.ok([...saved.artists,...saved.videos].every(record=>!Object.hasOwn(record,'description')&&!Object.hasOwn(record,'title')));
   assert.deepEqual(await createCatalogStore(file).read(),saved);
 });
 
@@ -161,7 +165,7 @@ test('video dates, comments, persistence and alternate sources',async t=>{
   const post=videoLink('https://t.me/hypernormis/291/313');
   assert.equal(post.fetchUrl,'https://t.me/hypernormis/313?embed=1&mode=tme');
   const telegram=videoMetadata('<time datetime="2025-03-04T12:00:00Z"></time><div class="tgme_widget_message_text js-message_text">Новый клип<br>Скоро премьера</div>',post);
-  assert.equal(telegram.title,'Новый клип\nСкоро премьера');
+  assert.equal(Object.hasOwn(telegram,'title'),false);
   assert.equal(telegram.publishedAt,'2025-03-04');
   const vk=videoLink('https://vk.com/video-12345_67890');
   assert.equal(vk.fetchUrl,'https://vk.com/video-12345_67890');
