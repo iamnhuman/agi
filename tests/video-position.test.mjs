@@ -99,3 +99,32 @@ test('only the curator API can persist a move and the public catalog sees the sa
  assert.deepEqual(published.videos,moved.videos);
  assert.deepEqual(ids(published.videos),['last','middle','unknown','first']);
 });
+
+test('saving video details and a new number is atomic in either display direction',async t=>{
+ const {file,store,catalog}=await fixture(t);
+ const original=catalog.videos.find(v=>v.id==='first');
+ const result=await store.mutate({action:'video-save',video:{...original,name:'Edited video',section:'runet'},position:1,reverseNumbering:true});
+ assert.equal(result.video.name,'Edited video');
+ let saved=await createCatalogStore(file).read();
+ assert.deepEqual(ids(orderVideos(saved.videos,'desc')),['first','last','unknown','middle']);
+ assert.equal(saved.videos.at(-1).section,'runet');
+ assert.equal(saved.videos.at(-1).publishedAt,original.publishedAt);
+ for(const video of catalog.videos.filter(v=>v.id!=='first'))assert.deepEqual(saved.videos.find(v=>v.id===video.id),video);
+ await store.mutate({action:'video-save',video:{...saved.videos.at(-1),title:'Edited work'},position:2});
+ saved=await store.read();assert.deepEqual(ids(saved.videos),['middle','first','unknown','last']);
+ assert.equal(saved.videos[1].title,'Edited work');
+});
+
+test('invalid numbers prevent the entire video edit from being saved',async t=>{
+ const {file,store,catalog}=await fixture(t),before=await readFile(file,'utf8');
+ for(const position of [0,-1,5,1.5,'2',null,NaN,Infinity]){
+  await assert.rejects(store.mutate({action:'video-save',video:{...catalog.videos[0],name:'Must not be saved'},position}),/целую позицию/);
+  assert.equal(await readFile(file,'utf8'),before);
+ }
+});
+
+test('a new video can be assigned its number during creation',async t=>{
+ const {store}=await fixture(t);
+ const result=await store.mutate({action:'video-save',video:{...video('','2020-01-01',9),name:'New video'},position:2,reverseNumbering:true});
+ assert.deepEqual(ids(orderVideos((await store.read()).videos,'desc')),['last',result.video.id,'first','unknown','middle']);
+});

@@ -43,6 +43,8 @@ export function createCatalogStore(file) {
         if(!validVideoDate(v.publishedAt))throw Error('Укажите корректную дату.');
         const link=videoLink(v.url);const list=catalog.videos||[];const old=list.find(x=>x.id===v.id);
         if(v.id&&!old)throw Error('Видео не найдено.');
+        const total=list.length+(old?0:1);
+        if(input.position!==undefined&&(!Number.isInteger(input.position)||input.position<1||input.position>total))throw Error(`Укажите целую позицию от 1 до ${total}.`);
         if(list.some(x=>x.id!==v.id&&(link.videoId?x.videoId===link.videoId:x.url===link.url)))throw Error('Видео уже есть в коллекции.');
         const image=String(v.image||'').trim();if(image&&!image.startsWith('https://')&&!/^\.\/avatars\/upload-[a-f0-9]{16}\.(jpg|png|webp)$/.test(image))throw Error('Превью должно быть HTTPS-ссылкой или загруженным изображением.');
         const sourceDate=v.dateSource==='source'&&v.dateUrl===link.fetchUrl;
@@ -51,6 +53,11 @@ export function createCatalogStore(file) {
         const video={...old,...link,id:old?.id||randomUUID(),name:String(v.name).trim().slice(0,160),title:String(v.title||'').slice(0,250),publishedAt:v.publishedAt,dateSource:v.publishedAt?(sourceDate?'source':'manual'):'unknown',dateUrl:sourceDate?v.dateUrl:'',image:image.slice(0,4000),description:String(v.description||'').slice(0,1500),isVideo:typeof v.isVideo==='boolean'?v.isVideo:Boolean(link.videoId||/^(?:video|clip)-?\d+_\d+$/.test(new URL(link.url).pathname.split('/').filter(Boolean)[0]||'')||new URL(link.url).pathname.split('/').filter(Boolean)[0]==='reel'),alternateUrls:old?.alternateUrls||[],sourceOrder:old?.sourceOrder??list.length};
         if(section)video.section=section;else delete video.section;
         catalog.videos=old?list.map(x=>x.id===old.id?video:x):[...list,video];
+        if(input.position!==undefined){
+          const at=catalog.videos.findIndex(item=>item.id===video.id);
+          const target=input.reverseNumbering===true?catalog.videos.length-input.position:input.position-1;
+          catalog.videos.splice(at,1);catalog.videos.splice(target,0,video);
+        }
         response={video};
       }else if(input.action==='video-delete'){
         if(!(catalog.videos||[]).some(v=>v.id===input.id))throw Error('Видео не найдено.');

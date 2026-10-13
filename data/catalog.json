@@ -1,9 +1,33 @@
 {
   "artists": [
     {
+      "id": "9e39f79c-d140-4941-96ee-70f79715f649",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "ai_kanumut",
+      "url": "https://www.instagram.com/ai_kanumut",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./avatars/upload-0e2b24d1fb64c9e0.jpg",
+      "description": "7,663 Followers, 7,867 Following, 890 Posts - See Instagram photos and videos from Aykan Umut (@ai_kanumut)",
+      "tags": ""
+    },
+    {
+      "id": "72fe9892-5e57-4cd5-9541-fa36f532292f",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "alntrch",
+      "url": "https://www.instagram.com/alntrch",
+      "platform": "Instagram",
+      "section": "runet",
+      "image": "./avatars/upload-0131b52c99e52c6a.jpg",
+      "description": "106 Followers, 208 Following, 34 Posts - See Instagram photos and videos from @alntrch",
+      "tags": ""
+    },
+    {
       "id": "b2c06013-e3e4-4c04-9856-e08c37dba252",
       "kind": "collective",
-      "rating": "AAA",
+      "rating": "AAA+",
       "name": "notitleyet.ai",
       "url": "https://www.instagram.com/notitleyet.ai",
       "platform": "Instagram",
@@ -5034,6 +5058,25 @@
       "isVideo": false
     },
     {
+      "url": "https://t.me/cdrommm/13462",
+      "platform": "Telegram",
+      "videoId": "",
+      "fetchUrl": "https://t.me/cdrommm/13462?embed=1&mode=tme",
+      "reference": false,
+      "id": "63ac0cb9-1ce0-43eb-875f-0ab639d8e3e7",
+      "name": "Boulevard Depo",
+      "title": "",
+      "publishedAt": "2025-12-11",
+      "dateSource": "source",
+      "dateUrl": "https://t.me/cdrommm/13462?embed=1&mode=tme",
+      "image": "./avatars/upload-06854bd5e04448fb.jpg",
+      "description": "",
+      "isVideo": false,
+      "alternateUrls": [],
+      "sourceOrder": 144,
+      "section": "runet"
+    },
+    {
       "id": "video-104",
       "name": "invertor",
       "url": "https://youtu.be/pcCtnHoasqI?si=ZwL8CpsdYRJWPnI8",
@@ -5778,25 +5821,6 @@
       "isVideo": true,
       "alternateUrls": [],
       "sourceOrder": 145
-    },
-    {
-      "url": "https://t.me/cdrommm/13462",
-      "platform": "Telegram",
-      "videoId": "",
-      "fetchUrl": "https://t.me/cdrommm/13462?embed=1&mode=tme",
-      "reference": false,
-      "id": "63ac0cb9-1ce0-43eb-875f-0ab639d8e3e7",
-      "name": "Boulevard Depo",
-      "title": "",
-      "publishedAt": "2025-12-11",
-      "dateSource": "source",
-      "dateUrl": "https://t.me/cdrommm/13462?embed=1&mode=tme",
-      "image": "./avatars/upload-06854bd5e04448fb.jpg",
-      "description": "",
-      "isVideo": false,
-      "alternateUrls": [],
-      "sourceOrder": 144,
-      "section": "runet"
     }
   ]
 }

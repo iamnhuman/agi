@@ -6428,3 +6428,5 @@ footer{width:var(--site-panel-width);margin-inline:auto}
   .video-section .video-card:is(:hover,:focus-within) .video-thumb img{transform:none}
   .video-section .video-thumb::after{display:none}
 }
+
+.video-editor-form .video-editor-position-hint{margin:-6px 0 0;color:#b6c2b4;font-size:9px;line-height:1.8}

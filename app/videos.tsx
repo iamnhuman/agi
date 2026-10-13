@@ -59,6 +59,7 @@ function VideoName({name,onOpen,fitToWidth=true}:{name:string;onOpen:()=>void;fi
 export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTotalChange?:(total:number)=>void}){
  const [videos,setVideos]=useState<Video[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState(''),[q,setQ]=useState(''),[order,setOrder]=useState<VideoOrder>('desc'),[orientation,setOrientation]=useState<'vertical'|'horizontal'>('horizontal'),[draft,setDraft]=useState<Video|null>(null),[selected,setSelected]=useState<Video|null>(null),[deleting,setDeleting]=useState<Video|null>(null),[busy,setBusy]=useState(false),[formError,setFormError]=useState(''),[importMessage,setImportMessage]=useState('');
  const [sceneZoom,setSceneZoom]=useState(.65);
+ const [draftPosition,setDraftPosition]=useState(''),[initialDraftPosition,setInitialDraftPosition]=useState('');
  const [positionDraft,setPositionDraft]=useState<Video|null>(null),[positionValue,setPositionValue]=useState(''),[positionError,setPositionError]=useState(''),[moving,setMoving]=useState(false),[moveNotice,setMoveNotice]=useState(''),[revealId,setRevealId]=useState<string|null>(null);
  const positionInputRef=useRef<HTMLInputElement>(null),videoRefs=useRef(new Map<string,HTMLElement>()),skipPositionFocusRestore=useRef(false);
  const zoomProgress=(sceneZoom-MIN_SCENE_ZOOM)/(MAX_SCENE_ZOOM-MIN_SCENE_ZOOM);
@@ -66,7 +67,7 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
  const drag=useRef<{pointerId:number;startX:number;scrollLeft:number;active:boolean}|null>(null);
  const suppressDragClick=useRef(false);
  const changeSceneZoom=(amount:number)=>setSceneZoom(current=>Math.round(Math.max(MIN_SCENE_ZOOM,Math.min(MAX_SCENE_ZOOM,current+amount))*100)/100);
- async function load(){try{setError('');const r=await fetch(catalogUrl,{cache:'no-store'});if(!r.ok)throw Error('Не удалось загрузить видео.');const data=await r.json(),items:Video[]=data.videos||[];setVideos(items);onTotalChange?.(items.length);if(admin){const editId=new URLSearchParams(location.search).get("edit");if(editId){const item=items.find((v:Video)=>v.id===editId);if(item)edit(item);const url=new URL(location.href);url.searchParams.delete("edit");history.replaceState(null,"",url);}}}catch(e){setError((e as Error).message);}finally{setLoading(false);}}
+ async function load(){try{setError('');const r=await fetch(catalogUrl,{cache:'no-store'});if(!r.ok)throw Error('Не удалось загрузить видео.');const data=await r.json(),items:Video[]=data.videos||[];setVideos(items);onTotalChange?.(items.length);if(admin){const editId=new URLSearchParams(location.search).get("edit");if(editId){const item=items.find((v:Video)=>v.id===editId);if(item)edit(item,items);const url=new URL(location.href);url.searchParams.delete("edit");history.replaceState(null,"",url);}}}catch(e){setError((e as Error).message);}finally{setLoading(false);}}
  useEffect(()=>{load();},[]);
  async function mutate(body:object){const r=await fetch('/api/catalog',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const d=await r.json();if(!r.ok)throw Error(d.error);return d;}
  const matchesVideo=(v:Video)=>(v.name+' '+v.title).toLowerCase().includes(q.toLowerCase());
@@ -206,7 +207,10 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
   }
   drag.current=null;
  }
- function edit(v?:Video){setDraft(v?{...v}:{...blank});setFormError('');setImportMessage('');}
+ function edit(v?:Video,items=videos){
+  const position=v?orderVideos(items,order).findIndex(item=>item.id===v.id)+1:order==='desc'?1:items.length+1;
+  setDraft(v?{...v}:{...blank});setDraftPosition(String(position));setInitialDraftPosition(String(position));setFormError('');setImportMessage('');
+ }
  async function importDraft(){
   if(!draft?.url)return;
   setBusy(true);setFormError('');setImportMessage('');
@@ -300,10 +304,19 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
    <DialogTitle>{draft?.id?'Редактировать видео':'Добавить видео'}</DialogTitle>
    <DialogDescription>Работа появится в разделе «ИИ в творчестве» после сохранения.</DialogDescription>
    {draft&&<form className="artist-form video-editor-form" onSubmit={async event=>{
-    event.preventDefault();setBusy(true);setFormError('');
-    try{await mutate({action:'video-save',video:draft});setDraft(null);await load();}
-    catch(error){setFormError((error as Error).message);}finally{setBusy(false);}
+    event.preventDefault();
+    const value=draftPosition.trim(),position=Number(value),total=videos.length+(draft.id?0:1);
+    if(!/^\d+$/.test(value)||!Number.isInteger(position)||position<1||position>total){setFormError(`Укажите целый номер от 1 до ${total}.`);return;}
+    const changedPosition=value!==initialDraftPosition;
+    setBusy(true);setFormError('');
+    try{
+     const result=await mutate({action:'video-save',video:draft,...(changedPosition?{position,reverseNumbering:order==='desc'}:{})});
+     setDraft(null);await load();
+     if(changedPosition){setMoveNotice(`${result.video.name} — позиция ${position}.`);setRevealId(result.video.id);}
+    }catch(error){setFormError((error as Error).message);}finally{setBusy(false);}
    }}>
+    <label>Номер в списке<input aria-label="Номер в списке" aria-describedby="video-editor-position-hint" required type="number" inputMode="numeric" min={1} max={videos.length+(draft.id?0:1)} step={1} value={draftPosition} onChange={event=>setDraftPosition(event.target.value)}/></label>
+    <p className="video-editor-position-hint" id="video-editor-position-hint">В порядке «{order==='desc'?'По убыванию':'По возрастанию'}», от 1 до {videos.length+(draft.id?0:1)}. Остальные карточки сдвинутся автоматически.</p>
     <label>Ссылка на видео или публикацию<input required type="url" value={draft.url} onChange={event=>{setImportMessage('');setDraft({...draft,url:event.target.value,publishedAt:'',dateSource:'unknown',dateUrl:'',videoId:'',isVideo:false,image:'',title:'',description:''});}}/></label>
     <button type="button" disabled={busy||!draft.url} className="secondary-btn metadata-import-btn" onClick={importDraft}>{busy?'Загрузка…':'Подгрузить данные и обложку из YouTube, VK, Telegram или Instagram'}</button>
     <label>Автор / название<input required maxLength={160} value={draft.name} onChange={event=>setDraft({...draft,name:event.target.value})}/></label>
