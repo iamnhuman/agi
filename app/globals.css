@@ -1861,12 +1861,9 @@ html,body,*{scrollbar-color:auto;scrollbar-width:auto}
 *::-webkit-scrollbar-corner{background:#15191b}
 @supports not selector(::-webkit-scrollbar){html,body,*{scrollbar-width:thin;scrollbar-color:#b22428 #25292b}}
 
-/* The video runway uses the same command-console scrollbar, laid out horizontally. */
-.timeline-layout--horizontal .timeline-content{scrollbar-width:auto;scrollbar-color:auto}
-.timeline-layout--horizontal .timeline-content::-webkit-scrollbar{height:16px}
-.timeline-layout--horizontal .timeline-content::-webkit-scrollbar-track{border:0;border-top:2px solid #616a6e;background:repeating-linear-gradient(90deg,#454a4c 0 5px,#202427 5px 10px);box-shadow:inset 0 2px 5px #000a}
-.timeline-layout--horizontal .timeline-content::-webkit-scrollbar-thumb{border:3px solid #2d3033;border-radius:3px;background:repeating-linear-gradient(135deg,#e1372e 0 3px,#9e1015 3px 6px,#660e11 6px 9px);box-shadow:inset 1px 1px #ff9a7c,0 0 5px #000a}
-@supports not selector(::-webkit-scrollbar){.timeline-layout--horizontal .timeline-content{scrollbar-width:thin;scrollbar-color:#b22428 #25292b}}
+/* One date scale; wheel, drag, touch and keyboard still scroll the native viewport. */
+.timeline-layout--horizontal .timeline-content{scrollbar-width:none;scroll-snap-type:none}
+.timeline-layout--horizontal .timeline-content::-webkit-scrollbar{display:none;width:0;height:0}
 
 /* Pixel-addressed command cursor; text fields keep a native insertion caret. */
 html,body{cursor:url('/cursor-alert.png') 2 2,auto}

@@ -37,8 +37,8 @@ test('radar waves fade away at the cycle boundary instead of jumping brightly',(
 
 test('each date connector starts on the timeline and ends on its own label frame',()=>{
  const width=900,height=500,railY=350;
- const ticks=[{x:450,label:'22.04.25'},{x:12,label:'18.04.25'},{x:888,label:'16.04.25'},{x:-20,label:'15.04.25'},{x:920,label:'15.04.25'}];
- const paths=[];let path=[];
+ const ticks=[{x:450,label:'22.04.25'},{x:125,label:'18.04.25'},{x:780,label:'16.04.25'}];
+ const paths=[],labels=[],rectangles=[];let path=[];
  const gradient={addColorStop(){}};
  const context=new Proxy({}, {
   get(target,key){
@@ -47,24 +47,34 @@ test('each date connector starts on the timeline and ends on its own label frame
    if(key==='beginPath')return ()=>{path=[];};
    if(key==='moveTo'||key==='lineTo')return (x,y)=>path.push([x,y]);
    if(key==='stroke')return ()=>paths.push(path);
+   if(key==='fillText')return (label,x)=>labels.push({label,x});
+   if(key==='fillRect')return (...rectangle)=>rectangles.push(rectangle);
    return ()=>{};
   },
  });
  const canvas={width,height,getBoundingClientRect:()=>({width,height}),getContext:()=>context};
  const previousWindow=globalThis.window;globalThis.window={devicePixelRatio:1};
  try{
-  drawTimelineRunway(canvas,0,railY,ticks,0);
+  drawTimelineRunway(canvas,railY,ticks,0);
   for(const tick of ticks){
-   const center=Math.max(38,Math.min(width-38,tick.x));
-   const anchor=Math.max(1,Math.min(width-1,tick.x));
-   assert.ok(paths.some(points=>JSON.stringify(points)===JSON.stringify([[anchor,railY],[anchor,railY+12],[center,railY+25]])));
+   assert.ok(paths.some(points=>JSON.stringify(points)===JSON.stringify([[tick.x,railY],[tick.x,railY+12],[tick.x,railY+25]])));
   }
   paths.length=0;
-  drawTimelineRunway(canvas,0,height-20,ticks,0);
+  drawTimelineRunway(canvas,height-20,ticks,0);
   for(const tick of ticks){
-   const center=Math.max(38,Math.min(width-38,tick.x));
-   assert.ok(paths.some(points=>points.length===3&&points[2][0]===center&&points[2][1]+19<=height-16),'Date frames must stay above the scrollbar');
+   assert.ok(paths.some(points=>points.length===3&&points[2][0]===tick.x&&points[2][1]+19<=height-16),'Date frames must stay inside the scene');
   }
+  labels.length=0;rectangles.length=0;
+  const crowded=[{x:-20,label:'offscreen left'},{x:12,label:'partial left'},{x:125,label:'first'},{x:145,label:'overlap'},{x:450,label:'second'},{x:888,label:'partial right'},{x:920,label:'offscreen right'}];
+  drawTimelineRunway(canvas,railY,crowded,0);
+  assert.deepEqual(labels,[{label:'first',x:125},{label:'second',x:450}],'Labels must not overlap or clamp to the scene edges');
+  assert.equal(rectangles.filter(rect=>rect[2]===2&&rect[3]===8).length,5,'Each visible date gets one tick without a second decorative scale');
+  rectangles.length=0;
+  drawTimelineRunway(canvas,50,ticks,0);
+  const firstRail=rectangles.find(rect=>rect[2]===width&&rect[3]===18);
+  rectangles.length=0;
+  drawTimelineRunway(canvas,50,ticks,5000);
+  assert.deepEqual(rectangles.find(rect=>rect[2]===width&&rect[3]===18),firstRail,'Background motion must not move the date scale');
  }finally{
   if(previousWindow===undefined)delete globalThis.window;else globalThis.window=previousWindow;
  }

@@ -99,7 +99,7 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
      return x < -40 || x > canvasBounds.width+40 ? [] : [{x,label:`${day}.${month}.${year.slice(-2)}`}];
     });
    }
-   drawTimelineRunway(canvas,viewport.scrollLeft,railY,dateTicks,reducedMotion.matches?0:time);
+   drawTimelineRunway(canvas,railY,dateTicks,reducedMotion.matches?0:time);
    dirty=false;
    lastPaint=time;
   };
