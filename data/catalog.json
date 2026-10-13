@@ -1,6 +1,18 @@
 {
   "artists": [
     {
+      "id": "b2c06013-e3e4-4c04-9856-e08c37dba252",
+      "kind": "collective",
+      "rating": "AAA",
+      "name": "notitleyet.ai",
+      "url": "https://www.instagram.com/notitleyet.ai",
+      "platform": "Instagram",
+      "section": "runet",
+      "image": "./avatars/upload-7555553d27a0d44a.jpg",
+      "description": "3,038 Followers, 110 Following, 32 Posts - See Instagram photos and videos from No title yet (@notitleyet.ai)",
+      "tags": ""
+    },
+    {
       "id": "63630221-deb1-45f1-adb1-f5a8dd67c48c",
       "kind": "artist",
       "rating": "AAA",
@@ -2996,18 +3008,6 @@
       "section": "runet",
       "image": "./avatars/upload-77d874e0e2b31a91.jpg",
       "description": "artist \tdm/inst - ibenedictfuc12",
-      "tags": ""
-    },
-    {
-      "id": "seed-88",
-      "kind": "collective",
-      "rating": "AAA",
-      "name": "No title yet. AI",
-      "url": "https://t.me/notitleyetai",
-      "platform": "Telegram",
-      "section": "runet",
-      "image": "./avatars/upload-6fccc13c23d0ef43.jpg",
-      "description": "Команда ИИ художников 🌎\t\thttps://www.instagram.com/notitleyet.ai/\thttp://notitleyet.ai/",
       "tags": ""
     },
     {
