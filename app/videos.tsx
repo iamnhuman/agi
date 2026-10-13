@@ -1,5 +1,5 @@
 import {useEffect,useLayoutEffect,useRef,useState} from 'react';
-import {Plus,ArrowUpRight,ArrowRight,Play,Pencil,Trash2,Search,ZoomIn,ZoomOut,ArrowDownWideNarrow,ArrowUpNarrowWide,GalleryHorizontal,LayoutGrid} from 'lucide-react';
+import {Plus,ArrowUpRight,Play,Pencil,Trash2,Search,ZoomIn,ZoomOut,ArrowDownWideNarrow,ArrowUpNarrowWide,GalleryHorizontal,LayoutGrid} from 'lucide-react';
 import {Dialog,DialogContent,DialogTitle,DialogDescription} from '@/components/ui/dialog';
 import {Popover,PopoverTrigger,PopoverContent} from '@/components/ui/popover';
 import {AlertDialog,AlertDialogContent,AlertDialogTitle,AlertDialogDescription,AlertDialogFooter,AlertDialogCancel,AlertDialogAction} from '@/components/ui/alert-dialog';
@@ -11,10 +11,12 @@ import {orderVideos,type VideoOrder} from './video-order';
 import type {Video} from '@/lib/types';
 import VideoPlayer from './video-player';
 import TimelineNavigator from './timeline-navigator';
+import TimelineGridFlow from './timeline-grid-flow';
 const blank:Video={id:'',name:'',url:'',platform:'',videoId:'',reference:false,isVideo:false,publishedAt:'',dateSource:'unknown',dateUrl:'',image:'',alternateUrls:[],sourceOrder:0};
 const fallbackImage='./video-fallback.svg';
 const platformShortNames:Record<string,string>={Instagram:'IG',YouTube:'YT',Telegram:'TG',VK:'VK'};
 const MIN_SCENE_ZOOM=.25,MAX_SCENE_ZOOM=1.5;
+const MIN_GRID_ZOOM=.5,MAX_GRID_ZOOM=1.5;
 function coverSource(video:Video){return video.image||video.videoId&&`https://i.ytimg.com/vi/${video.videoId}/hqdefault.jpg`||fallbackImage;}
 function coverError(event:React.SyntheticEvent<HTMLImageElement>,video:Video){
  const image=event.currentTarget,youtube=video.videoId&&`https://i.ytimg.com/vi/${video.videoId}/hqdefault.jpg`;
@@ -53,16 +55,24 @@ function VideoName({name,onOpen,url}:{name:string;onOpen:()=>void;url?:string}){
 export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTotalChange?:(total:number)=>void}){
  const [videos,setVideos]=useState<Video[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState(''),[q,setQ]=useState(''),[order,setOrder]=useState<VideoOrder>('desc'),[orientation,setOrientation]=useState<'vertical'|'horizontal'>('horizontal'),[draft,setDraft]=useState<Video|null>(null),[selected,setSelected]=useState<Video|null>(null),[deleting,setDeleting]=useState<Video|null>(null),[busy,setBusy]=useState(false),[formError,setFormError]=useState(''),[importMessage,setImportMessage]=useState('');
  const [sceneZoom,setSceneZoom]=useState(.65);
+ const [gridZoom,setGridZoom]=useState(1);
  const [draftPosition,setDraftPosition]=useState(''),[initialDraftPosition,setInitialDraftPosition]=useState('');
  const [positionDraft,setPositionDraft]=useState<Video|null>(null),[positionValue,setPositionValue]=useState(''),[positionError,setPositionError]=useState(''),[moving,setMoving]=useState(false),[moveNotice,setMoveNotice]=useState(''),[revealId,setRevealId]=useState<string|null>(null);
  const positionInputRef=useRef<HTMLInputElement>(null),videoRefs=useRef(new Map<string,HTMLElement>()),skipPositionFocusRestore=useRef(false);
  const editorReturn=useRef<{videoId:string;focus:HTMLElement|null;pageX:number;pageY:number;railX:number;railY:number}|null>(null),skipEditorFocusRestore=useRef(false);
  const zoomProgress=(sceneZoom-MIN_SCENE_ZOOM)/(MAX_SCENE_ZOOM-MIN_SCENE_ZOOM);
  const timelineScene=useRef<HTMLDivElement>(null),timelineViewport=useRef<HTMLDivElement>(null),timelineCanvas=useRef<HTMLCanvasElement>(null);
+ const gridFrame=useRef<HTMLDivElement>(null);
+ const gridZoomAnchor=useRef<{id:string;top:number}|null>(null),previousGridZoom=useRef(gridZoom);
  const previousSceneZoom=useRef(sceneZoom);
  const drag=useRef<{pointerId:number;startX:number;scrollLeft:number;active:boolean}|null>(null);
  const suppressDragClick=useRef(false);
  const changeSceneZoom=(amount:number)=>setSceneZoom(current=>Math.round(Math.max(MIN_SCENE_ZOOM,Math.min(MAX_SCENE_ZOOM,current+amount))*100)/100);
+ const changeGridZoom=(amount:number)=>{
+  const visible=[...gridFrame.current?.querySelectorAll<HTMLElement>('.video-card')||[]].find(card=>{const bounds=card.getBoundingClientRect();return bounds.bottom>80&&bounds.top<window.innerHeight;});
+  gridZoomAnchor.current=visible?{id:visible.dataset.videoId||'',top:visible.getBoundingClientRect().top}:null;
+  setGridZoom(current=>Math.round(Math.max(MIN_GRID_ZOOM,Math.min(MAX_GRID_ZOOM,current+amount))*100)/100);
+ };
  async function load(){try{setError('');const r=await fetch(catalogUrl,{cache:'no-store'});if(!r.ok)throw Error('Не удалось загрузить видео.');const data=await r.json(),items:Video[]=data.videos||[];setVideos(items);onTotalChange?.(items.length);if(admin){const editId=new URLSearchParams(location.search).get("edit");if(editId){const item=items.find((v:Video)=>v.id===editId);if(item)edit(item,items);const url=new URL(location.href);url.searchParams.delete("edit");history.replaceState(null,"",url);}}}catch(e){setError((e as Error).message);}finally{setLoading(false);}}
  useEffect(()=>{load();},[]);
  // Zoom changes the panel height. Keep its centre in view without moving the rail.
@@ -78,10 +88,35 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
   const frame=requestAnimationFrame(center);
   return()=>cancelAnimationFrame(frame);
  },[sceneZoom,orientation]);
+ useLayoutEffect(()=>{
+  const changed=previousGridZoom.current!==gridZoom;
+  previousGridZoom.current=gridZoom;
+  const anchor=gridZoomAnchor.current;gridZoomAnchor.current=null;
+  if(!changed||orientation!=='vertical'||!anchor)return;
+  const restore=()=>{
+   const card=videoRefs.current.get(anchor.id);
+   if(card)window.scrollBy({top:card.getBoundingClientRect().top-anchor.top,behavior:'instant'});
+  };
+  restore();
+  const frame=requestAnimationFrame(restore);
+  return()=>cancelAnimationFrame(frame);
+ },[gridZoom,orientation]);
  async function mutate(body:object){const r=await fetch('/api/catalog',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const d=await r.json();if(!r.ok)throw Error(d.error);return d;}
  const matchesVideo=(v:Video)=>v.name.toLowerCase().includes(q.toLowerCase());
  const filtered=videos.filter(matchesVideo),allOrdered=orderVideos(videos,order);
  const ordered=allOrdered.filter(matchesVideo),positions=new Map(allOrdered.map((video,index)=>[video.id,index+1]));
+ useEffect(()=>{
+  if(orientation!=='vertical'||loading)return;
+  const frame=gridFrame.current;
+  if(!frame)return;
+  const wheel=(event:WheelEvent)=>{
+   if(!event.ctrlKey&&!event.metaKey)return;
+   event.preventDefault();
+   changeGridZoom(event.deltaY<0?.1:-.1);
+  };
+  frame.addEventListener('wheel',wheel,{passive:false});
+  return()=>frame.removeEventListener('wheel',wheel);
+ },[orientation,loading]);
  // Catalog refreshes must keep the reader's position in the current view.
  useEffect(()=>{
   if(timelineViewport.current){timelineViewport.current.scrollLeft=0;timelineViewport.current.scrollTop=0;}
@@ -267,7 +302,6 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
     <div className="video-name-screen"><h3><VideoName name={v.name} onOpen={()=>setSelected(v)} url={playable?undefined:v.url}/></h3></div>
    </div>
    <DossierInstruments id={v.id}/>
-   {orientation==='vertical'&&<span className="video-flow-arrow" aria-hidden="true"><ArrowRight size={28}/></span>}
    {admin?<div className="video-actions"><button disabled={moving} aria-label={'Редактировать видео '+v.name} onClick={()=>edit(v)}><Pencil size={17}/></button><button disabled={moving} aria-label={'Удалить видео '+v.name} onClick={()=>setDeleting(v)}><Trash2 size={17}/></button></div>:showLocalAdmin&&<a className="card-edit video-card-edit" href={adminUrl+"/?edit="+encodeURIComponent(v.id)+"#videos"} aria-label={"Редактировать видео "+v.name} title="Редактировать материал"><Pencil size={16} aria-hidden="true"/></a>}
   </article>;
  }
@@ -292,21 +326,28 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
   {admin&&moveNotice&&<p className="notice" role="status">{moveNotice}</p>}
   {error&&<p role="alert" className="error">{error} <button onClick={load}>Повторить</button></p>}
   {loading?<p className="empty">Загружаем архив творческих работ…</p>:<div className={`timeline-layout timeline-layout--${orientation} timeline-layout--source`}>
-   <div ref={timelineScene} className="timeline-scene" data-compact-labels={orientation==='horizontal'&&sceneZoom<.6?true:undefined} data-mini-cards={orientation==='horizontal'&&sceneZoom<.5?true:undefined} style={orientation==='horizontal'?{
+   <div ref={timelineScene} className="timeline-scene" data-compact-labels={orientation==='horizontal'&&sceneZoom<.6?true:undefined} data-mini-cards={orientation==='horizontal'&&sceneZoom<.5?true:undefined} data-grid-compact-labels={orientation==='vertical'&&gridZoom<.8?true:undefined} style={orientation==='horizontal'?{
     '--timeline-zoom':sceneZoom,
     '--timeline-text-scale':Math.max(1,Math.min(2,1/sceneZoom)),
     '--timeline-card-width':`${160+zoomProgress*30}px`,
     '--timeline-stage-top':`${Math.round(52+zoomProgress*20)}px`,
     '--timeline-stage-bottom':`${Math.round(16+zoomProgress*16)}px`,
     '--timeline-stage-mobile-top':`${Math.round(64+zoomProgress*12)}px`,
-   } as React.CSSProperties:undefined}>
+   } as React.CSSProperties:{'--timeline-grid-zoom':gridZoom,'--timeline-grid-label-scale':Math.min(1.5,Math.max(1,1/gridZoom))} as React.CSSProperties}>
    {orientation==='horizontal'&&<canvas ref={timelineCanvas} className="timeline-runway" aria-hidden="true"/>}
    {orientation==='horizontal'&&<div className="timeline-scene-controls">
     <TimelineNavigator viewportRef={timelineViewport}/>
     <div className="timeline-zoom-controls"><label htmlFor="timeline-zoom">ЗУМ</label><button type="button" aria-label="Уменьшить масштаб" disabled={sceneZoom<=MIN_SCENE_ZOOM} onClick={()=>changeSceneZoom(-.1)}><ZoomOut size={18}/></button><input id="timeline-zoom" type="range" min={MIN_SCENE_ZOOM*100} max={MAX_SCENE_ZOOM*100} step="5" value={Math.round(sceneZoom*100)} onChange={event=>setSceneZoom(Number(event.target.value)/100)} aria-label="Масштаб видеоленты"/><output htmlFor="timeline-zoom" aria-live="polite">{Math.round(sceneZoom*100)}%</output><button type="button" aria-label="Увеличить масштаб" disabled={sceneZoom>=MAX_SCENE_ZOOM} onClick={()=>changeSceneZoom(.1)}><ZoomIn size={18}/></button></div>
    </div>}
+   {orientation==='vertical'&&<div className="timeline-grid-controls"><div className="timeline-zoom-controls timeline-grid-zoom-controls">
+    <label htmlFor="timeline-grid-zoom">ЗУМ</label>
+    <button type="button" aria-label="Уменьшить карточки сетки" disabled={gridZoom<=MIN_GRID_ZOOM} onClick={()=>changeGridZoom(-.1)}><ZoomOut size={18}/></button>
+    <input id="timeline-grid-zoom" type="range" min={MIN_GRID_ZOOM*100} max={MAX_GRID_ZOOM*100} step="10" value={Math.round(gridZoom*100)} onChange={event=>changeGridZoom(Number(event.target.value)/100-gridZoom)} aria-label="Масштаб сетки карточек"/>
+    <button className="timeline-grid-zoom-reset" type="button" aria-label="Сбросить масштаб сетки до 100%" title="Вернуть 100%" onClick={()=>changeGridZoom(1-gridZoom)}>{Math.round(gridZoom*100)}%</button>
+    <button type="button" aria-label="Увеличить карточки сетки" disabled={gridZoom>=MAX_GRID_ZOOM} onClick={()=>changeGridZoom(.1)}><ZoomIn size={18}/></button>
+   </div></div>}
    <div ref={timelineViewport} className="timeline-content" aria-label={orientation==='horizontal'?'Горизонтальная видеолента':undefined} tabIndex={orientation==='horizontal'?0:undefined} onPointerDown={orientation==='horizontal'?startDrag:undefined} onPointerMove={orientation==='horizontal'?moveDrag:undefined} onPointerUp={orientation==='horizontal'?stopDrag:undefined} onPointerCancel={orientation==='horizontal'?stopDrag:undefined} onClickCapture={orientation==='horizontal'?event=>{if(suppressDragClick.current){event.preventDefault();event.stopPropagation();suppressDragClick.current=false;}}:undefined} onDragStart={orientation==='horizontal'?event=>event.preventDefault():undefined} onKeyDown={orientation==='horizontal'?event=>{if(event.key==='+'||event.key==='='){event.preventDefault();changeSceneZoom(.1);}else if(event.key==='-'){event.preventDefault();changeSceneZoom(-.1);}}:undefined}>
-    <section className="timeline-year timeline-year--source"><h2>{order==='desc'?'По убыванию':'По возрастанию'}<sup>{ordered.length}</sup></h2><p className="undated-note">{order==='desc'?'Сначала последние позиции архива, затем первые.':'Сначала первые позиции архива, затем последние.'} Дата публикации не влияет на этот порядок.</p><div className="timeline-items">{ordered.map(card)}</div></section>
+    <section className="timeline-year timeline-year--source"><h2>{order==='desc'?'По убыванию':'По возрастанию'}<sup>{ordered.length}</sup></h2><p className="undated-note">{order==='desc'?'Сначала последние позиции архива, затем первые.':'Сначала первые позиции архива, затем последние.'} Дата публикации не влияет на этот порядок.</p>{orientation==='vertical'?<div ref={gridFrame} className="timeline-grid-frame"><div className="timeline-items">{ordered.map(card)}</div><TimelineGridFlow frameRef={gridFrame} layoutKey={`${gridZoom}:${ordered.map(video=>video.id).join(',')}`}/></div>:<div className="timeline-items">{ordered.map(card)}</div>}</section>
     {!filtered.length&&<p className="empty">Материалы не найдены. Измените поисковый запрос.</p>}
    </div>
    </div>
