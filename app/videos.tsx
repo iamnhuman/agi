@@ -68,8 +68,6 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
  const matchesVideo=(v:Video)=>v.name.toLowerCase().includes(q.toLowerCase());
  const filtered=videos.filter(matchesVideo),allOrdered=orderVideos(videos,order);
  const ordered=allOrdered.filter(matchesVideo),positions=new Map(allOrdered.map((video,index)=>[video.id,index+1]));
- const dated=ordered.filter(v=>v.publishedAt);
- const undated=ordered.filter(v=>!v.publishedAt);
  // Catalog refreshes must keep the reader's position in the current view.
  useEffect(()=>{
   if(timelineViewport.current){timelineViewport.current.scrollLeft=0;timelineViewport.current.scrollTop=0;}
@@ -276,7 +274,7 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
     </div></fieldset>
    </div>
   </div>
-  <div className="video-summary">{filtered.length} материалов · {dated.length} с датой · {undated.length} без даты</div>{orientation==='horizontal'&&<p className="timeline-hint">Колесо мыши или перетягивание листает ленту · Ctrl/⌘ + колесо меняет масштаб <span aria-hidden="true">← листайте →</span></p>}
+  <div className="video-summary">{filtered.length} материалов</div>{orientation==='horizontal'&&<p className="timeline-hint">Колесо мыши или перетягивание листает ленту · Ctrl/⌘ + колесо меняет масштаб <span aria-hidden="true">← листайте →</span></p>}
   {admin&&moveNotice&&<p className="notice" role="status">{moveNotice}</p>}
   {error&&<p role="alert" className="error">{error} <button onClick={load}>Повторить</button></p>}
   {loading?<p className="empty">Загружаем архив творческих работ…</p>:<div className={`timeline-layout timeline-layout--${orientation} timeline-layout--source`}>
