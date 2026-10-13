@@ -1,6 +1,17 @@
 {
   "artists": [
     {
+      "id": "8535a878-a71f-4991-a420-641ffa58874a",
+      "kind": "artist",
+      "rating": "AAA",
+      "name": "wildwestkobala",
+      "url": "https://www.instagram.com/wildwestkobala",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./avatars/upload-34334e9c8e236e45.jpg",
+      "tags": ""
+    },
+    {
       "id": "7469f452-ba5f-47f2-b9d9-a54d9d9064b5",
       "kind": "artist",
       "rating": "AA",
