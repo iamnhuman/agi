@@ -1,6 +1,6 @@
 export function timelineRunwayFrame(width:number,height:number,timeMs=0){
  const seconds=Math.max(0,timeMs)/1000;
- const maxRadius=Math.min(460,Math.max(140,width*.46));
+ const maxRadius=Math.max(240,width*.78);
  return {
   seconds,breath:Math.sin(seconds*.55),
   horizon:height*.43+Math.sin(seconds*.42)*2.5,
@@ -10,8 +10,8 @@ export function timelineRunwayFrame(width:number,height:number,timeMs=0){
   tilt:Math.sin(seconds*.14)*.008,
   gridShift:seconds*18%94,
   radar:Array.from({length:4},(_,index)=>{
-   const phase=(seconds*.065+index/4)%1;
-   return {radius:38+phase*(maxRadius-38),alpha:Math.sin(phase*Math.PI)*.22};
+   const phase=(seconds*.12+index/4)%1;
+   return {radius:38+phase*(maxRadius-38),alpha:Math.sin(phase*Math.PI)*.34};
   }),
   depths:Array.from({length:7},(_,index)=>(index/7+seconds*.08)%1),
  };
@@ -49,7 +49,7 @@ export function drawTimelineRunway(
  context.fillRect(-48,-24,width+96,height+48);
 
  context.save();
- context.lineWidth=1;
+ context.lineWidth=1.5;
  for(const {radius,alpha} of radar){
   context.strokeStyle=`rgba(221, 39, 46, ${alpha})`;
   context.beginPath();

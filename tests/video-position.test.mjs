@@ -15,51 +15,52 @@ async function fixture(t){
  await writeFile(file,JSON.stringify(catalog));return {dir,file,catalog,store:createCatalogStore(file)};
 }
 
-test('positions persist across years without changing dates or addition order',async t=>{
+test('edited positions persist in both directions without changing video metadata',async t=>{
  const {file,catalog,store}=await fixture(t);
  const moved=await store.mutate({action:'video-move',id:'last',position:1});
- assert.deepEqual(moved.videoTimelineOrder,['last','first','middle','unknown']);
- assert.deepEqual(moved.videos,catalog.videos);
+ assert.deepEqual(ids(moved.videos),['last','middle','unknown','first']);
  const saved=await createCatalogStore(file).read();
- assert.deepEqual(ids(orderVideos(saved.videos,'dates',saved.videoTimelineOrder)),moved.videoTimelineOrder);
- assert.deepEqual(ids(orderVideos(saved.videos,'asc',saved.videoTimelineOrder)),ids(catalog.videos));
- assert.deepEqual(ids(orderVideos(saved.videos,'desc',saved.videoTimelineOrder)),ids(catalog.videos).reverse());
- const end=await store.mutate({action:'video-move',id:'first',position:4});
- assert.deepEqual(end.videoTimelineOrder,['last','middle','unknown','first']);
+ assert.deepEqual(saved.videos,moved.videos);
+ for(const original of catalog.videos)assert.deepEqual(saved.videos.find(v=>v.id===original.id),original);
+ const descending=await store.mutate({action:'video-move',id:'last',position:1,reverseNumbering:true});
+ assert.deepEqual(ids(orderVideos(descending.videos,'desc')),['last','first','unknown','middle']);
+ const end=await store.mutate({action:'video-move',id:'first',position:4,reverseNumbering:true});
+ assert.deepEqual(ids(orderVideos(end.videos,'desc')),['last','unknown','middle','first']);
+ assert.deepEqual(ids(orderVideos(end.videos,'asc')),['first','middle','unknown','last']);
 });
 
-test('invalid moves leave the file unchanged and a no-op retains automatic chronology',async t=>{
- const {file,store}=await fixture(t);const before=await readFile(file,'utf8');
+test('invalid moves leave the file unchanged and a no-op preserves the collection',async t=>{
+ const {file,store,catalog}=await fixture(t);const before=await readFile(file,'utf8');
  for(const position of [0,-1,5,1.5,'2',null,undefined,NaN,Infinity]){
   await assert.rejects(store.mutate({action:'video-move',id:'first',position}),/целую позицию/);
   assert.equal(await readFile(file,'utf8'),before);
  }
  await assert.rejects(store.mutate({action:'video-move',id:'missing',position:1}),/не найдено/);
  assert.equal(await readFile(file,'utf8'),before);
- await store.mutate({action:'video-move',id:'first',position:1});
- assert.equal((await store.read()).videoTimelineOrder,undefined);
+ await store.mutate({action:'video-move',id:'last',position:1,reverseNumbering:true});
+ assert.deepEqual((await store.read()).videos,catalog.videos);
 });
 
-test('queued moves preserve the latest order, and edits, additions and deletions retain it',async t=>{
+test('queued moves, edits, new additions and deletions retain the collection order',async t=>{
  const {store}=await fixture(t);
  await Promise.all([store.mutate({action:'video-move',id:'last',position:1}),store.mutate({action:'video-move',id:'middle',position:1})]);
- let saved=await store.read();assert.deepEqual(saved.videoTimelineOrder,['middle','last','first','unknown']);
+ let saved=await store.read();assert.deepEqual(ids(saved.videos),['middle','last','unknown','first']);
  const edited={...saved.videos.find(video=>video.id==='middle'),name:'Renamed',publishedAt:'2022-01-01'};
  await store.mutate({action:'video-save',video:edited});
- assert.deepEqual((await store.read()).videoTimelineOrder,saved.videoTimelineOrder);
+ assert.deepEqual(ids((await store.read()).videos),ids(saved.videos));
  const added=await store.mutate({action:'video-save',video:{...video('','2021-01-01',9),name:'New video'}});
- saved=await store.read();assert.equal(saved.videoTimelineOrder[0],added.video.id);
- assert.deepEqual(saved.videoTimelineOrder.filter(id=>id!==added.video.id),['middle','last','first','unknown']);
+ saved=await store.read();assert.equal(orderVideos(saved.videos,'desc')[0].id,added.video.id);
+ assert.deepEqual(ids(saved.videos).filter(id=>id!==added.video.id),['middle','last','unknown','first']);
  await store.mutate({action:'video-delete',id:'last'});
- saved=await store.read();assert.ok(!saved.videoTimelineOrder.includes('last'));
- await store.mutate({action:'video-order-reset'});
- saved=await store.read();assert.equal(saved.videoTimelineOrder,undefined);
- assert.deepEqual(ids(orderVideos(saved.videos,'dates')),[added.video.id,'middle','first','unknown']);
+ saved=await store.read();assert.deepEqual(ids(saved.videos),['middle','unknown','first',added.video.id]);
 });
 
-test('manual order rejects duplicates and references to missing records',()=>{
- const catalog={artists:[],sections:[],videos:[video('one','2024-01-01',0)]};
- for(const order of ['one',['one','one'],['missing'],[1]])assert.throws(()=>validateCatalog({...catalog,videoTimelineOrder:order}),/порядок видео/);
+test('obsolete date-order metadata is removed on the next save',async t=>{
+ const {file,catalog,store}=await fixture(t);
+ await writeFile(file,JSON.stringify({...catalog,videoTimelineOrder:['first','middle','unknown','last']}));
+ await store.mutate({action:'video-move',id:'last',position:1,reverseNumbering:true});
+ assert.equal((await store.read()).videoTimelineOrder,undefined);
+ assert.deepEqual((await store.read()).videos,catalog.videos);
 });
 
 test('region assignment persists through edits and moves and can be changed or cleared',async t=>{
@@ -95,5 +96,6 @@ test('only the curator API can persist a move and the public catalog sees the sa
  assert.equal((await post(app.siteUrl)).status,403);
  const response=await post(app.adminUrl);assert.equal(response.status,200);
  const moved=await response.json(),published=await (await fetch(app.siteUrl+'/api/catalog')).json();
- assert.deepEqual(published.videoTimelineOrder,moved.videoTimelineOrder);
+ assert.deepEqual(published.videos,moved.videos);
+ assert.deepEqual(ids(published.videos),['last','middle','unknown','first']);
 });

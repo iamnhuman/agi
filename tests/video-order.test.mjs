@@ -29,33 +29,13 @@ test('search preserves the relative addition order in both directions',()=>{
  assert.deepEqual(ids(orderVideos(filtered,'asc')),['match-first','match-middle','match-last']);
 });
 
-test('chronology sorts publication dates and keeps ties and unknown dates stable',()=>{
- const catalog=[record('unknown-first',0),record('same-date-first',1,'2025-03-04'),record('earliest',2,'2023-12-31'),record('unknown-second',3),record('same-date-second',4,'2025-03-04'),record('latest',5,'2026-01-01')];
- assert.deepEqual(ids(orderVideos(catalog,'dates')),['earliest','same-date-first','same-date-second','latest','unknown-first','unknown-second']);
-});
-
 test('every order returns a new array without changing the catalog or its records',()=>{
  const catalog=Object.freeze([Object.freeze(record('older',0,'2025-02-01')),Object.freeze(record('newer',1,'2024-01-01'))]);
  const snapshot=structuredClone(catalog);
- for(const mode of ['desc','asc','dates']){
+ for(const mode of ['desc','asc']){
   const ordered=orderVideos(catalog,mode);
   assert.notEqual(ordered,catalog);
   assert.deepEqual(catalog,snapshot);
   assert.ok(ordered.every(video=>catalog.includes(video)));
  }
-});
-
-test('manual chronology preserves dates and leaves addition orders unchanged',()=>{
- const catalog=[record('first',0,'2024-01-01'),record('middle',1,'2025-01-01'),record('last',2,'2026-01-01')];
- const manual=['last','first','middle'],snapshot=structuredClone(catalog);
- assert.deepEqual(ids(orderVideos(catalog,'dates',manual)),manual);
- assert.deepEqual(ids(orderVideos(catalog,'asc',manual)),['first','middle','last']);
- assert.deepEqual(ids(orderVideos(catalog,'desc',manual)),['last','middle','first']);
- assert.deepEqual(catalog,snapshot);
-});
-
-test('new and filtered materials keep the relative manual chronology',()=>{
- const catalog=[record('a',0,'2024-01-01'),record('b',1,'2025-01-01'),record('c',2,'2026-01-01'),record('new',3,'2023-01-01'),record('unknown',4)];
- assert.deepEqual(ids(orderVideos(catalog,'dates',['c','a','b'])),['new','c','a','b','unknown']);
- assert.deepEqual(ids(orderVideos(catalog.filter(video=>['a','c'].includes(video.id)),'dates',['missing','c','a','b','c'])),['c','a']);
 });

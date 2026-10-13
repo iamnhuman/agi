@@ -3,7 +3,6 @@ import {dirname} from 'node:path';
 import {randomUUID} from 'node:crypto';
 import {videoLink,validVideoDate} from './video-import.mjs';
 import {parseArtistLink, linkKey} from './links.mjs';
-import {orderVideos} from '../lib/video-order.mjs';
 
 export function validateCatalog(data) {
   if (!data || !Array.isArray(data.artists) || !Array.isArray(data.sections)) throw new Error('Повреждён файл каталога. Восстановите его из Git или резервной копии.');
@@ -23,10 +22,6 @@ export function validateCatalog(data) {
   if(data.videos!==undefined&&!Array.isArray(data.videos))throw Error('Некорректный список видео.');
   const videoIds=new Set();
   for(const v of data.videos||[]){if(!v||typeof v.id!=='string'||typeof v.name!=='string'||!validVideoDate(v.publishedAt)||videoIds.has(v.id))throw Error('Некорректная запись видео.');if(v.section!==undefined&&!['world','runet'].includes(v.section))throw Error('Неизвестный регион видео.');videoLink(v.url);videoIds.add(v.id);}
-  if(data.videoTimelineOrder!==undefined){
-    const order=data.videoTimelineOrder;
-    if(!Array.isArray(order)||new Set(order).size!==order.length||order.some(id=>typeof id!=='string'||!videoIds.has(id)))throw Error('Некорректный порядок видео.');
-  }
   return data;
 }
 
@@ -40,6 +35,7 @@ export function createCatalogStore(file) {
   function mutate(input) {
     const result = queue.then(async () => {
       const catalog = await read();
+      delete catalog.videoTimelineOrder;
       let response;
       if (!input || typeof input !== 'object') throw new Error('Некорректный запрос.');
       if(input.action==='video-save'){
@@ -55,25 +51,18 @@ export function createCatalogStore(file) {
         const video={...old,...link,id:old?.id||randomUUID(),name:String(v.name).trim().slice(0,160),title:String(v.title||'').slice(0,250),publishedAt:v.publishedAt,dateSource:v.publishedAt?(sourceDate?'source':'manual'):'unknown',dateUrl:sourceDate?v.dateUrl:'',image:image.slice(0,4000),description:String(v.description||'').slice(0,1500),isVideo:typeof v.isVideo==='boolean'?v.isVideo:Boolean(link.videoId||/^(?:video|clip)-?\d+_\d+$/.test(new URL(link.url).pathname.split('/').filter(Boolean)[0]||'')||new URL(link.url).pathname.split('/').filter(Boolean)[0]==='reel'),alternateUrls:old?.alternateUrls||[],sourceOrder:old?.sourceOrder??list.length};
         if(section)video.section=section;else delete video.section;
         catalog.videos=old?list.map(x=>x.id===old.id?video:x):[...list,video];
-        if(!old&&catalog.videoTimelineOrder)catalog.videoTimelineOrder=orderVideos(catalog.videos,'dates',catalog.videoTimelineOrder).map(v=>v.id);
         response={video};
       }else if(input.action==='video-delete'){
         if(!(catalog.videos||[]).some(v=>v.id===input.id))throw Error('Видео не найдено.');
         catalog.videos=catalog.videos.filter(v=>v.id!==input.id);response={ok:true};
-        if(catalog.videoTimelineOrder)catalog.videoTimelineOrder=catalog.videoTimelineOrder.filter(id=>id!==input.id);
       }else if(input.action==='video-move'){
         const videos=catalog.videos||[];
         if(!videos.some(video=>video.id===input.id))throw Error('Видео не найдено.');
         if(!Number.isInteger(input.position)||input.position<1||input.position>videos.length)throw Error(`Укажите целую позицию от 1 до ${videos.length}.`);
-        const ordered=orderVideos(videos,'dates',catalog.videoTimelineOrder),at=ordered.findIndex(video=>video.id===input.id);
-        if(at!==input.position-1){
-          const [video]=ordered.splice(at,1);ordered.splice(input.position-1,0,video);
-          catalog.videoTimelineOrder=ordered.map(video=>video.id);
-        }
-        response={videos,videoTimelineOrder:catalog.videoTimelineOrder||[],position:input.position};
-      }else if(input.action==='video-order-reset'){
-        delete catalog.videoTimelineOrder;
-        response={videos:catalog.videos||[],videoTimelineOrder:[]};
+        const target=input.reverseNumbering===true?videos.length-input.position:input.position-1;
+        const at=videos.findIndex(video=>video.id===input.id);
+        const [video]=videos.splice(at,1);videos.splice(target,0,video);
+        response={videos,position:input.position};
       }else if (input.action === 'section') {
         throw new Error('География фиксирована: доступны только «Мир» и «Рунет».');
       } else if (input.action === 'delete') {

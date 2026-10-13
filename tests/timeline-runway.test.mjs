@@ -15,7 +15,7 @@ test('radar and the perspective grid advance from time alone',()=>{
  assert.notEqual(first.panX,next.panX);
  assert.notEqual(first.panY,next.panY);
  assert.notEqual(first.tilt,next.tilt);
- assert.ok(next.radar[0].radius>first.radar[0].radius);
+ assert.ok(next.radar[0].radius-first.radar[0].radius>200,'Arcs should visibly advance without interaction within two seconds');
 });
 
 test('the same clock produces the same backdrop without cursor state',()=>{
@@ -30,12 +30,12 @@ test('waves and grid cycles remain bounded on mobile and desktop',()=>{
   assert.ok(Math.abs(frame.panX)<=Math.min(30,width*.02));
   assert.ok(Math.abs(frame.panY)<=4&&Math.abs(frame.tilt)<=.008);
   assert.ok(frame.depths.every(depth=>depth>=0&&depth<1));
-  assert.ok(frame.radar.every(wave=>wave.radius>=38&&wave.radius<=460&&wave.alpha>=0&&wave.alpha<=.22));
+  assert.ok(frame.radar.every(wave=>wave.radius>=38&&wave.radius<=Math.max(240,width*.78)&&wave.alpha>=0&&wave.alpha<=.34));
  }
 });
 
 test('radar waves fade away at the cycle boundary instead of jumping brightly',()=>{
- const duration=1000/.065;
+ const duration=1000/.12;
  assert.ok(timelineRunwayFrame(1440,600,duration-1).radar[0].alpha<.001);
  assert.ok(timelineRunwayFrame(1440,600,duration+1).radar[0].alpha<.001);
 });
