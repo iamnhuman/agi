@@ -1,6 +1,17 @@
 {
   "artists": [
     {
+      "id": "7469f452-ba5f-47f2-b9d9-a54d9d9064b5",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "buzzy_agent",
+      "url": "https://www.instagram.com/buzzy_agent",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-1738b5f2ce0f9b36.jpg",
+      "tags": ""
+    },
+    {
       "id": "36c20655-f1ed-42bb-b6c3-07be0399a09b",
       "kind": "artist",
       "rating": "AA",
