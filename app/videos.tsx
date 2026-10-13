@@ -240,7 +240,7 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
  function card(v:Video){
   const [year,month,day]=v.publishedAt?.split('-')||[];
   const compactDate=year&&month&&day?`${day}.${month}.${year.slice(-2)}`:'БЕЗ ДАТЫ';
-  const playable=Boolean(v.videoId||v.isVideo);
+  const playable=Boolean(v.videoId||(v.isVideo&&instagramEmbedUrl(v)));
   const cover=<><img className="video-cover-image" src={coverSource(v)} alt="" loading="lazy" referrerPolicy="no-referrer" onError={e=>coverError(e,v)}/>{playable&&<span className="video-play video-cover-icon"><Play size={20} aria-hidden="true"/></span>}{v.section&&<span className="video-region-badge video-cover-icon" data-section={v.section} title={v.section==='world'?'Мир':'Рунет'}><img src={v.section==='world'?'./badges/region-en-eagle-cutout.png':'./badges/region-ru-emblem-cutout.png'} alt={v.section==='world'?'Мир':'Рунет'}/></span>}</>;
   return <article className="video-card" ref={node=>{if(node)videoRefs.current.set(v.id,node);else videoRefs.current.delete(v.id);}} data-video-id={v.id} data-curator={admin||undefined} data-position={admin?positions.get(v.id):undefined} style={cardMaterial(v.id)} key={v.id} onPointerMove={trackDossierPointer} onPointerLeave={resetDossierPointer}>
    {admin&&<Popover open={positionDraft?.id===v.id} onOpenChange={open=>{if(moving)return;if(open)editPosition(v);else setPositionDraft(null);}}>

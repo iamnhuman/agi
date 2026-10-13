@@ -5776,7 +5776,8 @@
       "videoId": "",
       "fetchUrl": "https://www.instagram.com/p/Dc24fq-M5-1/",
       "reference": false,
-      "isVideo": true
+      "isVideo": true,
+      "section": "runet"
     },
     {
       "url": "https://youtube.com/watch?v=IccXumZcCRs",
@@ -5794,7 +5795,8 @@
       "description": "",
       "isVideo": true,
       "alternateUrls": [],
-      "sourceOrder": 142
+      "sourceOrder": 142,
+      "section": "runet"
     },
     {
       "url": "https://www.youtube.com/watch?v=AIIZ3Nl1QRg",
@@ -5812,7 +5814,8 @@
       "description": "",
       "isVideo": true,
       "alternateUrls": [],
-      "sourceOrder": 144
+      "sourceOrder": 144,
+      "section": "runet"
     },
     {
       "url": "https://youtu.be/AVu5p2DMIf8?si=th8j8vvsIgwfG26l",
@@ -5830,7 +5833,8 @@
       "description": "",
       "isVideo": true,
       "alternateUrls": [],
-      "sourceOrder": 145
+      "sourceOrder": 145,
+      "section": "world"
     }
   ]
 }
