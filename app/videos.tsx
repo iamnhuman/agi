@@ -28,8 +28,8 @@ function instagramEmbedUrl(video:Video){
   return post?`https://www.instagram.com/${post[1]}/${post[2]}/embed/`:'';
  }catch{return '';}
 }
-function VideoName({name,onOpen}:{name:string;onOpen:()=>void}){
- const ref=useRef<HTMLButtonElement>(null),windowRef=useRef<HTMLSpanElement>(null),copyRef=useRef<HTMLSpanElement>(null);
+function VideoName({name,onOpen,url}:{name:string;onOpen:()=>void;url?:string}){
+ const ref=useRef<HTMLButtonElement|HTMLAnchorElement>(null),windowRef=useRef<HTMLSpanElement>(null),copyRef=useRef<HTMLSpanElement>(null);
  useEffect(()=>{
   const button=ref.current,viewport=windowRef.current,copy=copyRef.current;
   if(!button||!viewport||!copy)return;
@@ -53,8 +53,9 @@ function VideoName({name,onOpen}:{name:string;onOpen:()=>void}){
   observer.observe(button);observer.observe(viewport);observer.observe(copy);
   document.fonts.ready.then(fit);fit();
   return()=>{active=false;observer.disconnect();};
- },[name]);
- return <button ref={ref} className="video-name-button" type="button" title={name} onClick={onOpen}><span ref={windowRef} className="video-name-window"><span ref={copyRef} className="video-name-copy">{name.split(/(\s+)/).map((part,index)=>/^\s+$/.test(part)?part:<span className="video-name-word" key={index}>{part}</span>)}</span></span></button>;
+ },[name,url]);
+ const content=<span ref={windowRef} className="video-name-window"><span ref={copyRef} className="video-name-copy">{name.split(/(\s+)/).map((part,index)=>/^\s+$/.test(part)?part:<span className="video-name-word" key={index}>{part}</span>)}</span></span>;
+ return url?<a ref={node=>{ref.current=node;}} className="video-name-button" href={url} target="_blank" rel="noopener noreferrer" title={name+' · открыть в новой вкладке'}>{content}</a>:<button ref={node=>{ref.current=node;}} className="video-name-button" type="button" title={name} onClick={onOpen}>{content}</button>;
 }
 export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTotalChange?:(total:number)=>void}){
  const [videos,setVideos]=useState<Video[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState(''),[q,setQ]=useState(''),[order,setOrder]=useState<VideoOrder>('desc'),[orientation,setOrientation]=useState<'vertical'|'horizontal'>('horizontal'),[draft,setDraft]=useState<Video|null>(null),[selected,setSelected]=useState<Video|null>(null),[deleting,setDeleting]=useState<Video|null>(null),[busy,setBusy]=useState(false),[formError,setFormError]=useState(''),[importMessage,setImportMessage]=useState('');
@@ -240,6 +241,7 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
   const [year,month,day]=v.publishedAt?.split('-')||[];
   const compactDate=year&&month&&day?`${day}.${month}.${year.slice(-2)}`:'БЕЗ ДАТЫ';
   const playable=Boolean(v.videoId||v.isVideo);
+  const cover=<><img className="video-cover-image" src={coverSource(v)} alt="" loading="lazy" referrerPolicy="no-referrer" onError={e=>coverError(e,v)}/>{playable&&<span className="video-play video-cover-icon"><Play size={20} aria-hidden="true"/></span>}{v.section&&<span className="video-region-badge video-cover-icon" data-section={v.section} title={v.section==='world'?'Мир':'Рунет'}><img src={v.section==='world'?'./badges/region-en-eagle-cutout.png':'./badges/region-ru-emblem-cutout.png'} alt={v.section==='world'?'Мир':'Рунет'}/></span>}</>;
   return <article className="video-card" ref={node=>{if(node)videoRefs.current.set(v.id,node);else videoRefs.current.delete(v.id);}} data-video-id={v.id} data-curator={admin||undefined} data-position={admin?positions.get(v.id):undefined} style={cardMaterial(v.id)} key={v.id} onPointerMove={trackDossierPointer} onPointerLeave={resetDossierPointer}>
    {admin&&<Popover open={positionDraft?.id===v.id} onOpenChange={open=>{if(moving)return;if(open)editPosition(v);else setPositionDraft(null);}}>
     <PopoverTrigger asChild><button className="video-position-number video-position-button" type="button" disabled={moving} aria-label={`Изменить позицию ${v.name}, сейчас ${positions.get(v.id)}`} title="Изменить номер карточки"><span aria-hidden="true">#</span>{positions.get(v.id)}</button></PopoverTrigger>
@@ -254,10 +256,10 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
     </PopoverContent>
    </Popover>}
    <div className="video-date"><time dateTime={v.publishedAt||undefined} title={v.publishedAt?new Date(v.publishedAt+'T12:00:00').toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'}):'Дата неизвестна'}><span className="video-date-compact">{compactDate}</span><span className="video-date-full">{v.publishedAt?new Date(v.publishedAt+'T12:00:00').toLocaleDateString('ru-RU',{day:'2-digit',month:'short',year:'numeric'}):'—'}</span></time><small>{!v.publishedAt?'Дата неизвестна':v.dateSource==='manual'?'Указана куратором':v.platform==='Telegram'?'Дата поста':'Дата публикации'}</small></div>
-   <button className="video-thumb" aria-label={playable?'Открыть видео '+v.name:'Открыть материал '+v.name} onClick={()=>setSelected(v)}><img className="video-cover-image" src={coverSource(v)} alt="" loading="lazy" referrerPolicy="no-referrer" onError={e=>coverError(e,v)}/>{playable&&<span className="video-play video-cover-icon"><Play size={20} aria-hidden="true"/></span>}{v.section&&<span className="video-region-badge video-cover-icon" data-section={v.section} title={v.section==='world'?'Мир':'Рунет'}><img src={v.section==='world'?'./badges/region-en-eagle-cutout.png':'./badges/region-ru-emblem-cutout.png'} alt={v.section==='world'?'Мир':'Рунет'}/></span>}</button>
+   {playable?<button className="video-thumb" aria-label={'Открыть видео '+v.name} onClick={()=>setSelected(v)}>{cover}</button>:<a className="video-thumb" href={v.url} target="_blank" rel="noopener noreferrer" aria-label={'Открыть ссылку '+v.name+' в новой вкладке'}>{cover}</a>}
    <div className="video-copy">
     <a href={v.url} target="_blank" rel="noreferrer" className="video-platform" aria-label={`Открыть источник: ${v.name} · ${v.platform}`} title={`Открыть в ${v.platform}`}><span className="video-platform-full">{v.platform}</span><span className="video-platform-short" aria-hidden="true">{platformShortNames[v.platform]||v.platform.slice(0,2).toUpperCase()}</span><ArrowUpRight size={12} aria-hidden="true"/></a>
-    <div className="video-name-screen"><h3><VideoName name={v.name} onOpen={()=>setSelected(v)}/></h3></div>
+    <div className="video-name-screen"><h3><VideoName name={v.name} onOpen={()=>setSelected(v)} url={playable?undefined:v.url}/></h3></div>
    </div>
    <DossierInstruments id={v.id}/>
    {orientation==='vertical'&&<span className="video-flow-arrow" aria-hidden="true"><ArrowRight size={28}/></span>}
