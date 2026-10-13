@@ -1794,12 +1794,13 @@ footer .manifesto{min-height:235px;gap:9px;border-block-color:#d7293066;backgrou
 
 /* Editor inputs and rating controls are raised off the charcoal panel. */
 .editor-dialog{background:linear-gradient(145deg,#262a2e,#111315 55%)!important}
-.editor-dialog .artist-form [data-slot=select-trigger],.editor-dialog .artist-form input:not([type=radio]):not([type=file]),.editor-dialog .artist-form textarea,.editor-dialog .import-box input{
+.artist-form select{width:100%;padding:11px 12px;outline:none}
+.editor-dialog .artist-form [data-slot=select-trigger],.editor-dialog .artist-form select,.editor-dialog .artist-form input:not([type=radio]):not([type=file]),.editor-dialog .artist-form textarea,.editor-dialog .import-box input{
   min-height:47px;color:#f6f5ef!important;border:1px solid #8a9295!important;border-top-color:#c8cdd0!important;border-radius:4px!important;
   background:linear-gradient(180deg,#202427 0,#0a0c0e 20%,#111518 100%)!important;
   box-shadow:inset 0 1px #ffffff1c,inset 0 -2px #0008,0 4px 10px #0007!important;
 }
-.editor-dialog .artist-form [data-slot=select-trigger]:focus-visible,.editor-dialog .artist-form input:not([type=radio]):focus-visible,.editor-dialog .artist-form textarea:focus-visible,.editor-dialog .import-box input:focus-visible{outline:2px solid #ffe84d;outline-offset:2px}
+.editor-dialog .artist-form [data-slot=select-trigger]:focus-visible,.editor-dialog .artist-form select:focus-visible,.editor-dialog .artist-form input:not([type=radio]):focus-visible,.editor-dialog .artist-form textarea:focus-visible,.editor-dialog .import-box input:focus-visible{outline:2px solid #ffe84d;outline-offset:2px}
 .editor-dialog .artist-form .rating-option input[type=radio]{accent-color:var(--tag-accent)}
 .editor-dialog .artist-form .rating-option input[type=radio]:focus-visible{outline:2px solid var(--tag-accent);outline-offset:3px}
 .editor-dialog .artist-form .rating-option:has(input[type=radio]:focus-visible){outline:1px solid var(--tag-accent);outline-offset:3px}
@@ -3403,7 +3404,7 @@ body,body *{font-family:'Press Start 2P',ui-monospace,monospace!important}
 .editor-dialog h2{font-size:19px;line-height:1.5}
 .editor-dialog [data-slot=dialog-description],
 .artist-form label,.import-box>label,.notice,.error{font-size:10px;line-height:1.7}
-.artist-form input,.artist-form textarea,.import-box input,
+.artist-form input,.artist-form textarea,.artist-form select,.import-box input,
 .artist-form [data-slot=select-trigger]{font-size:11px;line-height:1.6}
 .form-actions .primary-btn,.form-actions .secondary-btn,
 .import-box .primary-btn{font-size:10px;line-height:1.5}
