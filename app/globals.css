@@ -5395,6 +5395,19 @@ html.toyota-signal-touch #root .toyota-mark-frame *:not(.toyota-signal-prompt){v
 .catalog-controls .catalog-search-clear svg{filter:drop-shadow(0 0 3px #ffd72888)}
 .catalog-controls .input-search>.catalog-search-clear:hover{background:linear-gradient(180deg,#c82029,#680b12);color:#fff6b0}
 .catalog-controls .input-search>.catalog-search-clear:focus-visible{outline:2px solid #ffe86c;outline-offset:-3px}
+/* Reset lives inside both search fields, so it never wraps the main toolbar. */
+.catalog-controls .input-search>.catalog-search-reset{
+  position:relative;z-index:1;display:grid;place-items:center;flex:0 0 38px;
+  width:38px;min-width:38px;height:38px;min-height:38px;margin:0 0 0 8px;padding:0;
+  border:0;border-left:1px solid #667376;border-radius:0;
+  background:linear-gradient(180deg,#2b3638,#111a1d 45%,#1c292b);
+  box-shadow:inset 0 1px #d5e3dd26,inset 0 -1px #0008;color:#cbd8d1;
+}
+.catalog-controls .input-search>.catalog-search-reset:hover:not(:disabled){
+  background:linear-gradient(180deg,#9f1d24,#4b080d);color:#fff26b;
+}
+.catalog-controls .input-search>.catalog-search-reset:focus-visible{outline:2px solid #ffe86c;outline-offset:-3px}
+.catalog-controls .input-search::after{display:none}
 
 /* Public controls respond to their cabinet width, including browser zoom. */
 footer{width:var(--site-panel-width);margin-inline:auto}
@@ -5411,10 +5424,6 @@ footer{width:var(--site-panel-width);margin-inline:auto}
   width:auto;height:40px;min-height:40px;padding:0 12px;white-space:nowrap;
 }
 .catalog-controls .catalog-head .filters sup{display:inline;font-size:10px}
-.catalog-controls .catalog-head .catalog-reset{
-  flex:none;width:48px;min-width:48px;height:48px;min-height:48px;
-  margin:0;padding:3px;
-}
 /* Wrap the complete action group only when its natural width no longer fits. */
 .catalog-controls .catalog-head .catalog-actions{
   display:flex;flex:0 0 auto;flex-wrap:wrap;justify-content:flex-end;align-items:center;
@@ -5442,7 +5451,7 @@ footer{width:var(--site-panel-width);margin-inline:auto}
 }
 .catalog-controls .search-row>.input-search{
   grid-column:1;grid-row:1;width:100%;min-width:0;max-width:none;
-  height:48px;min-height:48px;padding:2px 32px 2px 2px;
+  height:48px;min-height:48px;padding:2px;
 }
 .catalog-controls .search-row>.catalog-type-controls{display:contents}
 .catalog-controls .search-row .catalog-type-controls>.catalog-type-radios{
@@ -5487,28 +5496,25 @@ footer{width:var(--site-panel-width);margin-inline:auto}
 @container catalog-controls (min-width:681px) and (max-width:1032px){
   .catalog-controls .catalog-head .catalog-view-controls>.view-switch{flex:1 1 274px}
   .catalog-controls .catalog-head:has(.catalog-density){
-    display:grid;grid-template-columns:minmax(0,1fr) 48px;
+    display:grid;grid-template-columns:minmax(0,1fr);
   }
   .catalog-controls .catalog-head:has(.catalog-density) .filters{grid-column:1;grid-row:1}
-  .catalog-controls .catalog-head:has(.catalog-density) .catalog-reset{grid-column:2;grid-row:1}
   .catalog-controls .catalog-head:has(.catalog-density) .catalog-actions{
     grid-column:1/-1;grid-row:2;width:100%;margin-left:0;justify-content:flex-start;
   }
 }
 @container catalog-controls (min-width:681px) and (max-width:860px){
-  .catalog-controls .catalog-head{display:grid;grid-template-columns:minmax(0,1fr) 48px}
+  .catalog-controls .catalog-head{display:grid;grid-template-columns:minmax(0,1fr)}
   .catalog-controls .catalog-head .filters{grid-column:1;grid-row:1}
-  .catalog-controls .catalog-head .catalog-reset{grid-column:2;grid-row:1}
   .catalog-controls .catalog-head .catalog-actions{
     grid-column:1/-1;grid-row:2;width:100%;margin-left:0;justify-content:flex-start;
   }
 }
 @container catalog-controls (max-width:680px){
   .catalog-controls .catalog-settings .catalog-head{
-    display:grid;grid-template-columns:minmax(0,1fr) 48px;align-items:start;
+    display:grid;grid-template-columns:minmax(0,1fr);align-items:start;
   }
   .catalog-controls .catalog-settings .catalog-head .filters{grid-column:1;grid-row:1}
-  .catalog-controls .catalog-settings .catalog-head .catalog-reset{grid-column:2;grid-row:1}
   .catalog-controls .catalog-settings .catalog-head .catalog-actions{
     grid-column:1/-1;grid-row:2;display:contents;
   }
@@ -5542,10 +5548,12 @@ footer{width:var(--site-panel-width);margin-inline:auto}
     margin:0;padding:12px;border:2px solid #636a6e;border-top-color:#b4bbbd;border-radius:6px;
   }
   .catalog-controls .catalog-mobile-bar>.input-search{flex:1 1 0;width:100%;max-width:none}
+  .catalog-controls .catalog-mobile-bar .input-search>:is(svg,.catalog-search-clear){margin-right:4px}
+  .catalog-controls .catalog-mobile-bar .catalog-search-reset{margin-left:0}
   .catalog-settings{display:none}
   .catalog-settings[data-open="true"]{display:block;padding-top:10px}
   .catalog-controls .catalog-settings .catalog-head{
-    display:grid;grid-template-columns:minmax(0,1fr) 48px;
+    display:grid;grid-template-columns:minmax(0,1fr);
     align-items:start;gap:12px;padding:12px;
   }
   .catalog-controls .catalog-settings .catalog-head .filters{
@@ -5557,9 +5565,6 @@ footer{width:var(--site-panel-width);margin-inline:auto}
   }
   .catalog-controls .catalog-settings .catalog-head .filters sup{display:inline}
   .catalog-controls .catalog-settings .catalog-head .catalog-actions{display:contents}
-  .catalog-controls .catalog-settings .catalog-reset{
-    grid-column:2;grid-row:1;position:static;width:48px;margin:0;
-  }
   .catalog-controls .catalog-settings .catalog-density,
   .catalog-controls .catalog-settings .catalog-sort-switch,
   .catalog-controls .catalog-settings .catalog-view-controls>.view-switch{

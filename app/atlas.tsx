@@ -471,11 +471,12 @@ function ArtistNameFlow({artists}:{artists:Artist[]}){
  </>;
 }
 
-function CatalogSearch({query,onChange}:{query:string;onChange:(value:string)=>void}){
+function CatalogSearch({query,onChange,onReset,resetDisabled}:{query:string;onChange:(value:string)=>void;onReset:()=>void;resetDisabled:boolean}){
  const input=useRef<HTMLInputElement>(null);
  return <div className="input-search">
  {query?<button type="button" className="catalog-search-clear" aria-label="Очистить поиск" title="Очистить поиск" onClick={()=>{onChange('');input.current?.focus();}}><X size={20} aria-hidden="true"/></button>:<Search size={17} aria-hidden="true"/>}
  <input ref={input} aria-label="Поиск записи" placeholder="Поиск" value={query} onChange={event=>onChange(event.target.value)}/>
+ <button type="button" className="catalog-reset catalog-search-reset" aria-label="Сбросить настройки каталога" title="Сбросить поиск и настройки каталога" disabled={resetDisabled} onClick={onReset}><RotateCcw size={18} aria-hidden="true"/></button>
  </div>;
 }
 
@@ -518,7 +519,7 @@ return <>
 <section className="catalog" id="catalog">{error&&<p className="error" role="alert">{error} <button onClick={refresh}>Восстановить связь</button>
 </p>}<div className="catalog-controls" onKeyDown={event=>{if(event.key==='Escape'&&controlsOpen&&controlsToggle.current?.getClientRects().length){event.preventDefault();setControlsOpen(false);controlsToggle.current.focus();}}}>
 <div className="search-row catalog-mobile-bar">
-<CatalogSearch query={q} onChange={setQ}/>
+<CatalogSearch query={q} onChange={setQ} onReset={resetCatalog} resetDisabled={catalogIsDefault}/>
 <button ref={controlsToggle} type="button" className="catalog-menu-toggle" aria-label={controlsOpen?'Закрыть настройки каталога':'Открыть настройки каталога'} aria-expanded={controlsOpen} aria-controls="catalog-settings" onClick={()=>setControlsOpen(open=>!open)}>{controlsOpen?<X size={22}/>:<Menu size={22}/>}</button>
 </div>
 <div id="catalog-settings" className="catalog-settings" data-open={controlsOpen}>
@@ -534,10 +535,9 @@ return <>
 <button key={id} aria-label={label} aria-pressed={view===id} className={view===id?'active':''} onClick={()=>changeView(id)}>
 <Icon size={18}/>
 </button>)}</div></div></div>
-<button type="button" className="catalog-reset" aria-label="Сбросить настройки каталога" title="Сбросить настройки каталога" disabled={catalogIsDefault} onClick={resetCatalog}><RotateCcw size={18} aria-hidden="true"/></button>
 </div>
 <div className="search-row">
-<CatalogSearch query={q} onChange={setQ}/>
+<CatalogSearch query={q} onChange={setQ} onReset={resetCatalog} resetDisabled={catalogIsDefault}/>
 {sortControls('footer')}
 <div className="catalog-type-controls">
 <div className="catalog-type-radios" role="radiogroup" aria-label="Тип записей">{[['all','Все'],['artist','Артисты'],['media','Медиа'],['collective','Проекты']].map(([id,label])=><label key={id} className={kind===id?'is-active':''}><input type="radio" name="catalog-kind" value={id} checked={kind===id} onChange={()=>setKind(id)}/><span>{label}</span></label>)}</div>
