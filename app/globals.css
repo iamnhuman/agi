@@ -6316,10 +6316,28 @@ footer{width:var(--site-panel-width);margin-inline:auto}
   content:'';position:absolute;z-index:1;inset:0;pointer-events:none;
   background:repeating-linear-gradient(0deg,#0002 0 1px,transparent 1px 3px),linear-gradient(115deg,#d3fbe50a,transparent 35% 75%,#d3fbe505);
 }
-.video-section .video-copy .video-name-screen h3{margin:0}
+.video-section .video-copy .video-name-screen h3{display:block;margin:0;-webkit-line-clamp:unset}
 .video-section .video-copy .video-name-screen h3 button{color:#e4f1e6;text-shadow:0 0 2px #cbeedc40,0 1px #030806}
 .video-section .video-card:is(:hover,:focus-within) .video-name-screen{border-bottom-color:#ada675;box-shadow:inset 0 2px 5px #000,inset 0 0 0 1px #d4c38229,0 1px #bdcbbb22}
 .video-section .video-card:is(:hover,:focus-within) .video-name-screen h3 button{color:#fff1ad;text-shadow:0 0 4px #f3d78940,0 1px #030806}
+/* Reveal clipped lines inside the existing display without resizing the case. */
+.video-name-window{display:block;max-height:3.3em;overflow:hidden}
+.video-name-copy{display:block;transform:translateY(0)}
+.timeline-layout--horizontal .video-name-window{max-height:2.8em}
+.timeline-layout--horizontal .timeline-scene[data-mini-cards="true"] .video-name-window{max-height:4.2em}
+.video-card:is(:hover,:focus-within) .video-name-button[data-overflow="true"] .video-name-copy{
+  animation:video-name-drift var(--video-name-duration,4s) ease-in-out .45s infinite both;
+}
+@keyframes video-name-drift{
+  0%,12%,100%{transform:translateY(0)}
+  44%,60%{transform:translateY(calc(-1 * var(--video-name-travel,0px)))}
+}
+@media(hover:none),(prefers-reduced-motion:reduce){
+  .video-section .timeline-layout .timeline-scene .video-card .video-copy .video-name-screen h3{max-height:none}
+  .video-name-window,.timeline-layout--horizontal .video-name-window,
+  .timeline-layout--horizontal .timeline-scene[data-mini-cards="true"] .video-name-window{max-height:none}
+  .video-card:is(:hover,:focus-within) .video-name-button[data-overflow="true"] .video-name-copy{animation:none;transform:none}
+}
 /* The overview keeps the smaller labels and discards details that cannot be read. */
 .video-section .timeline-layout--horizontal .timeline-scene[data-mini-cards="true"] .video-card{padding-bottom:10px}
 .video-section .timeline-layout--horizontal .timeline-scene[data-mini-cards="true"] .dossier-instruments{display:none}

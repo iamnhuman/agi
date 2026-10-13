@@ -28,26 +28,32 @@ function instagramEmbedUrl(video:Video){
  }catch{return '';}
 }
 function VideoName({name,onOpen,fitToWidth=true}:{name:string;onOpen:()=>void;fitToWidth?:boolean}){
- const ref=useRef<HTMLButtonElement>(null);
+ const ref=useRef<HTMLButtonElement>(null),windowRef=useRef<HTMLSpanElement>(null),copyRef=useRef<HTMLSpanElement>(null);
  useEffect(()=>{
-  const button=ref.current;if(!button)return;
-  button.style.removeProperty('font-size');
-  if(!fitToWidth)return;
+  const button=ref.current,viewport=windowRef.current,copy=copyRef.current;
+  if(!button||!viewport||!copy)return;
   const canvas=document.createElement('canvas'),context=canvas.getContext('2d');
   let active=true;
   const fit=()=>{
-   if(!active||!context)return;
+   if(!active)return;
    button.style.removeProperty('font-size');
-   const style=getComputedStyle(button),fontSize=parseFloat(style.fontSize);
-   context.font=style.font;
-   const longest=Math.max(...name.split(/\s+/).map(word=>context.measureText(word).width));
-   if(longest>button.clientWidth)button.style.fontSize=`${Math.max(6,Math.floor(fontSize*button.clientWidth/longest))}px`;
+   if(fitToWidth&&context&&button.clientWidth>0){
+    const style=getComputedStyle(button),fontSize=parseFloat(style.fontSize);
+    context.font=style.font;
+    const longest=Math.max(...name.split(/\s+/).map(word=>context.measureText(word).width));
+    if(longest>button.clientWidth)button.style.fontSize=`${Math.max(6,Math.floor(fontSize*button.clientWidth/longest))}px`;
+   }
+   const travel=Math.max(0,copy.scrollHeight-viewport.clientHeight);
+   button.dataset.overflow=travel>1?'true':'false';
+   button.style.setProperty('--video-name-travel',`${travel}px`);
+   button.style.setProperty('--video-name-duration',`${Math.max(4,Math.min(18,travel/20*2+1.5))}s`);
   };
-  const observer=new ResizeObserver(fit);observer.observe(button);
+  const observer=new ResizeObserver(fit);
+  observer.observe(button);observer.observe(viewport);observer.observe(copy);
   document.fonts.ready.then(fit);fit();
   return()=>{active=false;observer.disconnect();};
  },[name,fitToWidth]);
- return <button ref={ref} type="button" title={name} onClick={onOpen}>{name}</button>;
+ return <button ref={ref} className="video-name-button" type="button" title={name} onClick={onOpen}><span ref={windowRef} className="video-name-window"><span ref={copyRef} className="video-name-copy">{name}</span></span></button>;
 }
 export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTotalChange?:(total:number)=>void}){
  const [videos,setVideos]=useState<Video[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState(''),[q,setQ]=useState(''),[order,setOrder]=useState<VideoOrder>('desc'),[orientation,setOrientation]=useState<'vertical'|'horizontal'>('horizontal'),[draft,setDraft]=useState<Video|null>(null),[selected,setSelected]=useState<Video|null>(null),[deleting,setDeleting]=useState<Video|null>(null),[busy,setBusy]=useState(false),[formError,setFormError]=useState(''),[importMessage,setImportMessage]=useState('');
