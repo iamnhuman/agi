@@ -1,14 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFile} from 'node:fs/promises';
-import ts from 'typescript';
-
-async function loadTs(path){
- const source=await readFile(new URL(path,import.meta.url),'utf8');
- const {outputText}=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}});
- return import(`data:text/javascript;base64,${Buffer.from(outputText).toString('base64')}`);
-}
-const {orderVideos}=await loadTs('../app/video-order.ts');
+import {orderVideos} from '../lib/video-order.mjs';
 const ids=videos=>videos.map(video=>video.id);
 const record=(id,sourceOrder,publishedAt='')=>({id,name:id,sourceOrder,publishedAt});
 
@@ -51,4 +43,19 @@ test('every order returns a new array without changing the catalog or its record
   assert.deepEqual(catalog,snapshot);
   assert.ok(ordered.every(video=>catalog.includes(video)));
  }
+});
+
+test('manual chronology preserves dates and leaves addition orders unchanged',()=>{
+ const catalog=[record('first',0,'2024-01-01'),record('middle',1,'2025-01-01'),record('last',2,'2026-01-01')];
+ const manual=['last','first','middle'],snapshot=structuredClone(catalog);
+ assert.deepEqual(ids(orderVideos(catalog,'dates',manual)),manual);
+ assert.deepEqual(ids(orderVideos(catalog,'asc',manual)),['first','middle','last']);
+ assert.deepEqual(ids(orderVideos(catalog,'desc',manual)),['last','middle','first']);
+ assert.deepEqual(catalog,snapshot);
+});
+
+test('new and filtered materials keep the relative manual chronology',()=>{
+ const catalog=[record('a',0,'2024-01-01'),record('b',1,'2025-01-01'),record('c',2,'2026-01-01'),record('new',3,'2023-01-01'),record('unknown',4)];
+ assert.deepEqual(ids(orderVideos(catalog,'dates',['c','a','b'])),['new','c','a','b','unknown']);
+ assert.deepEqual(ids(orderVideos(catalog.filter(video=>['a','c'].includes(video.id)),'dates',['missing','c','a','b','c'])),['c','a']);
 });

@@ -5,6 +5,9 @@ export function timelineRunwayFrame(width:number,height:number,timeMs=0){
   seconds,breath:Math.sin(seconds*.55),
   horizon:height*.43+Math.sin(seconds*.42)*2.5,
   vanishX:width*.5+Math.sin(seconds*.28)*width*.012,
+  panX:Math.sin(seconds*.22)*Math.min(30,width*.02),
+  panY:Math.sin(seconds*.17)*4,
+  tilt:Math.sin(seconds*.14)*.008,
   gridShift:seconds*18%94,
   radar:Array.from({length:4},(_,index)=>{
    const phase=(seconds*.065+index/4)%1;
@@ -32,13 +35,18 @@ export function drawTimelineRunway(
  context.setTransform(ratio,0,0,ratio,0,0);
  context.clearRect(0,0,width,height);
 
- const {seconds,breath,horizon,vanishX,gridShift,radar,depths}=timelineRunwayFrame(width,height,timeMs);
+ const {seconds,breath,horizon,vanishX,panX,panY,tilt,gridShift,radar,depths}=timelineRunwayFrame(width,height,timeMs);
+ // A slow camera sway moves only the panorama; the dated foreground stays aligned.
+ context.save();
+ context.translate(width*.5+panX,height*.5+panY);
+ context.rotate(tilt);
+ context.translate(-width*.5,-height*.5);
  const ambient=context.createRadialGradient(vanishX,horizon,12,vanishX,horizon,width*.67);
  ambient.addColorStop(0,`rgba(165, 23, 28, ${.2+breath*.035})`);
  ambient.addColorStop(.42,'rgba(75, 14, 19, .07)');
  ambient.addColorStop(1,'rgba(0, 0, 0, 0)');
  context.fillStyle=ambient;
- context.fillRect(0,0,width,height);
+ context.fillRect(-48,-24,width+96,height+48);
 
  context.save();
  context.lineWidth=1;
@@ -55,7 +63,7 @@ export function drawTimelineRunway(
  floor.addColorStop(.55,'rgba(47, 11, 15, .08)');
  floor.addColorStop(1,'rgba(115, 19, 24, .16)');
  context.fillStyle=floor;
- context.fillRect(0,horizon,width,height-horizon);
+ context.fillRect(-48,horizon,width+96,height-horizon+48);
 
  const sweepX=(seconds*48)%(width+320)-160;
  const sweep=context.createLinearGradient(sweepX-120,0,sweepX+120,0);
@@ -63,7 +71,7 @@ export function drawTimelineRunway(
  sweep.addColorStop(.5,'rgba(235, 49, 54, .075)');
  sweep.addColorStop(1,'rgba(235, 49, 54, 0)');
  context.fillStyle=sweep;
- context.fillRect(0,horizon,width,height-horizon);
+ context.fillRect(-48,horizon,width+96,height-horizon+48);
 
  const spacing=94,shift=gridShift;
  context.strokeStyle='rgba(234, 56, 62, .32)';
@@ -72,7 +80,7 @@ export function drawTimelineRunway(
   const x=bottomX-shift;
   context.beginPath();
   context.moveTo(vanishX+(x-vanishX)*.04,horizon);
-  context.lineTo(x,height);
+  context.lineTo(x,height+48);
   context.stroke();
  }
  for(const depth of depths){
@@ -80,10 +88,11 @@ export function drawTimelineRunway(
   const fade=Math.min(1,depth*8,(1-depth)*8);
   context.strokeStyle=`rgba(231, 57, 63, ${(.12+depth*.2)*fade})`;
   context.beginPath();
-  context.moveTo(0,y);
-  context.lineTo(width,y);
+  context.moveTo(-48,y);
+  context.lineTo(width+48,y);
   context.stroke();
  }
+ context.restore();
 
  // The single date scale stays still while the radar and floor animate behind it.
  const railBottom=height-(dateTicks.length?60:24);

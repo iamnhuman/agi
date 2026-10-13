@@ -5778,6 +5778,24 @@
       "isVideo": true,
       "alternateUrls": [],
       "sourceOrder": 145
+    },
+    {
+      "url": "https://t.me/cdrommm/13462",
+      "platform": "Telegram",
+      "videoId": "",
+      "fetchUrl": "https://t.me/cdrommm/13462?embed=1&mode=tme",
+      "reference": false,
+      "id": "63ac0cb9-1ce0-43eb-875f-0ab639d8e3e7",
+      "name": "Boulevard Depo",
+      "title": "",
+      "publishedAt": "2025-12-11",
+      "dateSource": "source",
+      "dateUrl": "https://t.me/cdrommm/13462?embed=1&mode=tme",
+      "image": "./public/avatars/upload-06854bd5e04448fb.jpg",
+      "description": "",
+      "isVideo": false,
+      "alternateUrls": [],
+      "sourceOrder": 144
     }
   ]
 }

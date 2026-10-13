@@ -1,6 +1,7 @@
 import {useEffect,useRef,useState} from 'react';
-import {Plus,ArrowUpRight,Play,Pencil,Trash2,Search,ZoomIn,ZoomOut,ArrowDownWideNarrow,ArrowUpNarrowWide,CalendarDays,GalleryHorizontal,List} from 'lucide-react';
+import {Plus,ArrowUpRight,ArrowRight,Play,Pencil,Trash2,Search,ZoomIn,ZoomOut,ArrowDownWideNarrow,ArrowUpNarrowWide,CalendarDays,GalleryHorizontal,LayoutGrid} from 'lucide-react';
 import {Dialog,DialogContent,DialogTitle,DialogDescription} from '@/components/ui/dialog';
+import {Popover,PopoverTrigger,PopoverContent} from '@/components/ui/popover';
 import {AlertDialog,AlertDialogContent,AlertDialogTitle,AlertDialogDescription,AlertDialogFooter,AlertDialogCancel,AlertDialogAction} from '@/components/ui/alert-dialog';
 import {catalogUrl,adminUrl,showLocalAdmin} from '@/client/config';
 import {drawTimelineRunway} from './timeline-runway';
@@ -58,22 +59,57 @@ function VideoName({name,onOpen,fitToWidth=true}:{name:string;onOpen:()=>void;fi
 export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTotalChange?:(total:number)=>void}){
  const [videos,setVideos]=useState<Video[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState(''),[q,setQ]=useState(''),[order,setOrder]=useState<VideoOrder>('desc'),[orientation,setOrientation]=useState<'vertical'|'horizontal'>('horizontal'),[draft,setDraft]=useState<Video|null>(null),[selected,setSelected]=useState<Video|null>(null),[deleting,setDeleting]=useState<Video|null>(null),[busy,setBusy]=useState(false),[formError,setFormError]=useState(''),[importMessage,setImportMessage]=useState('');
  const [sceneZoom,setSceneZoom]=useState(.65);
+ const [timelineOrder,setTimelineOrder]=useState<string[]>([]),[positionDraft,setPositionDraft]=useState<Video|null>(null),[positionValue,setPositionValue]=useState(''),[positionError,setPositionError]=useState(''),[moving,setMoving]=useState(false),[moveNotice,setMoveNotice]=useState(''),[revealId,setRevealId]=useState<string|null>(null);
+ const positionInputRef=useRef<HTMLInputElement>(null),videoRefs=useRef(new Map<string,HTMLElement>()),skipPositionFocusRestore=useRef(false);
  const zoomProgress=(sceneZoom-MIN_SCENE_ZOOM)/(MAX_SCENE_ZOOM-MIN_SCENE_ZOOM);
  const timelineViewport=useRef<HTMLDivElement>(null),timelineCanvas=useRef<HTMLCanvasElement>(null);
  const drag=useRef<{pointerId:number;startX:number;scrollLeft:number;active:boolean}|null>(null);
  const suppressDragClick=useRef(false);
  const changeSceneZoom=(amount:number)=>setSceneZoom(current=>Math.round(Math.max(MIN_SCENE_ZOOM,Math.min(MAX_SCENE_ZOOM,current+amount))*100)/100);
- async function load(){try{setError('');const r=await fetch(catalogUrl,{cache:'no-store'});if(!r.ok)throw Error('Не удалось загрузить видео.');const items:Video[]=(await r.json()).videos||[];setVideos(items);onTotalChange?.(items.length);if(admin){const editId=new URLSearchParams(location.search).get("edit");if(editId){const item=items.find((v:Video)=>v.id===editId);if(item)edit(item);const url=new URL(location.href);url.searchParams.delete("edit");history.replaceState(null,"",url);}}}catch(e){setError((e as Error).message);}finally{setLoading(false);}}
+ async function load(){try{setError('');const r=await fetch(catalogUrl,{cache:'no-store'});if(!r.ok)throw Error('Не удалось загрузить видео.');const data=await r.json(),items:Video[]=data.videos||[];setVideos(items);setTimelineOrder(data.videoTimelineOrder||[]);onTotalChange?.(items.length);if(admin){const editId=new URLSearchParams(location.search).get("edit");if(editId){const item=items.find((v:Video)=>v.id===editId);if(item)edit(item);const url=new URL(location.href);url.searchParams.delete("edit");history.replaceState(null,"",url);}}}catch(e){setError((e as Error).message);}finally{setLoading(false);}}
  useEffect(()=>{load();},[]);
  async function mutate(body:object){const r=await fetch('/api/catalog',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const d=await r.json();if(!r.ok)throw Error(d.error);return d;}
- const filtered=videos.filter(v=>(v.name+' '+v.title).toLowerCase().includes(q.toLowerCase()));
- const ordered=orderVideos(filtered,order);
+ const matchesVideo=(v:Video)=>(v.name+' '+v.title).toLowerCase().includes(q.toLowerCase());
+ const filtered=videos.filter(matchesVideo),allOrdered=orderVideos(videos,order,timelineOrder);
+ const ordered=allOrdered.filter(matchesVideo),positions=new Map(allOrdered.map((video,index)=>[video.id,index+1]));
+ const manualDates=order==='dates'&&timelineOrder.length>0;
  const dated=ordered.filter(v=>v.publishedAt);
  const undated=ordered.filter(v=>!v.publishedAt);
  const years=[...new Set(dated.map(v=>v.publishedAt.slice(0,4)))];
  useEffect(()=>{
   if(timelineViewport.current){timelineViewport.current.scrollLeft=0;timelineViewport.current.scrollTop=0;}
  },[order,q,orientation,videos]);
+ useEffect(()=>{
+  if(!revealId)return;
+  const frame=requestAnimationFrame(()=>{
+   const card=videoRefs.current.get(revealId);
+   card?.scrollIntoView({block:'nearest',inline:'center',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+   card?.querySelector<HTMLButtonElement>('.video-position-button')?.focus({preventScroll:true});
+   setRevealId(null);
+  });
+  return()=>cancelAnimationFrame(frame);
+ },[revealId,videos,timelineOrder,orientation]);
+ function editPosition(video:Video){
+  skipPositionFocusRestore.current=false;setPositionDraft(video);setPositionValue(String(positions.get(video.id)));setPositionError('');
+ }
+ async function applyPosition(event:React.FormEvent){
+  event.preventDefault();if(!positionDraft||moving)return;
+  const value=positionValue.trim(),position=Number(value);
+  if(!/^\d+$/.test(value)||!Number.isInteger(position)||position<1||position>videos.length){setPositionError(`Укажите целую позицию от 1 до ${videos.length}.`);return;}
+  setMoving(true);setPositionError('');
+  try{
+   const data=await mutate({action:'video-move',id:positionDraft.id,position}) as {videos:Video[];videoTimelineOrder:string[];position:number};
+   skipPositionFocusRestore.current=true;setVideos(data.videos);setTimelineOrder(data.videoTimelineOrder);
+   setMoveNotice(`${positionDraft.name} — позиция ${data.position}.`);setRevealId(positionDraft.id);setPositionDraft(null);
+  }catch(error){setPositionError((error as Error).message);}finally{setMoving(false);}
+ }
+ async function resetTimelineOrder(){
+  if(moving)return;setMoving(true);
+  try{
+   const data=await mutate({action:'video-order-reset'}) as {videos:Video[];videoTimelineOrder:string[]};
+   setVideos(data.videos);setTimelineOrder(data.videoTimelineOrder);setMoveNotice('Хронология восстановлена по датам публикации.');
+  }catch(error){setError((error as Error).message);}finally{setMoving(false);}
+ }
  useEffect(()=>{
   if(orientation!=='horizontal'||loading)return;
   const viewport=timelineViewport.current,canvas=timelineCanvas.current;
@@ -207,15 +243,29 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
   const [year,month,day]=v.publishedAt?.split('-')||[];
   const compactDate=year&&month&&day?`${day}.${month}.${year.slice(-2)}`:'БЕЗ ДАТЫ';
   const playable=Boolean(v.videoId||v.isVideo);
-  return <article className="video-card" style={cardMaterial(v.id)} key={v.id} onPointerMove={trackDossierPointer} onPointerLeave={resetDossierPointer}>
+  return <article className="video-card" ref={node=>{if(node)videoRefs.current.set(v.id,node);else videoRefs.current.delete(v.id);}} data-video-id={v.id} data-curator={admin||undefined} data-position={admin?positions.get(v.id):undefined} style={cardMaterial(v.id)} key={v.id} onPointerMove={trackDossierPointer} onPointerLeave={resetDossierPointer}>
+   {admin&&(order==='dates'?<Popover open={positionDraft?.id===v.id} onOpenChange={open=>{if(moving)return;if(open)editPosition(v);else setPositionDraft(null);}}>
+    <PopoverTrigger asChild><button className="video-position-number video-position-button" type="button" disabled={moving} aria-label={`Изменить позицию ${v.name}, сейчас ${positions.get(v.id)}`} title="Изменить позицию в «ИИ по датам»"><span aria-hidden="true">#</span>{positions.get(v.id)}</button></PopoverTrigger>
+    <PopoverContent className="admin-position-editor" side="top" align="start" aria-label={`Позиция ${v.name}`} onOpenAutoFocus={event=>{event.preventDefault();positionInputRef.current?.focus();positionInputRef.current?.select();}} onCloseAutoFocus={event=>{if(skipPositionFocusRestore.current)event.preventDefault();}} onInteractOutside={event=>{if(moving)event.preventDefault();}} onEscapeKeyDown={event=>{if(moving)event.preventDefault();}}>
+     <form onSubmit={applyPosition} noValidate aria-busy={moving}>
+      <label htmlFor={`video-position-${v.id}`}>Позиция в «ИИ по датам»</label>
+      <p id={`video-position-hint-${v.id}`}>От 1 до {videos.length}, во всём архиве. Дата публикации сохранится.</p>
+      <input ref={positionInputRef} id={`video-position-${v.id}`} type="number" inputMode="numeric" min={1} max={videos.length} step={1} value={positionValue} disabled={moving} aria-invalid={!!positionError} aria-describedby={`video-position-hint-${v.id}`} onChange={event=>{setPositionValue(event.target.value);setPositionError('');}}/>
+      {positionError&&<p className="error" role="alert">{positionError}</p>}
+      <div className="admin-position-editor-actions"><button type="button" className="secondary-btn" disabled={moving} onClick={()=>setPositionDraft(null)}>Отмена</button><button type="submit" className="primary-btn" disabled={moving}>{moving?'Сохраняем…':'Применить'}</button></div>
+     </form>
+    </PopoverContent>
+   </Popover>:<span className="video-position-number" aria-label={`Позиция ${positions.get(v.id)}`}><span aria-hidden="true">#</span>{positions.get(v.id)}</span>)}
    <div className="video-date"><time dateTime={v.publishedAt||undefined} title={v.publishedAt?new Date(v.publishedAt+'T12:00:00').toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'}):'Дата неизвестна'}><span className="video-date-compact">{compactDate}</span><span className="video-date-full">{v.publishedAt?new Date(v.publishedAt+'T12:00:00').toLocaleDateString('ru-RU',{day:'2-digit',month:'short',...(order!=='dates'?{year:'numeric' as const}:{})}):'—'}</span></time><small>{!v.publishedAt?'Дата неизвестна':v.dateSource==='manual'?'Указана куратором':v.platform==='Telegram'?'Дата поста':'Дата публикации'}</small></div>
    <button className="video-thumb" aria-label={playable?'Открыть видео '+v.name:'Открыть материал '+v.name} onClick={()=>setSelected(v)}><img src={coverSource(v)} alt="" loading="lazy" referrerPolicy="no-referrer" onError={e=>coverError(e,v)}/>{playable&&<span className="video-play"><Play size={18}/></span>}</button>
    <div className="video-copy">
     <a href={v.url} target="_blank" rel="noreferrer" className="video-platform" aria-label={`Открыть источник: ${v.name} · ${v.platform}`} title={`Открыть в ${v.platform}`}><span className="video-platform-full">{v.platform}</span><span className="video-platform-short" aria-hidden="true">{platformShortNames[v.platform]||v.platform.slice(0,2).toUpperCase()}</span><ArrowUpRight size={12} aria-hidden="true"/></a>
+    {v.section&&<span className="video-region-badge" data-section={v.section}><img src={v.section==='world'?'./badges/region-en-eagle-cutout.png':'./badges/region-ru-emblem-cutout.png'} alt=""/><span>{v.section==='world'?'Мир':'Рунет'}</span></span>}
     <div className="video-name-screen"><h3><VideoName name={v.name} fitToWidth={orientation!=='horizontal'} onOpen={()=>setSelected(v)}/></h3></div>
    </div>
    <DossierInstruments id={v.id}/>
-   {admin?<div className="video-actions"><button aria-label={'Редактировать видео '+v.name} onClick={()=>edit(v)}><Pencil size={17}/></button><button aria-label={'Удалить видео '+v.name} onClick={()=>setDeleting(v)}><Trash2 size={17}/></button></div>:showLocalAdmin&&<a className="card-edit video-card-edit" href={adminUrl+"/?edit="+encodeURIComponent(v.id)+"#videos"} aria-label={"Редактировать видео "+v.name} title="Редактировать материал"><Pencil size={16} aria-hidden="true"/></a>}
+   {orientation==='vertical'&&<span className="video-flow-arrow" aria-hidden="true"><ArrowRight size={28}/></span>}
+   {admin?<div className="video-actions"><button disabled={moving} aria-label={'Редактировать видео '+v.name} onClick={()=>edit(v)}><Pencil size={17}/></button><button disabled={moving} aria-label={'Удалить видео '+v.name} onClick={()=>setDeleting(v)}><Trash2 size={17}/></button></div>:showLocalAdmin&&<a className="card-edit video-card-edit" href={adminUrl+"/?edit="+encodeURIComponent(v.id)+"#videos"} aria-label={"Редактировать видео "+v.name} title="Редактировать материал"><Pencil size={16} aria-hidden="true"/></a>}
   </article>;
  }
  const instagramEmbed=selected?instagramEmbedUrl(selected):'';
@@ -233,14 +283,16 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
     <fieldset className="video-radio-group video-view-group"><legend className="sr-only">ВИД</legend><div>
      <span className="video-control-label" aria-hidden="true">ВИД</span>
      <label title="Горизонтальная лента карточек"><input type="radio" name="video-orientation" value="horizontal" aria-label="Горизонтально" checked={orientation==='horizontal'} onChange={()=>setOrientation('horizontal')}/><span><GalleryHorizontal size={16} aria-hidden="true"/><b>Лента</b></span></label>
-     <label title="Вертикальный список работ"><input type="radio" name="video-orientation" value="vertical" aria-label="Вертикально" checked={orientation==='vertical'} onChange={()=>setOrientation('vertical')}/><span><List size={16} aria-hidden="true"/><b>Список</b></span></label>
+     <label title="Сетка работ"><input type="radio" name="video-orientation" value="vertical" aria-label="Сетка" checked={orientation==='vertical'} onChange={()=>setOrientation('vertical')}/><span><LayoutGrid size={16} aria-hidden="true"/><b>Сетка</b></span></label>
     </div></fieldset>
    </div>
   </div>
   <div className="video-summary">{filtered.length} материалов · {dated.length} с датой · {undated.length} без даты</div>{orientation==='horizontal'&&<p className="timeline-hint">Колесо мыши или перетягивание листает ленту · Ctrl/⌘ + колесо меняет масштаб <span aria-hidden="true">← листайте →</span></p>}
+  {manualDates&&<div className="video-order-note"><span>Порядок выбран куратором · даты публикации сохранены.</span>{admin&&<button type="button" className="secondary-btn" disabled={moving} onClick={resetTimelineOrder}>Вернуть по датам</button>}</div>}
+  {admin&&moveNotice&&<p className="notice" role="status">{moveNotice}</p>}
   {error&&<p role="alert" className="error">{error} <button onClick={load}>Повторить</button></p>}
-  {loading?<p className="empty">Загружаем архив творческих работ…</p>:<div className={`timeline-layout timeline-layout--${orientation}${order!=='dates'?' timeline-layout--source':''}`}>
-   {order==='dates'&&<nav className="timeline-years" aria-label="Годы таймлайна">{years.map(y=><a key={y} href={'#year-'+y}>{y}</a>)}{undated.length>0&&<a href="#year-unknown">Без даты <small>{undated.length}</small></a>}</nav>}
+  {loading?<p className="empty">Загружаем архив творческих работ…</p>:<div className={`timeline-layout timeline-layout--${orientation}${order!=='dates'||manualDates?' timeline-layout--source':''}`}>
+   {order==='dates'&&!manualDates&&<nav className="timeline-years" aria-label="Годы таймлайна">{years.map(y=><a key={y} href={'#year-'+y}>{y}</a>)}{undated.length>0&&<a href="#year-unknown">Без даты <small>{undated.length}</small></a>}</nav>}
    <div className="timeline-scene" data-compact-labels={orientation==='horizontal'&&sceneZoom<.6?true:undefined} data-mini-cards={orientation==='horizontal'&&sceneZoom<.5?true:undefined} style={orientation==='horizontal'?{
     '--timeline-zoom':sceneZoom,
     '--timeline-text-scale':Math.max(1,Math.min(2,1/sceneZoom)),
@@ -252,7 +304,7 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
    {orientation==='horizontal'&&<canvas ref={timelineCanvas} className="timeline-runway" aria-hidden="true"/>}
    {orientation==='horizontal'&&<div className="timeline-zoom-controls"><label htmlFor="timeline-zoom">ЗУМ</label><button type="button" aria-label="Уменьшить масштаб" disabled={sceneZoom<=MIN_SCENE_ZOOM} onClick={()=>changeSceneZoom(-.1)}><ZoomOut size={18}/></button><input id="timeline-zoom" type="range" min={MIN_SCENE_ZOOM*100} max={MAX_SCENE_ZOOM*100} step="5" value={Math.round(sceneZoom*100)} onChange={event=>setSceneZoom(Number(event.target.value)/100)} aria-label="Масштаб видеоленты"/><output htmlFor="timeline-zoom" aria-live="polite">{Math.round(sceneZoom*100)}%</output><button type="button" aria-label="Увеличить масштаб" disabled={sceneZoom>=MAX_SCENE_ZOOM} onClick={()=>changeSceneZoom(.1)}><ZoomIn size={18}/></button></div>}
    <div ref={timelineViewport} className="timeline-content" aria-label={orientation==='horizontal'?'Горизонтальная видеолента':undefined} tabIndex={orientation==='horizontal'?0:undefined} onPointerDown={orientation==='horizontal'?startDrag:undefined} onPointerMove={orientation==='horizontal'?moveDrag:undefined} onPointerUp={orientation==='horizontal'?stopDrag:undefined} onPointerCancel={orientation==='horizontal'?stopDrag:undefined} onClickCapture={orientation==='horizontal'?event=>{if(suppressDragClick.current){event.preventDefault();event.stopPropagation();suppressDragClick.current=false;}}:undefined} onDragStart={orientation==='horizontal'?event=>event.preventDefault():undefined} onKeyDown={orientation==='horizontal'?event=>{if(event.key==='+'||event.key==='='){event.preventDefault();changeSceneZoom(.1);}else if(event.key==='-'){event.preventDefault();changeSceneZoom(-.1);}}:undefined}>
-    {order!=='dates'?<section className="timeline-year timeline-year--source"><h2>{order==='desc'?'Новые добавления':'Ранние добавления'}<sup>{ordered.length}</sup></h2><p className="undated-note">{order==='desc'?'Сначала последние добавленные работы, затем ранние.':'Сначала первые добавленные работы, затем новые.'} Дата публикации не влияет на этот порядок.</p><div className="timeline-items">{ordered.map(card)}</div></section>:<>
+    {order!=='dates'||manualDates?<section className="timeline-year timeline-year--source"><h2>{manualDates?'ИИ по датам':order==='desc'?'Новые добавления':'Ранние добавления'}<sup>{ordered.length}</sup></h2>{!manualDates&&<p className="undated-note">{order==='desc'?'Сначала последние добавленные работы, затем ранние.':'Сначала первые добавленные работы, затем новые.'} Дата публикации не влияет на этот порядок.</p>}<div className="timeline-items">{ordered.map(card)}</div></section>:<>
      {years.map(y=><section id={'year-'+y} className="timeline-year" key={y}><h2>{y}<sup>{dated.filter(v=>v.publishedAt.startsWith(y)).length}</sup></h2><div className="timeline-items">{dated.filter(v=>v.publishedAt.startsWith(y)).map(card)}</div></section>)}
      {undated.length>0&&<section id="year-unknown" className="timeline-year"><h2>Дата не указана<sup>{undated.length}</sup></h2><p className="undated-note">Дата публикации неизвестна. Материалы расположены по времени добавления.</p><div className="timeline-items">{undated.map(card)}</div></section>}
     </>}
@@ -273,6 +325,7 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
     <label>Ссылка на видео или публикацию<input required type="url" value={draft.url} onChange={event=>{setImportMessage('');setDraft({...draft,url:event.target.value,publishedAt:'',dateSource:'unknown',dateUrl:'',videoId:'',isVideo:false,image:'',title:'',description:''});}}/></label>
     <button type="button" disabled={busy||!draft.url} className="secondary-btn metadata-import-btn" onClick={importDraft}>{busy?'Загрузка…':'Подгрузить данные и обложку из YouTube, VK, Telegram или Instagram'}</button>
     <label>Автор / название<input required maxLength={160} value={draft.name} onChange={event=>setDraft({...draft,name:event.target.value})}/></label>
+    <label>Регион<select aria-label="Регион" value={draft.section||''} onChange={event=>setDraft({...draft,section:event.target.value as Video['section']})}><option value="">Не указан</option><option value="runet">Рунет</option><option value="world">Мир</option></select></label>
     <label>Название работы<input maxLength={250} value={draft.title} onChange={event=>setDraft({...draft,title:event.target.value})}/></label>
     <label>Дата публикации<input type="date" value={draft.publishedAt} onChange={event=>setDraft({...draft,publishedAt:event.target.value,dateSource:'manual',dateUrl:''})}/></label>
     <div className="video-cover-editor">

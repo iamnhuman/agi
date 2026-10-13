@@ -12,6 +12,9 @@ test('radar and the perspective grid advance from time alone',()=>{
  assert.notEqual(first.gridShift,next.gridShift);
  assert.notDeepEqual(first.depths,next.depths);
  assert.notDeepEqual(first.radar,next.radar);
+ assert.notEqual(first.panX,next.panX);
+ assert.notEqual(first.panY,next.panY);
+ assert.notEqual(first.tilt,next.tilt);
  assert.ok(next.radar[0].radius>first.radar[0].radius);
 });
 
@@ -24,6 +27,8 @@ test('waves and grid cycles remain bounded on mobile and desktop',()=>{
  for(const width of [390,1440,2048])for(const time of [0,5000,16000,60000,86400000]){
   const frame=timelineRunwayFrame(width,600,time);
   assert.ok(frame.gridShift>=0&&frame.gridShift<94);
+  assert.ok(Math.abs(frame.panX)<=Math.min(30,width*.02));
+  assert.ok(Math.abs(frame.panY)<=4&&Math.abs(frame.tilt)<=.008);
   assert.ok(frame.depths.every(depth=>depth>=0&&depth<1));
   assert.ok(frame.radar.every(wave=>wave.radius>=38&&wave.radius<=460&&wave.alpha>=0&&wave.alpha<=.22));
  }
