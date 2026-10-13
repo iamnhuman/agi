@@ -1,6 +1,114 @@
 {
   "artists": [
     {
+      "id": "7f4566ed-2ab1-4ff4-8acb-944b1a995909",
+      "kind": "artist",
+      "rating": "A",
+      "name": "Короче, Гена",
+      "url": "https://t.me/koroche_gena",
+      "platform": "Telegram",
+      "section": "runet",
+      "image": "./public/avatars/upload-f30bdeb091c44a15.jpg",
+      "description": "Геннадий Денежных, руководитель и креативный продюсер «Короче, Медиа». Лениво рассказываю, что знаю о креативе, видеопроизводстве, соцсетях и видео в целом.\t\tЕсли есть вопросы, запросы для постов, пишите мне в лс: @KorocheGena",
+      "tags": ""
+    },
+    {
+      "id": "63630221-deb1-45f1-adb1-f5a8dd67c48c",
+      "kind": "artist",
+      "rating": "AAA",
+      "name": "memuse.cast",
+      "url": "https://www.instagram.com/memuse.cast",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-4894b2ad542a3670.jpg",
+      "description": "106K Followers, 39 Following, 72 Posts - See Instagram photos and videos from Memuse (@memuse.cast)",
+      "tags": ""
+    },
+    {
+      "id": "46fc7d84-9c28-44bb-8adc-4c1df358c3a1",
+      "kind": "media",
+      "rating": "AAA",
+      "name": "Trabun",
+      "url": "https://t.me/danieltrbn",
+      "platform": "Telegram",
+      "section": "runet",
+      "image": "./public/avatars/upload-3518bdd82a22cb73.jpg",
+      "description": "Реклама и сотрудничество: @coldmay\t\tТренды в культуре и технологиях; AI, фильмы, сериалы, книги, музыка. Наблюдения за реальностью.\t\tАвтор: @dtrbn\t\t#AII9O\t\tНомер заявления: 7726253803",
+      "tags": ""
+    },
+    {
+      "id": "53c90fb7-cf15-485b-bd67-6a1d293f012a",
+      "kind": "artist",
+      "rating": "A",
+      "name": "Никита Шарипов",
+      "url": "https://t.me/sharipovnikita",
+      "platform": "Telegram",
+      "section": "runet",
+      "image": "./public/avatars/upload-a5a0c3a6ef0f099e.jpg",
+      "description": "Руковожу R&D направлением по созданию AI контент-заводов. Решаю нетривиальные инфраструктурные задачи и занимаюсь эксплуатацией нейросетей за пределами их  возможностей. Архитектура высоконагруженных систем в условиях агрессивных антифрод-систем.",
+      "tags": ""
+    },
+    {
+      "id": "b4e20414-0b90-4c0b-9303-5eba5759141e",
+      "kind": "artist",
+      "rating": "A",
+      "name": "Пелипас про нейросети",
+      "url": "https://t.me/pelipas_neuro",
+      "platform": "Telegram",
+      "section": "runet",
+      "image": "./public/avatars/upload-53d7bc63877bb7a2.jpg",
+      "description": "Ai creator. VEO3 и другие нейросети. Научу делать крутые видео. Автор блога Бабы Яги\t\tКонтакты тут pelipas.ru\tКурс тут https://pelipas.ru/obuchenie_neirosetyam\t\tИП Пелипас Дмитрий Анатольевич ИНН 644927984900",
+      "tags": ""
+    },
+    {
+      "id": "1ac52fd3-cadc-4702-9fb3-f85d70c85fb3",
+      "kind": "artist",
+      "rating": "A",
+      "name": "Исх’арт",
+      "url": "https://t.me/haolism",
+      "platform": "Telegram",
+      "section": "runet",
+      "image": "./public/avatars/upload-70ec5db9ae1feb2d.jpg",
+      "description": "Мой личный 'fuck handbook fashion' новой визуальной реальности\tПо вопросам в лс @haotlow\t\tПоддержка канала \thttps://t.me/boost/haolism",
+      "tags": ""
+    },
+    {
+      "id": "7f7c59fe-cb0e-4d0a-abd1-4f7ef283dec4",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "троян хорс",
+      "url": "https://t.me/trjnxhrs",
+      "platform": "Telegram",
+      "section": "runet",
+      "image": "./public/avatars/upload-be8fffb171e3d559.jpg",
+      "description": "троян хорс х trjnxhrs x hooorsik design",
+      "tags": ""
+    },
+    {
+      "id": "a131216e-5031-45e9-bd0b-77abf046c6a0",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "Mokhnataya Lora",
+      "url": "https://t.me/mokhnatayalora",
+      "platform": "Telegram",
+      "section": "runet",
+      "image": "./public/avatars/upload-1a13a7da1bda5b8e.jpg",
+      "description": "Работаю в @sholotch\tСвязь @pashadope",
+      "tags": ""
+    },
+    {
+      "id": "d55a349c-b952-4cc8-8620-04a006e0ce63",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "stroinaya",
+      "url": "https://www.instagram.com/stroinaya",
+      "platform": "Instagram",
+      "section": "runet",
+      "image": "./public/avatars/upload-fe18cb293551c577.jpg",
+      "description": "33K Followers, 1,224 Following, 2,230 Posts - See Instagram photos and videos from Tatyana Tereshchenko (Stroinaya) (@stroinaya)",
+      "tags": ""
+    },
+    {
       "id": "d7a08d3f-de61-4225-ac37-d1cd8f85cf77",
       "kind": "artist",
       "rating": "AAA",
@@ -442,6 +550,18 @@
       "section": "world",
       "image": "./public/avatars/upload-2fa096ba5645d1e5.jpg",
       "description": "289 Followers, 227 Following, 25 Posts - See Instagram photos and videos from Error404creative (@error404creativebrothers)",
+      "tags": ""
+    },
+    {
+      "id": "008053e4-a1bf-4069-a309-243d2a358640",
+      "kind": "media",
+      "rating": "AAA",
+      "name": "Ai molodca",
+      "url": "https://t.me/strangedalle",
+      "platform": "Telegram",
+      "section": "runet",
+      "image": "./public/avatars/upload-fe139f3aad72b6d4.jpg",
+      "description": "Авторские AI работы  и полезности. Новый мир исследует @dobrokotov_work (по всем вопросам).  https://aimolodca.com\t\tКурс: https://l.skbx.pro/SQY6aP\t\tРКН: https://surl.li/dpoifm",
       "tags": ""
     },
     {
@@ -1717,6 +1837,18 @@
       "tags": ""
     },
     {
+      "id": "eb2a6d09-efa5-4aaa-bb1b-974fc411d36c",
+      "kind": "media",
+      "rating": "AAA",
+      "name": "Psy Eyes",
+      "url": "https://t.me/Psy_Eyes",
+      "platform": "Telegram",
+      "section": "runet",
+      "image": "./public/avatars/upload-a761e4f82d3d826e.jpg",
+      "description": "Креатив + AI + Web3... и мемы\t\tЛичная страница @AndreyBezryadin\t\tЗа рекламой — в личку.",
+      "tags": ""
+    },
+    {
       "id": "6bfa633a-5887-4b67-9610-74cc0fa75e62",
       "kind": "artist",
       "rating": "AA",
@@ -2387,6 +2519,18 @@
       "tags": ""
     },
     {
+      "id": "6ff26c0f-a3f6-44c6-a377-4eee80ca1db8",
+      "kind": "media",
+      "rating": "AAA",
+      "name": "Digital Шкаф",
+      "url": "https://t.me/digitalshkaf",
+      "platform": "Telegram",
+      "section": "runet",
+      "image": "./public/avatars/upload-3615e8709de0a9eb.jpg",
+      "description": "Рассказываем про то, как технологии проникают в креативную индустрию. \t\tМного пишем про fashion-tech.\t\tАвтор: Алексей Кучма \t\tПо вопросам: @alexkuchmadshf",
+      "tags": ""
+    },
+    {
       "id": "seed-50",
       "kind": "artist",
       "rating": "AA",
@@ -2663,6 +2807,30 @@
       "tags": ""
     },
     {
+      "id": "8f765ca2-9a8d-40bb-898a-62cbe3e30dca",
+      "kind": "media",
+      "rating": "AAA",
+      "name": "Точки над ИИ",
+      "url": "https://t.me/TochkiNadAI",
+      "platform": "Telegram",
+      "section": "runet",
+      "image": "./public/avatars/upload-6da20a7a349b0faa.jpg",
+      "description": "• Учимся системной работе с AI\t• Провожу консультации для бизнеса и команд \t• В канале удобная навигация, любой AI-сервис в закрепленном посте\t\tАвтор: Ваня Юницкий \tЗаписаться в AI-кэмп: tochkicamp.ru\t\tРеклама: @hello_voic\t\tЧат: https://shorturl.at/gXE8C",
+      "tags": ""
+    },
+    {
+      "id": "6c0f5c08-0295-4e74-a8e2-09abb85e2f5f",
+      "kind": "media",
+      "rating": "AA",
+      "name": "Музыкальный ИИ",
+      "url": "https://t.me/gensound",
+      "platform": "Telegram",
+      "section": "runet",
+      "image": "./public/avatars/upload-565562a89b22253c.jpg",
+      "description": "Об ИИ в музыкальной индустрии\tПродвижение: https://mishas.tips/agency\tДистрибуция музыки: https://mishas.tips/mishasdistro\tДругие каналы: \t- о муз менеджменте @mishastips\t- об издании и монетизации музыки @mudinews\tАвтор: @mazunov",
+      "tags": ""
+    },
+    {
       "id": "seed-74",
       "kind": "artist",
       "rating": "AA",
@@ -2912,6 +3080,18 @@
       "section": "runet",
       "image": "./public/avatars/upload-7b8744ea55f4ac86.jpg",
       "description": "1,226 Followers, 1,574 Following, 94 Posts - See Instagram photos and videos from &#x42d;&#x43b;&#x43c;&#x430;&#x43d; (@gazed)",
+      "tags": ""
+    },
+    {
+      "id": "47f0e907-faf6-436c-a013-802180830b88",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "olenjon",
+      "url": "https://www.instagram.com/olenjon",
+      "platform": "Instagram",
+      "section": "runet",
+      "image": "./public/avatars/upload-3d236c80f72eadd7.jpg",
+      "description": "37K Followers, 1,704 Following, 1,990 Posts - See Instagram photos and videos from Oleg Trofim (@olenjon)",
       "tags": ""
     },
     {

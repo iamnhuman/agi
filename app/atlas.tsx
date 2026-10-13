@@ -544,7 +544,7 @@ return <>
 <div className="catalog-tag-filter"><span>ТЕГ</span><div className="catalog-type-radios" role="radiogroup" aria-label="Рейтинг тегов">{[['all','Все'],['A','A'],['AA','AA'],['AAA','AAA'],['AAA+','AAA+']].map(([id,label])=><label key={id} className={rating===id?'is-active':''}><input type="radio" name="catalog-rating" value={id} checked={rating===id} onChange={()=>setRating(id)}/><span>{label}</span></label>)}</div></div>
 </div>
  </div></div></div>{view==='names'?<ArtistNameFlow artists={artists}/>:view==='map'?<ArtistMap artists={artists} sections={sections}/>:view==='deck'?<ArtistCanvasDeck artists={artists} zoom={deckZoom} onZoomStep={changeDeckZoom}/>:<div className={view==='list'?'artist-list':'artist-grid'} data-size={view==='grid'?cardSize:listSize}>{artists.map((a,i)=>
-<article className="artist-card" data-rating={a.rating||'A'} data-kind={a.kind||'artist'} data-section={a.section} style={cardMaterial(a.id)} key={a.id} onPointerMove={view==='grid'?trackDossierPointer:undefined} onPointerLeave={view==='grid'?resetDossierPointer:undefined}>
+<article className="artist-card" data-rating={a.rating||'A'} data-kind={a.kind||'artist'} data-section={a.section} style={cardMaterial(a.id)} key={a.id} onPointerMove={trackDossierPointer} onPointerLeave={resetDossierPointer}>
 <div className={'art art-'+i%8}>
 <span className="art-index">{String(i+1).padStart(3,'0')}</span>
 <div className="missing-avatar" role="img" aria-label="Аватарка отсутствует">
@@ -568,7 +568,7 @@ return <>
 {a.kind==='collective'?<span className="list-kind-tag"><UsersRound size={11} aria-hidden="true"/>Проект</span>:a.kind==='media'?<span className="list-kind-tag"><Radio size={11} aria-hidden="true"/>Медиа</span>:null}
 </p>}
 </div>{view==='grid'&&<DossierInstruments id={a.id}/>}</div>
-{view==='list'&&<span className="list-source-cue" aria-hidden="true"><ArrowUpRight size={14}/></span>}
+{view==='list'&&<><DossierInstruments id={a.id} registry/><span className="list-source-cue" aria-hidden="true"><ArrowUpRight size={14}/></span></>}
 {view!=='deck'&&<a className="card-hit-area" href={a.url} target="_blank" rel="noopener noreferrer" aria-label={"Открыть источник: "+a.name}/>}
 {showLocalAdmin&&view!=='grid'&&<a className="card-edit" aria-label={"Редактировать "+a.name} href={adminUrl+"/?edit="+encodeURIComponent(a.id)+"#catalog"}><Pencil size={15}/></a>}
 </article>)}</div>}{!artists.length&&view!=='deck'&&<p className="empty">Сигнал не обнаружен. Измените запрос или фильтр.</p>}</section>

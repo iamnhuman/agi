@@ -35,11 +35,20 @@
 @media(max-width:360px){.admin-grid{grid-template-columns:1fr!important}}
 /* Dragging the artist map must not select its labels or controls. */
 .map-kind>text{fill:#e0edcf;font:700 20px monospace;letter-spacing:2px;text-transform:uppercase}.map-kind>line{stroke:#536346;stroke-width:1;stroke-dasharray:5 10}.map-group-count{fill:#7f9570;font:8px monospace;letter-spacing:.8px}.map-wrap,.map-wrap *{-webkit-user-select:none;user-select:none}
-/* Reserve a header above the canvas so its labels stay clear of the legend at every width. */
-.map-note{position:relative;top:auto;right:auto;left:auto;padding:20px 22px 14px;text-align:right}
-.map-note span{margin-left:18px;margin-right:0}
-.map-note span:first-child{margin-left:0}
-.map-note p{margin:10px 0 0;line-height:1.6}
+/* Legend and instructions live outside the clipped, movable map surface. */
+.map-panel{min-width:0}
+.map-note{
+  position:relative;z-index:auto;inset:auto;display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:10px 24px;padding:0 2px 12px;text-align:left;pointer-events:auto;
+}
+.map-legend{display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px}
+.map-note span{margin:0;font-size:8px;line-height:1.6;letter-spacing:0}
+.map-note p{flex:1;margin:0;font-size:8px;line-height:1.8;text-align:right}
+@media(max-width:700px){
+  .map-note{gap:8px;padding-bottom:10px}
+  .map-note span{font-size:7px}
+  .map-note p{flex-basis:100%;font-size:7px;text-align:left}
+}
 .map-wrap>svg{overflow:hidden}
 .topbar>a{height:40px;display:flex;align-items:center;line-height:1}.topbar .brand{height:40px;line-height:1}.topbar .brand svg{flex:0 0 auto}.topbar .brand span{min-height:28px;display:flex;align-items:center;line-height:1}.topbar .header-section-link,.topbar .admin-link{height:40px;line-height:1}
 .artist-list[data-size="sm"]{grid-template-columns:repeat(5,minmax(0,1fr));gap:0 24px}.artist-list[data-size="sm"] .artist-card>.art{width:64px;height:64px}.artist-list[data-size="md"]{grid-template-columns:repeat(3,minmax(0,1fr));gap:0 30px}.artist-list[data-size="lg"]{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 36px}.artist-list[data-size="lg"] .artist-card>.art{width:112px;height:88px}.catalog-density button{min-width:34px;width:auto;padding:0 7px}
@@ -5847,8 +5856,9 @@ footer{width:var(--site-panel-width);margin-inline:auto}
 .dossier-instruments{
   --instrument-duration:300ms;--instrument-step:calc(var(--instrument-duration) / 10);
   --receiver-step:calc(var(--instrument-duration) / 7);
-  --instrument-rest:#788b80;--instrument-ink:var(--instrument-rest);--instrument-light:var(--card-accent,var(--name-rank,#ffe174));
-  --instrument-glow:color-mix(in srgb,var(--instrument-light) 55%,transparent);
+  --instrument-rest:#788680;--instrument-ink:var(--instrument-rest);--instrument-light:#bfc9c3;
+  --instrument-glow:color-mix(in srgb,var(--instrument-light) 24%,transparent);
+  --instrument-accent:var(--card-accent,var(--instrument-light));
   container-name:dossier-instruments;container-type:inline-size;
   position:absolute;z-index:4;left:8px;right:8px;bottom:5px;height:28px;
   box-sizing:border-box;display:flex;align-items:center;gap:5px;padding:2px 5px;
@@ -5885,6 +5895,42 @@ footer{width:var(--site-panel-width);margin-inline:auto}
   box-shadow:inset 0 1px #b5c5b830;transform-origin:bottom;
   transition:background .14s ease,box-shadow .14s ease;
 }
+.dossier-waveform,.dossier-dials{display:block;width:100%;min-width:0;max-width:78px;height:14px;overflow:visible;stroke:var(--instrument-rest);stroke-width:1}
+.dossier-waveform-grid{opacity:.2}
+.dossier-scope-trace{stroke:var(--instrument-rest);opacity:.8}
+.dossier-dials{max-width:70px;height:18px}
+.dossier-dial-case{opacity:.45}
+.dossier-dial-needle{stroke:var(--instrument-ink)}
+.dossier-scanner{display:flex;flex:1;flex-direction:column;justify-content:center;gap:2px;min-width:0;max-width:68px;height:14px}
+.dossier-scanner-lane{display:flex;gap:1px;height:2px}
+.dossier-scanner-lane i{display:block;flex:1;min-width:1px;height:2px;border-radius:0;background:#2f4038}
+.dossier-scanner-lane i[data-lit="1"]{background:#718178}
+.dossier-radar,.dossier-cascade,.dossier-phase{
+  display:block;width:100%;min-width:0;max-width:76px;height:18px;
+  stroke:var(--instrument-rest);stroke-width:1;
+}
+.dossier-radar{height:20px;max-width:68px}
+.dossier-radar-grid,.dossier-cascade-track{opacity:.35;stroke-width:.7}
+.dossier-radar-sweep{stroke:var(--instrument-ink);transform-origin:12px 10px;transform:rotate(var(--radar-angle))}
+.dossier-phase{max-width:70px;stroke-linecap:round;stroke-linejoin:round}
+.dossier-phase-grid{stroke:#61796b;stroke-width:.6;opacity:.35}
+.dossier-instruments[data-instrument="radar"] .dossier-signal-screen{
+  border-radius:9px 2px 2px 9px;background:radial-gradient(circle at 22% 50%,#25433255,transparent 45%),#030b08;
+}
+.dossier-instruments[data-instrument="cascade"] .dossier-signal-screen{
+  background:repeating-linear-gradient(0deg,#7c918114 0 1px,transparent 1px 4px),#030b08;
+}
+.dossier-instruments[data-instrument="phase"] .dossier-signal-screen{
+  border-top-color:#65796b60;border-bottom-color:#65796b60;
+  background:linear-gradient(180deg,#020607,#17241b 50%,#020607);
+}
+/* Each record keeps its instrument family, geometry and light pattern. */
+.dossier-instruments[data-instrument-layout="target-first"] .dossier-target{order:-2}
+.dossier-instruments[data-instrument-layout="target-first"] .dossier-matrix{order:-1}
+.dossier-instruments[data-instrument-layout="target-first"] .dossier-target-status{order:-1}
+.dossier-instruments[data-instrument-layout="matrix-last"] .dossier-matrix{order:1}
+.dossier-instruments[data-instrument-layout="matrix-first"] .dossier-matrix{order:-1}
+.dossier-instruments:is([data-instrument="dials"],[data-instrument="radar"],[data-instrument="cascade"],[data-instrument="phase"]) .dossier-signal-glyph{display:none}
 .dossier-matrix{
   display:grid;grid-template-columns:repeat(6,2px);grid-template-rows:repeat(3,2px);gap:2px 1px;
   flex:none;align-content:center;justify-content:center;height:20px;padding:0 5px;
@@ -5893,6 +5939,19 @@ footer{width:var(--site-panel-width);margin-inline:auto}
 }
 .dossier-matrix i{display:block;width:2px;height:2px;border-radius:0;background:#35463e;box-shadow:0 1px #0008}
 .dossier-matrix i[data-lit="1"]{background:#819582;opacity:.65}
+.dossier-instruments[data-instrument="scanner"] .dossier-matrix{
+  grid-template-columns:repeat(3,2px);grid-template-rows:repeat(6,2px);gap:1px 2px;
+}
+.dossier-instruments[data-instrument-panel="orbit"] .dossier-matrix{position:relative;display:block;width:26px;padding:0 4px}
+.dossier-instruments[data-instrument-panel="orbit"] .dossier-matrix i{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(var(--lamp-angle)) translateY(-7px);
+}
+.dossier-instruments[data-instrument-panel="ladder"] .dossier-matrix{
+  grid-template-columns:repeat(2,6px);grid-template-rows:repeat(9,1px);gap:1px 3px;
+}
+.dossier-instruments[data-instrument-panel="ladder"] .dossier-matrix i{width:6px;height:1px}
+.dossier-instruments[data-instrument-panel="banks"] .dossier-matrix{grid-template-columns:repeat(3,2px) 3px repeat(3,2px);row-gap:3px}
+.dossier-instruments[data-instrument-panel="banks"] .dossier-matrix i:nth-child(6n+4){grid-column:5}
 .dossier-target{
   display:flex;align-items:center;justify-content:center;gap:4px;flex:none;height:22px;
 }
@@ -5910,41 +5969,77 @@ footer{width:var(--site-panel-width);margin-inline:auto}
   display:block;width:4px;height:4px;border:1px solid #090e0c;border-radius:50%;background:#ff3b30;
   box-shadow:inset 0 1px #ffffff60,0 0 4px #ff3b3080;
 }
-.artist-grid:not(.artist-deck) .artist-card:is(:hover,:focus-within) .dossier-instruments,
+:is(.artist-grid:not(.artist-deck),.artist-list) .artist-card:is(:hover,:focus-within) .dossier-instruments,
 .video-section .video-card:is(:hover,:focus-within) .dossier-instruments,
 .dossier-instruments--preview{
   --instrument-ink:var(--instrument-light);
   border-bottom-color:color-mix(in srgb,var(--instrument-light) 45%,transparent);
 }
-.artist-grid:not(.artist-deck) .artist-card:is(:hover,:focus-within) .dossier-receiver-bars i,
+:is(.artist-grid:not(.artist-deck),.artist-list) .artist-card:is(:hover,:focus-within) .dossier-receiver-bars i,
 .video-section .video-card:is(:hover,:focus-within) .dossier-receiver-bars i,
 .dossier-instruments--preview .dossier-receiver-bars i{
   --receiver-animation:dossier-receiver-scan var(--receiver-step) step-end calc(var(--receiver-step) * var(--signal-index)) 1 backwards;
   color:var(--instrument-light);box-shadow:0 0 3px var(--instrument-glow);opacity:1;
   animation:var(--receiver-animation);
 }
-:is(.artist-grid:not(.artist-deck) .artist-card:is(:hover,:focus-within),.video-section .video-card:is(:hover,:focus-within)) .dossier-matrix i[data-lit="1"],
+:is(:is(.artist-grid:not(.artist-deck),.artist-list) .artist-card:is(:hover,:focus-within),.video-section .video-card:is(:hover,:focus-within)) .dossier-matrix i[data-lit="1"],
 .dossier-instruments--preview .dossier-matrix i[data-lit="1"]{
   --receiver-animation:dossier-receiver-scan var(--receiver-step) step-end calc(var(--receiver-step) * var(--signal-index)) 1 backwards;
-  background:var(--instrument-light);box-shadow:0 0 2px var(--instrument-glow);opacity:1;
+  background:var(--instrument-accent);box-shadow:0 0 2px color-mix(in srgb,var(--instrument-accent) 30%,transparent);opacity:1;
   animation:var(--receiver-animation);
 }
-:is(.artist-grid:not(.artist-deck) .artist-card:is(:hover,:focus-within),.video-section .video-card:is(:hover,:focus-within)) :is(.dossier-target-scale,.dossier-target-jaw,.dossier-target-crosshair),
+:is(:is(.artist-grid:not(.artist-deck),.artist-list) .artist-card:is(:hover,:focus-within),.video-section .video-card:is(:hover,:focus-within)) .dossier-scope-trace,
+.dossier-instruments--preview .dossier-scope-trace{
+  --receiver-animation:dossier-receiver-scan var(--receiver-step) step-end calc(var(--receiver-step) * var(--signal-index)) 1 backwards;
+  stroke:var(--instrument-light);opacity:1;animation:var(--receiver-animation);
+}
+:is(:is(.artist-grid:not(.artist-deck),.artist-list) .artist-card:is(:hover,:focus-within),.video-section .video-card:is(:hover,:focus-within)) .dossier-radar-sweep,
+.dossier-instruments--preview .dossier-radar-sweep{animation:dossier-radar-lock var(--instrument-duration) steps(7,end) 1 backwards}
+:is(:is(.artist-grid:not(.artist-deck),.artist-list) .artist-card:is(:hover,:focus-within),.video-section .video-card:is(:hover,:focus-within)) .dossier-scanner-lane i[data-lit="1"],
+.dossier-instruments--preview .dossier-scanner-lane i[data-lit="1"]{
+  --receiver-animation:dossier-receiver-scan var(--receiver-step) step-end calc(var(--receiver-step) * var(--signal-index)) 1 backwards;
+  background:var(--instrument-light);box-shadow:0 0 2px var(--instrument-glow);opacity:1;animation:var(--receiver-animation);
+}
+:is(:is(.artist-grid:not(.artist-deck),.artist-list) .artist-card:is(:hover,:focus-within),.video-section .video-card:is(:hover,:focus-within)) :is(.dossier-target-scale,.dossier-target-jaw,.dossier-target-crosshair),
 .dossier-instruments--preview :is(.dossier-target-scale,.dossier-target-jaw,.dossier-target-crosshair){
   --target-animation:dossier-target-light var(--instrument-step) step-end calc(var(--instrument-step) * var(--target-index)) 1 backwards;
   animation:var(--target-animation);
 }
-.artist-grid:not(.artist-deck) .artist-card:is(:hover,:focus-within) .dossier-target-jaw--left,
+:is(.artist-grid:not(.artist-deck),.artist-list) .artist-card:is(:hover,:focus-within) .dossier-target-jaw--left,
 .video-section .video-card:is(:hover,:focus-within) .dossier-target-jaw--left,
 .dossier-instruments--preview .dossier-target-jaw--left{transform:translateX(2px)}
-.artist-grid:not(.artist-deck) .artist-card:is(:hover,:focus-within) .dossier-target-jaw--right,
+:is(.artist-grid:not(.artist-deck),.artist-list) .artist-card:is(:hover,:focus-within) .dossier-target-jaw--right,
 .video-section .video-card:is(:hover,:focus-within) .dossier-target-jaw--right,
 .dossier-instruments--preview .dossier-target-jaw--right{transform:translateX(-2px)}
-.artist-grid:not(.artist-deck) .artist-card:is(:hover,:focus-within) .dossier-target-crosshair,
+:is(.artist-grid:not(.artist-deck),.artist-list) .artist-card:is(:hover,:focus-within) .dossier-target-crosshair,
 .video-section .video-card:is(:hover,:focus-within) .dossier-target-crosshair{
   transform:translate(var(--target-x,0px),var(--target-y,0px));
 }
 .dossier-instruments--preview{left:12px;right:12px;bottom:6px}
+/* Registry rails occupy their own row so the existing identity bay stays intact. */
+.artist-list[data-size] .artist-card[data-rating]{
+  grid-template-rows:minmax(var(--list-avatar),auto) 26px;row-gap:9px;
+}
+.artist-list[data-size] .artist-card[data-rating]>.dossier-instruments--registry{
+  position:relative;inset:auto;grid-column:1/-1;width:100%;height:26px;
+  gap:7px;padding:2px 8px;border-radius:1px;
+  border-color:#060c0d #4b5c554d #7384798c #182520;
+  background:linear-gradient(180deg,#2d3935,#0d1715 18% 82%,#24312a);
+  box-shadow:inset 0 0 0 1px #020607,inset 0 3px 4px #0008,0 -1px #0009,0 1px #b3c2aa1f;
+}
+.dossier-instruments--registry::before,.dossier-instruments--registry::after{top:10px}
+.dossier-instruments--registry .dossier-signal-screen{
+  background:repeating-linear-gradient(90deg,#8c9c8512 0 1px,transparent 1px 8px),
+    repeating-linear-gradient(0deg,#79908409 0 1px,transparent 1px 3px),linear-gradient(180deg,#020708,#0b1512);
+}
+.dossier-instruments--registry .dossier-matrix{min-width:34px;height:20px}
+.dossier-instruments--registry .dossier-target{gap:6px;height:20px}
+.dossier-instruments--registry .dossier-target svg{width:35px;height:20px}
+.artist-list[data-size] .artist-card[data-rating]>.card-edit{
+  top:calc(var(--list-inset) + var(--list-avatar) - 28px);
+  left:calc(var(--list-inset) + var(--list-avatar) - 28px);right:auto;bottom:auto;
+  width:28px;height:28px;min-width:28px;min-height:28px;
+}
 @container dossier-instruments (max-width:150px){
   .dossier-signal-glyph{display:none}
   .dossier-matrix{padding-inline:4px}
@@ -5957,7 +6052,12 @@ footer{width:var(--site-panel-width);margin-inline:auto}
   .dossier-target svg{width:30px;height:20px}
 }
 @container dossier-instruments (max-width:95px){
-  .dossier-matrix{display:none}
+  .dossier-instruments[data-instrument] .dossier-matrix{display:none}
+  /* The reticle center carries the single rating accent when the matrix is omitted. */
+  :is(:is(.artist-grid:not(.artist-deck),.artist-list) .artist-card:is(:hover,:focus-within),.video-section .video-card:is(:hover,:focus-within)) .dossier-target-crosshair,
+  .dossier-instruments--preview .dossier-target-crosshair{
+    --instrument-light:var(--instrument-accent);stroke:var(--instrument-accent);
+  }
 }
 @container dossier-instruments (max-width:80px){
   .dossier-signal-screen{padding-inline:1px}
@@ -5968,6 +6068,10 @@ footer{width:var(--site-panel-width);margin-inline:auto}
   0%{opacity:.22}
   100%{opacity:1}
 }
+@keyframes dossier-radar-lock{
+  from{transform:rotate(calc(var(--radar-angle) - 90deg))}
+  to{transform:rotate(var(--radar-angle))}
+}
 @keyframes dossier-target-light{
   0%{stroke:var(--instrument-rest)}
   100%{stroke:var(--instrument-light)}
@@ -5975,10 +6079,10 @@ footer{width:var(--site-panel-width);margin-inline:auto}
 @media(prefers-reduced-motion:reduce){
   .dossier-instruments *{animation:none!important;transition:none!important}
   /* Keep the light sequence; reduced motion still freezes all geometry. */
-  .dossier-receiver-bars i,.dossier-matrix i{animation:var(--receiver-animation,none)!important}
+  .dossier-receiver-bars i,.dossier-matrix i,.dossier-scope-trace,.dossier-scanner-lane i{animation:var(--receiver-animation,none)!important}
   .dossier-target-scale,.dossier-target-jaw,.dossier-target-crosshair{animation:var(--target-animation,none)!important}
   .dossier-instruments .dossier-target-jaw{transform:none!important}
-  .artist-grid:not(.artist-deck) .artist-card:is(:hover,:focus-within) .dossier-target-crosshair,
+  :is(.artist-grid:not(.artist-deck),.artist-list) .artist-card:is(:hover,:focus-within) .dossier-target-crosshair,
   .video-section .video-card:is(:hover,:focus-within) .dossier-target-crosshair{transform:none}
 }
 
