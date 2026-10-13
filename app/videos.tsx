@@ -9,6 +9,7 @@ import {cardMaterial} from './card-material';
 import DossierInstruments,{trackDossierPointer,resetDossierPointer} from './dossier-instruments';
 import {orderVideos,type VideoOrder} from './video-order';
 import type {Video} from '@/lib/types';
+import VideoPlayer from './video-player';
 const blank:Video={id:'',name:'',url:'',platform:'',videoId:'',reference:false,isVideo:false,title:'',publishedAt:'',dateSource:'unknown',dateUrl:'',image:'',alternateUrls:[],sourceOrder:0};
 const fallbackImage='./video-fallback.svg';
 const platformShortNames:Record<string,string>={Instagram:'IG',YouTube:'YT',Telegram:'TG',VK:'VK'};
@@ -18,15 +19,6 @@ function coverError(event:React.SyntheticEvent<HTMLImageElement>,video:Video){
  const image=event.currentTarget,youtube=video.videoId&&`https://i.ytimg.com/vi/${video.videoId}/hqdefault.jpg`;
  if(image.src.endsWith('/video-fallback.svg'))return;
  image.src=youtube&&image.src!==youtube?youtube:fallbackImage;
-}
-function instagramEmbedUrl(video:Video){
- if(video.platform!=='Instagram'||video.reference)return '';
- try{
-  const url=new URL(video.url);
-  if(!['instagram.com','www.instagram.com'].includes(url.hostname.toLowerCase()))return '';
-  const post=url.pathname.match(/^\/(p|reel|tv)\/([A-Za-z0-9_-]{5,30})\/?$/);
-  return post?`https://www.instagram.com/${post[1]}/${post[2]}/embed/`:'';
- }catch{return '';}
 }
 function VideoName({name,onOpen,url}:{name:string;onOpen:()=>void;url?:string}){
  const ref=useRef<HTMLButtonElement|HTMLAnchorElement>(null),windowRef=useRef<HTMLSpanElement>(null),copyRef=useRef<HTMLSpanElement>(null);
@@ -223,7 +215,7 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
    const response=await fetch('/api/video-import',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:draft.url})});
    const result=await response.json();if(!response.ok)throw Error(result.error);
    setDraft(current=>({...current!,...result,name:current!.name||result.title||'',title:result.title||current!.title,publishedAt:result.publishedAt||current!.publishedAt,dateSource:result.publishedAt?result.dateSource:current!.dateSource,dateUrl:result.publishedAt?result.dateUrl:current!.dateUrl,image:result.image||current!.image}));
-   setImportMessage(result.imageSavedLocally?'Обложка найдена и сохранена локально. Проверьте данные.':result.image?'Обложка найдена, но сохранить её локально не удалось. '+(result.imageNotice||''):'Источник не отдал изображение. Загрузите свой файл или укажите ссылку на обложку.');
+   setImportMessage((result.media?'Видео сохранено для просмотра на сайте. ':result.videoNotice?'Не удалось сохранить видео: '+result.videoNotice+' ':'')+(result.imageSavedLocally?'Обложка найдена и сохранена локально. Проверьте данные.':result.image?'Обложка найдена, но сохранить её локально не удалось. '+(result.imageNotice||''):'Источник не отдал изображение. Загрузите свой файл или укажите ссылку на обложку.'));
   }catch(error){setFormError((error as Error).message);}finally{setBusy(false);}
  }
  async function uploadCover(file:File){
@@ -240,7 +232,7 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
  function card(v:Video){
   const [year,month,day]=v.publishedAt?.split('-')||[];
   const compactDate=year&&month&&day?`${day}.${month}.${year.slice(-2)}`:'БЕЗ ДАТЫ';
-  const playable=Boolean(v.videoId||(v.isVideo&&instagramEmbedUrl(v)));
+  const playable=Boolean(v.videoId||v.media);
   const cover=<><img className="video-cover-image" src={coverSource(v)} alt="" loading="lazy" referrerPolicy="no-referrer" onError={e=>coverError(e,v)}/>{playable&&<span className="video-play video-cover-icon"><Play size={20} aria-hidden="true"/></span>}{v.section&&<span className="video-region-badge video-cover-icon" data-section={v.section} title={v.section==='world'?'Мир':'Рунет'}><img src={v.section==='world'?'./badges/region-en-eagle-cutout.png':'./badges/region-ru-emblem-cutout.png'} alt={v.section==='world'?'Мир':'Рунет'}/></span>}</>;
   return <article className="video-card" ref={node=>{if(node)videoRefs.current.set(v.id,node);else videoRefs.current.delete(v.id);}} data-video-id={v.id} data-curator={admin||undefined} data-position={admin?positions.get(v.id):undefined} style={cardMaterial(v.id)} key={v.id} onPointerMove={trackDossierPointer} onPointerLeave={resetDossierPointer}>
    {admin&&<Popover open={positionDraft?.id===v.id} onOpenChange={open=>{if(moving)return;if(open)editPosition(v);else setPositionDraft(null);}}>
@@ -266,7 +258,6 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
    {admin?<div className="video-actions"><button disabled={moving} aria-label={'Редактировать видео '+v.name} onClick={()=>edit(v)}><Pencil size={17}/></button><button disabled={moving} aria-label={'Удалить видео '+v.name} onClick={()=>setDeleting(v)}><Trash2 size={17}/></button></div>:showLocalAdmin&&<a className="card-edit video-card-edit" href={adminUrl+"/?edit="+encodeURIComponent(v.id)+"#videos"} aria-label={"Редактировать видео "+v.name} title="Редактировать материал"><Pencil size={16} aria-hidden="true"/></a>}
   </article>;
  }
- const instagramEmbed=selected?instagramEmbedUrl(selected):'';
  return <section className="video-section">
   <div className="video-heading"><div><div className="eyebrow">{admin?'КУРАТОРСКАЯ · УПРАВЛЕНИЕ ВИДЕО':'ПРИМЕНЕНИЕ ИИ · АРХИВ РАБОТ'}</div><h1>ИИ в творчестве<span>.</span></h1><p>{admin?'Добавляйте видео и публикации, редактируйте подписи и обложки карточек.':'Музыка, видео, визуальные работы и эксперименты с ИИ. Смотрите работы по возрастанию или убыванию порядка в архиве.'}</p></div>{admin&&<div className="video-admin-actions"><button className="primary-btn" onClick={()=>edit()}><Plus size={18}/>Добавить работу</button></div>}</div>
   <div className="video-toolbar">
@@ -304,7 +295,7 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
    </div>
    </div>
   </div>}
- <Dialog open={!!selected} onOpenChange={open=>{if(!open)setSelected(null);}}><DialogContent className={`editor-dialog video-dialog${instagramEmbed?' video-dialog--instagram':''}`}><DialogTitle>{selected?.name}</DialogTitle><DialogDescription>{selected?.title||selected?.platform}</DialogDescription>{selected?.videoId?<iframe title={selected.name} src={'https://www.youtube-nocookie.com/embed/'+selected.videoId} referrerPolicy="strict-origin-when-cross-origin" allow="encrypted-media; picture-in-picture; fullscreen" allowFullScreen/>:instagramEmbed?<div className="instagram-player"><iframe key={instagramEmbed} title={`Instagram · ${selected?.name}`} src={instagramEmbed} scrolling="no" referrerPolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen/></div>:<p>Встроенный просмотр недоступен. Откройте материал у источника.</p>}{selected?.reference&&<p className="notice">В архиве указан профиль или сайт, а не отдельная публикация.</p>}<a className="primary-btn" href={selected?.url} target="_blank" rel="noreferrer">Открыть источник · {selected?.platform}<ArrowUpRight size={17}/></a>{selected?.alternateUrls.map((url,i)=><a key={url} href={url} target="_blank" rel="noreferrer">Резервный источник {i+1} ↗</a>)}</DialogContent></Dialog>
+ <Dialog open={!!selected} onOpenChange={open=>{if(!open)setSelected(null);}}>{selected&&<VideoPlayer key={selected.id} video={selected}/>}</Dialog>
  <Dialog open={!!draft} onOpenChange={open=>{if(!open&&!busy)setDraft(null);}}>
   <DialogContent className="editor-dialog video-editor-dialog" onCloseAutoFocus={event=>{
    event.preventDefault();
@@ -334,7 +325,7 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
    }}>
     <label>Номер в списке<input aria-label="Номер в списке" aria-describedby="video-editor-position-hint" required type="number" inputMode="numeric" min={1} max={videos.length+(draft.id?0:1)} step={1} value={draftPosition} onChange={event=>setDraftPosition(event.target.value)}/></label>
     <p className="video-editor-position-hint" id="video-editor-position-hint">В порядке «{order==='desc'?'По убыванию':'По возрастанию'}», от 1 до {videos.length+(draft.id?0:1)}. Остальные карточки сдвинутся автоматически.</p>
-    <label>Ссылка на видео или публикацию<input required type="url" value={draft.url} onChange={event=>{setImportMessage('');setDraft({...draft,url:event.target.value,publishedAt:'',dateSource:'unknown',dateUrl:'',videoId:'',isVideo:false,image:'',title:''});}}/></label>
+    <label>Ссылка на видео или публикацию<input required type="url" value={draft.url} onChange={event=>{setImportMessage('');setDraft({...draft,url:event.target.value,publishedAt:'',dateSource:'unknown',dateUrl:'',videoId:'',isVideo:false,media:'',image:'',title:''});}}/></label>
     <button type="button" disabled={busy||!draft.url} className="secondary-btn metadata-import-btn" onClick={importDraft}>{busy?'Загрузка…':'Подгрузить данные и обложку из YouTube, VK, Telegram или Instagram'}</button>
     <label>Автор / название<input required maxLength={160} value={draft.name} onChange={event=>setDraft({...draft,name:event.target.value})}/></label>
     <label>Регион<select aria-label="Регион" value={draft.section||''} onChange={event=>setDraft({...draft,section:event.target.value as Video['section']})}><option value="">Не указан</option><option value="runet">Рунет</option><option value="world">Мир</option></select></label>

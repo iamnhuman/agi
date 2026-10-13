@@ -1650,10 +1650,6 @@ footer .manifesto{position:relative;contain:none;overflow:visible;min-height:180
 .editor-dialog.video-dialog::-webkit-scrollbar{width:6px;height:0}
 .editor-dialog.video-dialog::-webkit-scrollbar-track{border:0;background:transparent;box-shadow:none}
 .editor-dialog.video-dialog::-webkit-scrollbar-thumb{border:0;border-radius:6px;background:#67736c;box-shadow:none}
-.video-dialog--instagram{width:min(460px,calc(100vw - 32px));max-width:460px!important;max-height:calc(100dvh - 32px);overflow-y:auto}
-.instagram-player{width:100%;min-width:0;container-type:inline-size}
-.video-dialog--instagram .instagram-player iframe{display:block;width:100%;height:calc(125cqw + 70px);aspect-ratio:auto;background:#fff}
-@media(max-width:480px){.editor-dialog.video-dialog--instagram{width:calc(100vw - 16px);padding:12px!important}}
 .video-admin-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap}
 .video-heading:has(.video-admin-actions){flex-wrap:wrap}
 .video-heading:has(.video-admin-actions)>div:first-child{min-width:min(100%,500px);flex:1 1 500px}
@@ -6449,3 +6445,21 @@ footer{width:var(--site-panel-width);margin-inline:auto}
 }
 
 .video-editor-form .video-editor-position-hint{margin:-6px 0 0;color:#b6c2b4;font-size:9px;line-height:1.8}
+
+.video-player-dialog[role=dialog]{
+  width:min(960px,calc(100vw - 24px),calc((100dvh - 64px) * var(--video-player-ratio,1.77778)));
+  max-width:none!important;max-height:calc(100dvh - 64px);padding:0!important;gap:0;
+  border:0!important;border-radius:4px!important;background:#000!important;
+  box-shadow:0 24px 80px #000c!important;overflow:hidden;
+}
+.video-player-dialog>video,.video-player-dialog>iframe{
+  display:block;width:100%;max-height:calc(100dvh - 64px);aspect-ratio:var(--video-player-ratio,1.77778);
+  object-fit:contain;border:0;background:#000;
+}
+.video-player-dialog>[data-slot=dialog-close]{
+  z-index:2;top:8px;right:8px;display:grid;place-items:center;width:34px;height:34px;
+  border:1px solid #ffffff40;border-radius:3px;background:#0a0c0ed9;color:#f4f5ef;opacity:1;
+}
+.video-player-dialog>[data-slot=dialog-close]:hover{background:#343a3f}
+.video-playback-error{padding:48px 24px;color:#f4f5ef;font-size:11px;line-height:1.8}
+.video-playback-error a{color:#ffdf79;text-decoration:underline}

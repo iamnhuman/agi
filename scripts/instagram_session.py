@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Keep an Instagram session local and return only profile avatar URLs."""
+"""Keep an Instagram session local and resolve public profile and post media."""
 from __future__ import annotations
 
 import argparse
@@ -197,6 +197,7 @@ def post(shortcode: str) -> None:
         "publishedAt": media.date_utc.date().isoformat(),
         "title": (media.caption or "").strip()[:250],
         "isVideo": bool(media.is_video),
+        "videoUrl": media.video_url if media.is_video else None,
     }))
 
 

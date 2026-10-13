@@ -3146,7 +3146,8 @@
       "fetchUrl": "https://www.instagram.com/p/DYFQ3K4pmBD/",
       "reference": false,
       "isVideo": true,
-      "section": "runet"
+      "section": "runet",
+      "media": "./public/videos/clip-ade364521475e8fa.mp4"
     },
     {
       "id": "video-137",
@@ -3632,7 +3633,8 @@
       "videoId": "",
       "fetchUrl": "https://www.instagram.com/p/DF4ytvJsbJT/",
       "reference": false,
-      "isVideo": true
+      "isVideo": true,
+      "media": "./public/videos/clip-2416ed14ca24f602.mp4"
     },
     {
       "id": "video-6",
@@ -3666,7 +3668,8 @@
       "videoId": "",
       "fetchUrl": "https://www.instagram.com/reel/DGOzosqykEw/",
       "reference": false,
-      "isVideo": true
+      "isVideo": true,
+      "media": "./public/videos/clip-7e1955d1438011cb.mp4"
     },
     {
       "id": "video-39",
@@ -3883,7 +3886,8 @@
       "videoId": "",
       "fetchUrl": "https://www.instagram.com/p/DH_g4RRvE5l/",
       "reference": false,
-      "isVideo": true
+      "isVideo": true,
+      "media": "./public/videos/clip-de8ac891bad50e01.mp4"
     },
     {
       "id": "video-52",
@@ -4178,7 +4182,8 @@
       "videoId": "",
       "fetchUrl": "https://www.instagram.com/p/DLP80pXNcZe/",
       "reference": false,
-      "isVideo": true
+      "isVideo": true,
+      "media": "./public/videos/clip-c3ccc775562d3af6.mp4"
     },
     {
       "id": "video-71",
@@ -4244,7 +4249,8 @@
       "videoId": "",
       "fetchUrl": "https://www.instagram.com/p/DMFRdmniVqZ/",
       "reference": false,
-      "isVideo": true
+      "isVideo": true,
+      "media": "./public/videos/clip-15801750371ee5f7.mp4"
     },
     {
       "id": "video-74",
@@ -5227,7 +5233,8 @@
       "fetchUrl": "https://www.instagram.com/p/DacVO3wsUAH/",
       "reference": false,
       "isVideo": true,
-      "section": "runet"
+      "section": "runet",
+      "media": "./public/videos/clip-cdb37c64b3dba93c.mp4"
     },
     {
       "id": "video-136",
@@ -5297,7 +5304,8 @@
       "fetchUrl": "https://www.instagram.com/p/Db0opRbO_0R/",
       "reference": false,
       "isVideo": true,
-      "section": "world"
+      "section": "world",
+      "media": "./public/videos/clip-a51e7b47b649ef40.mp4"
     },
     {
       "id": "video-139",
@@ -5351,7 +5359,8 @@
       "fetchUrl": "https://www.instagram.com/p/Dc02-B7CBzL/",
       "reference": false,
       "isVideo": true,
-      "section": "runet"
+      "section": "runet",
+      "media": "./public/videos/clip-43b0c3b52ef86583.mp4"
     },
     {
       "id": "video-142",
@@ -5369,7 +5378,8 @@
       "fetchUrl": "https://www.instagram.com/p/Dc24fq-M5-1/",
       "reference": false,
       "isVideo": true,
-      "section": "runet"
+      "section": "runet",
+      "media": "./public/videos/clip-9a236287059ae79b.mp4"
     },
     {
       "url": "https://youtube.com/watch?v=IccXumZcCRs",

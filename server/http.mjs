@@ -1,15 +1,17 @@
 import http from 'node:http';
+import {createReadStream} from 'node:fs';
 import {readFile, stat} from 'node:fs/promises';
 import {resolve, extname, sep} from 'node:path';
 import {createCatalogStore} from './catalog.mjs';
 import {importVideo} from './video-import.mjs';
 import {downloadVideoImage} from './video-images.mjs';
+import {downloadInstagramVideo} from './video-files.mjs';
 import {importArtist} from './import.mjs';
 import {downloadRemoteAvatar,MAX_AVATAR_BYTES,saveAvatarBytes} from './avatar-files.mjs';
 import {instagramSessionAvatar,instagramSessionPost} from './instagram-session.mjs';
 import {parseArtistLink} from './links.mjs';
 
-const mime = {'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.jpg':'image/jpeg','.jpeg':'image/jpeg','.png':'image/png','.webp':'image/webp','.ico':'image/x-icon','.woff2':'font/woff2'};
+const mime = {'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.jpg':'image/jpeg','.jpeg':'image/jpeg','.png':'image/png','.webp':'image/webp','.ico':'image/x-icon','.woff2':'font/woff2','.mp4':'video/mp4'};
 function json(res,status,data) { res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'}); res.end(JSON.stringify(data)); }
 async function readBody(req) {
   if (!req.headers['content-type']?.startsWith('application/json')) throw Object.assign(new Error('Нужен JSON-запрос.'), {status:415});
@@ -77,6 +79,8 @@ export async function startServers({catalogFile,distDir,sitePort=3333,adminPort=
                 imported.dateUrl=imported.publishedAt?imported.fetchUrl:'';
                 imported.title=post.title||imported.title;
                 imported.isVideo=post.isVideo;
+                if(post.videoUrl)try{imported.media=await downloadInstagramVideo(post.videoUrl,distDir,fetcher);}
+                catch(error){imported.videoNotice=error.message;}
               }catch(error){imported.sessionNotice=error.message;}
               else if(parts.length===1&&/^[A-Za-z0-9._]+$/.test(parts[0]))try{
                 const avatar=await instagramSessionAvatar(parts[0]);
@@ -131,6 +135,23 @@ export async function startServers({catalogFile,distDir,sitePort=3333,adminPort=
         if (!path.startsWith(resolve(distDir)+sep)) return json(res,403,{error:'Нет доступа.'});
         const file = await stat(path).catch(()=>null);
         if (!file?.isFile()) return json(res,404,{error:'Не найдено.'});
+        if(extname(path)==='.mp4'){
+          const headers={'Content-Type':mime['.mp4'],'Accept-Ranges':'bytes','Cache-Control':'public, max-age=31536000, immutable'};
+          let start=0,end=file.size-1,status=200;
+          if(req.headers.range){
+            const range=req.headers.range.match(/^bytes=(\d*)-(\d*)$/);
+            const first=range?.[1],last=range?.[2];
+            if(first){start=Number(first);end=last?Math.min(Number(last),end):end;}
+            else if(last){start=Math.max(0,file.size-Number(last));}
+            if(!range||!first&&!last||!Number.isSafeInteger(start)||!Number.isSafeInteger(end)||start<0||start>end||start>=file.size||!first&&Number(last)<=0){res.writeHead(416,{...headers,'Content-Range':`bytes */${file.size}`});return res.end();}
+            status=206;headers['Content-Range']=`bytes ${start}-${end}/${file.size}`;
+          }
+          headers['Content-Length']=String(end-start+1);
+          res.writeHead(status,headers);
+          if(req.method==='HEAD')return res.end();
+          const stream=createReadStream(path,{start,end});
+          stream.on('error',()=>res.destroy());res.on('close',()=>stream.destroy());stream.pipe(res);return;
+        }
         const content = await readFile(path);
         res.writeHead(200,{'Content-Type':mime[extname(path)] || 'application/octet-stream','Cache-Control':'no-cache'});
         res.end(req.method === 'HEAD' ? undefined : content);

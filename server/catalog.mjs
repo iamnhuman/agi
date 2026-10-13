@@ -3,6 +3,7 @@ import {dirname} from 'node:path';
 import {randomUUID} from 'node:crypto';
 import {videoLink,validVideoDate} from './video-import.mjs';
 import {parseArtistLink, linkKey} from './links.mjs';
+import {localVideoPattern} from './video-files.mjs';
 
 export function validateCatalog(data) {
   if (!data || !Array.isArray(data.artists) || !Array.isArray(data.sections)) throw new Error('Повреждён файл каталога. Восстановите его из Git или резервной копии.');
@@ -21,7 +22,7 @@ export function validateCatalog(data) {
   }
   if(data.videos!==undefined&&!Array.isArray(data.videos))throw Error('Некорректный список видео.');
   const videoIds=new Set();
-  for(const v of data.videos||[]){if(!v||typeof v.id!=='string'||typeof v.name!=='string'||!validVideoDate(v.publishedAt)||videoIds.has(v.id))throw Error('Некорректная запись видео.');if(v.section!==undefined&&!['world','runet'].includes(v.section))throw Error('Неизвестный регион видео.');videoLink(v.url);videoIds.add(v.id);}
+  for(const v of data.videos||[]){if(!v||typeof v.id!=='string'||typeof v.name!=='string'||!validVideoDate(v.publishedAt)||videoIds.has(v.id))throw Error('Некорректная запись видео.');if(v.section!==undefined&&!['world','runet'].includes(v.section))throw Error('Неизвестный регион видео.');if(v.media!==undefined&&!localVideoPattern.test(v.media))throw Error('Некорректный видеофайл.');videoLink(v.url);videoIds.add(v.id);}
   const withoutDescription=({description,...record})=>record;
   return {...data,artists:data.artists.map(withoutDescription),...(data.videos?{videos:data.videos.map(withoutDescription)}:{})};
 }
@@ -68,15 +69,25 @@ export function createCatalogStore(file) {
         const image=String(v.image||'').trim();if(image&&!image.startsWith('https://')&&!/^\.\/avatars\/upload-[a-f0-9]{16}\.(jpg|png|webp)$/.test(image))throw Error('Превью должно быть HTTPS-ссылкой или загруженным изображением.');
         const sourceDate=v.dateSource==='source'&&v.dateUrl===link.fetchUrl;
         const section=v.section??old?.section;
+        const media=v.media??(old?.url===link.url?old.media:undefined);
+        if(media&&!localVideoPattern.test(media))throw Error('Выберите сохранённый видеофайл.');
         if(section!==undefined&&!['','world','runet'].includes(section))throw Error('Выберите регион: «Рунет» или «Мир».');
         const video={...old,...link,id:old?.id||randomUUID(),name:String(v.name).trim().slice(0,160),title:String(v.title||'').slice(0,250),publishedAt:v.publishedAt,dateSource:v.publishedAt?(sourceDate?'source':'manual'):'unknown',dateUrl:sourceDate?v.dateUrl:'',image:image.slice(0,4000),isVideo:typeof v.isVideo==='boolean'?v.isVideo:Boolean(link.videoId||/^(?:video|clip)-?\d+_\d+$/.test(new URL(link.url).pathname.split('/').filter(Boolean)[0]||'')||new URL(link.url).pathname.split('/').filter(Boolean)[0]==='reel'),alternateUrls:old?.alternateUrls||[],sourceOrder:old?.sourceOrder??list.length};
         if(section)video.section=section;else delete video.section;
+        if(media)video.media=media;else delete video.media;
         catalog.videos=old?list.map(x=>x.id===old.id?video:x):[...list,video];
         if(input.position!==undefined){
           const at=catalog.videos.findIndex(item=>item.id===video.id);
           const target=input.reverseNumbering===true?catalog.videos.length-input.position:input.position-1;
           catalog.videos.splice(at,1);catalog.videos.splice(target,0,video);
         }
+        response={video};
+      }else if(input.action==='video-media'){
+        const video=(catalog.videos||[]).find(record=>record.id===input.id);
+        if(!video)throw Error('Видео не найдено.');
+        if(video.url!==input.url)throw Error('Ссылка карточки изменилась. Повторите загрузку видео.');
+        if(!localVideoPattern.test(input.media))throw Error('Выберите сохранённый видеофайл.');
+        video.media=input.media;
         response={video};
       }else if(input.action==='video-delete'){
         if(!(catalog.videos||[]).some(v=>v.id===input.id))throw Error('Видео не найдено.');

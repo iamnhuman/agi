@@ -32,6 +32,7 @@ if (pages) {
   const rootHtml = html
     .replaceAll('./avatars/','./public/avatars/')
     .replaceAll('./badges/','./public/badges/')
+    .replaceAll('./videos/','./public/videos/')
     .replaceAll('url(./fonts/','url(./public/fonts/')
     .replaceAll('url(./textures/','url(./public/textures/')
     .replaceAll('./radar-world-red.webp','./public/radar-world-red.webp')
@@ -45,6 +46,8 @@ if (pages) {
   for(const item of [...rootCatalog.artists || [],...rootCatalog.videos || []]){
     if(typeof item.image==='string'&&item.image.startsWith('./avatars/'))
       item.image=item.image.replace('./avatars/','./public/avatars/');
+    if(typeof item.media==='string'&&item.media.startsWith('./videos/'))
+      item.media=item.media.replace('./videos/','./public/videos/');
   }
   await writeFile('catalog.json',JSON.stringify(rootCatalog,null,2)+'\n');
   await writeFile('.nojekyll','');
