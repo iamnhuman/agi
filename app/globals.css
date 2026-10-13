@@ -6148,7 +6148,7 @@ footer{width:var(--site-panel-width);margin-inline:auto}
   font-size:calc(11px * var(--timeline-text-scale,1));line-height:1.4;max-height:2.8em;
 }
 .video-section .timeline-layout--horizontal .video-copy h3 button{
-  overflow-wrap:anywhere;word-break:normal;
+  overflow-wrap:normal;word-break:normal;
 }
 .video-section .timeline-layout--horizontal .video-copy>a.video-platform,
 .video-section .timeline-layout--horizontal .video-date time{
@@ -6320,6 +6320,7 @@ footer{width:var(--site-panel-width);margin-inline:auto}
 /* Reveal clipped lines inside the existing display without resizing the case. */
 .video-name-window{display:block;max-height:3.3em;overflow:hidden}
 .video-name-copy{display:block;transform:translateY(0)}
+.video-name-word{white-space:nowrap;word-break:normal;overflow-wrap:normal;hyphens:none}
 .timeline-layout--horizontal .video-name-window{max-height:2.8em}
 .timeline-layout--horizontal .timeline-scene[data-mini-cards="true"] .video-name-window{max-height:4.2em}
 .video-card:is(:hover,:focus-within) .video-name-button[data-overflow="true"] .video-name-copy{

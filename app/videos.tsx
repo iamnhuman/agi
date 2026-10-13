@@ -28,7 +28,7 @@ function instagramEmbedUrl(video:Video){
   return post?`https://www.instagram.com/${post[1]}/${post[2]}/embed/`:'';
  }catch{return '';}
 }
-function VideoName({name,onOpen,fitToWidth=true}:{name:string;onOpen:()=>void;fitToWidth?:boolean}){
+function VideoName({name,onOpen}:{name:string;onOpen:()=>void}){
  const ref=useRef<HTMLButtonElement>(null),windowRef=useRef<HTMLSpanElement>(null),copyRef=useRef<HTMLSpanElement>(null);
  useEffect(()=>{
   const button=ref.current,viewport=windowRef.current,copy=copyRef.current;
@@ -38,11 +38,11 @@ function VideoName({name,onOpen,fitToWidth=true}:{name:string;onOpen:()=>void;fi
   const fit=()=>{
    if(!active)return;
    button.style.removeProperty('font-size');
-   if(fitToWidth&&context&&button.clientWidth>0){
+   if(context&&button.clientWidth>0){
     const style=getComputedStyle(button),fontSize=parseFloat(style.fontSize);
     context.font=style.font;
     const longest=Math.max(...name.split(/\s+/).map(word=>context.measureText(word).width));
-    if(longest>button.clientWidth)button.style.fontSize=`${Math.max(6,Math.floor(fontSize*button.clientWidth/longest))}px`;
+    if(longest>button.clientWidth)button.style.fontSize=`${Math.max(6,Math.floor(fontSize*(button.clientWidth-2)/longest))}px`;
    }
    const travel=Math.max(0,copy.scrollHeight-viewport.clientHeight);
    button.dataset.overflow=travel>1?'true':'false';
@@ -53,8 +53,8 @@ function VideoName({name,onOpen,fitToWidth=true}:{name:string;onOpen:()=>void;fi
   observer.observe(button);observer.observe(viewport);observer.observe(copy);
   document.fonts.ready.then(fit);fit();
   return()=>{active=false;observer.disconnect();};
- },[name,fitToWidth]);
- return <button ref={ref} className="video-name-button" type="button" title={name} onClick={onOpen}><span ref={windowRef} className="video-name-window"><span ref={copyRef} className="video-name-copy">{name}</span></span></button>;
+ },[name]);
+ return <button ref={ref} className="video-name-button" type="button" title={name} onClick={onOpen}><span ref={windowRef} className="video-name-window"><span ref={copyRef} className="video-name-copy">{name.split(/(\s+)/).map((part,index)=>/^\s+$/.test(part)?part:<span className="video-name-word" key={index}>{part}</span>)}</span></span></button>;
 }
 export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTotalChange?:(total:number)=>void}){
  const [videos,setVideos]=useState<Video[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState(''),[q,setQ]=useState(''),[order,setOrder]=useState<VideoOrder>('desc'),[orientation,setOrientation]=useState<'vertical'|'horizontal'>('horizontal'),[draft,setDraft]=useState<Video|null>(null),[selected,setSelected]=useState<Video|null>(null),[deleting,setDeleting]=useState<Video|null>(null),[busy,setBusy]=useState(false),[formError,setFormError]=useState(''),[importMessage,setImportMessage]=useState('');
@@ -253,7 +253,7 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
    <button className="video-thumb" aria-label={playable?'Открыть видео '+v.name:'Открыть материал '+v.name} onClick={()=>setSelected(v)}><img src={coverSource(v)} alt="" loading="lazy" referrerPolicy="no-referrer" onError={e=>coverError(e,v)}/>{playable&&<span className="video-play"><Play size={18}/></span>}{v.section&&<span className="video-region-badge" data-section={v.section} title={v.section==='world'?'Мир':'Рунет'}><img src={v.section==='world'?'./badges/region-en-eagle-cutout.png':'./badges/region-ru-emblem-cutout.png'} alt={v.section==='world'?'Мир':'Рунет'}/></span>}</button>
    <div className="video-copy">
     <a href={v.url} target="_blank" rel="noreferrer" className="video-platform" aria-label={`Открыть источник: ${v.name} · ${v.platform}`} title={`Открыть в ${v.platform}`}><span className="video-platform-full">{v.platform}</span><span className="video-platform-short" aria-hidden="true">{platformShortNames[v.platform]||v.platform.slice(0,2).toUpperCase()}</span><ArrowUpRight size={12} aria-hidden="true"/></a>
-    <div className="video-name-screen"><h3><VideoName name={v.name} fitToWidth={orientation!=='horizontal'} onOpen={()=>setSelected(v)}/></h3></div>
+    <div className="video-name-screen"><h3><VideoName name={v.name} onOpen={()=>setSelected(v)}/></h3></div>
    </div>
    <DossierInstruments id={v.id}/>
    {orientation==='vertical'&&<span className="video-flow-arrow" aria-hidden="true"><ArrowRight size={28}/></span>}
