@@ -1,6 +1,28 @@
 {
   "artists": [
     {
+      "id": "91f755cb-5c04-4e06-91b7-e1e4795e1bb7",
+      "kind": "artist",
+      "rating": "A",
+      "name": "derek.mercer",
+      "url": "https://www.instagram.com/derek.mercer.2006",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-55d72046e73149c8.jpg",
+      "tags": ""
+    },
+    {
+      "id": "958f9720-3d63-4d61-9f6a-3e9ca7f11d9d",
+      "kind": "collective",
+      "rating": "AA",
+      "name": "slop_collective",
+      "url": "https://www.instagram.com/slop_collective",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-485eb470d9773307.jpg",
+      "tags": ""
+    },
+    {
       "id": "8535a878-a71f-4991-a420-641ffa58874a",
       "kind": "artist",
       "rating": "AAA",
