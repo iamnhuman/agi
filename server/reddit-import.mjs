@@ -18,19 +18,19 @@ function jsonMetadata(payload,link) {
   if(link.redditType==='subreddit'){
     const data=payload?.data;
     if(payload?.kind!=='t5'||data?.display_name?.toLowerCase()!==identifier)return null;
-    return {name:`r/${data.display_name}`,description:String(data.public_description||data.description||'').slice(0,1500),image:imageUrl(data.community_icon,data.icon_img,data.banner_background_image,data.banner_img,data.header_img)};
+    return {name:`r/${data.display_name}`,image:imageUrl(data.community_icon,data.icon_img,data.banner_background_image,data.banner_img,data.header_img)};
   }
   if(link.redditType==='user'){
     const data=payload?.data;
     if(payload?.kind!=='t2'||data?.name?.toLowerCase()!==identifier)return null;
-    return {name:`u/${data.name}`,description:String(data.subreddit?.public_description||'').slice(0,1500),image:imageUrl(data.icon_img,data.snoovatar_img,data.subreddit?.icon_img)};
+    return {name:`u/${data.name}`,image:imageUrl(data.icon_img,data.snoovatar_img,data.subreddit?.icon_img)};
   }
   const listing=Array.isArray(payload)?payload[0]:payload;
   const data=listing?.data?.children?.find(child=>child.kind==='t3'&&child.data?.id?.toLowerCase()===identifier)?.data;
   if(!data)return null;
   const gallery=(data.gallery_data?.items||[]).map(item=>data.media_metadata?.[item.media_id]?.s?.u);
   const previews=(data.preview?.images||[]).map(item=>item.source?.url);
-  return {name:String(data.title||'').slice(0,120),description:String(data.selftext||'').slice(0,1500),image:imageUrl(data.url_overridden_by_dest,data.url,...gallery,...previews,data.secure_media?.oembed?.thumbnail_url,data.thumbnail)};
+  return {name:String(data.title||'').slice(0,120),image:imageUrl(data.url_overridden_by_dest,data.url,...gallery,...previews,data.secure_media?.oembed?.thumbnail_url,data.thumbnail)};
 }
 
 function htmlMetadata(html,link) {
@@ -51,7 +51,7 @@ function htmlMetadata(html,link) {
     if(!image&&/\/(?:communityIcon_|bannerBackgroundImage_|avatars\/)/i.test(ogImage))image=imageUrl(ogImage);
   }else image=imageUrl(pageMeta(html,'og:image'),pageMeta(html,'twitter:image'));
   if(!valid&&!image)return null;
-  return {name:link.isPost?title.replace(/\s*[:|–-]\s*(?:r\/\S+\s*[-–]\s*)?Reddit.*$/i,'').slice(0,120):link.name,description:(pageMeta(html,'og:description')||pageMeta(html,'description')).slice(0,1500),image};
+  return {name:link.isPost?title.replace(/\s*[:|–-]\s*(?:r\/\S+\s*[-–]\s*)?Reddit.*$/i,'').slice(0,120):link.name,image};
 }
 
 async function redditResponse(target,fetcher,signal) {
@@ -102,5 +102,5 @@ export async function importRedditArtist(initialLink,fetcher=fetch) {
     }
   }
   const image=metadata?.image||'';
-  return {metadataLoaded:Boolean(metadata),profileAvatar:!link.isPost&&Boolean(image),coverLoaded:Boolean(image),lowResolution:false,artist:{name:metadata?.name||link.name,url:link.url,platform:'Reddit',description:metadata?.description||'',image,tags:''},notice:metadata?'Данные Reddit загружены. Проверьте карточку перед сохранением.':'Ссылка Reddit принята. Данные страницы недоступны — заполните карточку вручную.',...(!image?{imageNotice:metadata?'Reddit не отдал доступное изображение. Можно загрузить обложку вручную.':'Reddit ограничил загрузку данных. Ссылка принимается; обложку можно загрузить файлом или прямой ссылкой Reddit.'}:{})};
+  return {metadataLoaded:Boolean(metadata),profileAvatar:!link.isPost&&Boolean(image),coverLoaded:Boolean(image),lowResolution:false,artist:{name:metadata?.name||link.name,url:link.url,platform:'Reddit',image,tags:''},notice:metadata?'Данные Reddit загружены. Проверьте карточку перед сохранением.':'Ссылка Reddit принята. Данные страницы недоступны — заполните карточку вручную.',...(!image?{imageNotice:metadata?'Reddit не отдал доступное изображение. Можно загрузить обложку вручную.':'Reddit ограничил загрузку данных. Ссылка принимается; обложку можно загрузить файлом или прямой ссылкой Reddit.'}:{})};
 }

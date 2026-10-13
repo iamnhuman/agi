@@ -59,7 +59,7 @@ test('community import uses its own icon and decodes HTML entities in the CDN UR
   });
   assert.deepEqual(requested,['https://www.reddit.com/r/aivideo/about.json?raw_json=1']);
   assert.equal(result.artist.name,'r/aivideo');
-  assert.equal(result.artist.description,'AI video community');
+  assert.equal(Object.hasOwn(result.artist,'description'),false);
   assert.equal(result.artist.image,'https://styles.redditmedia.com/t5_test/styles/communityIcon_test.png?width=256&s=signature');
   assert.equal(result.profileAvatar,true);assert.equal(result.metadataLoaded,true);
 });
@@ -71,7 +71,7 @@ test('a community with no icon can use its published banner',async()=>{
 
 test('profile imports select the requested user avatar',async()=>{
   const result=await importArtist('u/Artist',async()=>json({kind:'t2',data:{name:'Artist',icon_img:'https://www.redditstatic.com/avatars/artist.png',subreddit:{public_description:'Artist bio'}}}));
-  assert.equal(result.artist.name,'u/Artist');assert.equal(result.artist.description,'Artist bio');
+  assert.equal(result.artist.name,'u/Artist');assert.equal(Object.hasOwn(result.artist,'description'),false);
   assert.equal(result.artist.image,'https://www.redditstatic.com/avatars/artist.png');assert.equal(result.profileAvatar,true);
   const wrong=await importArtist('u/Artist',async()=>json({kind:'t2',data:{name:'SomeoneElse',icon_img:'https://i.redd.it/wrong.png'}}));
   assert.equal(wrong.metadataLoaded,false);assert.equal(wrong.artist.image,'');
@@ -90,7 +90,7 @@ test('HTML fallback uses the community icon rather than an image from the feed',
   const html='<meta property="og:title" content="r/aivideo - AI videos"><meta property="og:image" content="https://i.redd.it/feed-photo.png"><meta name="description" content="Community &amp; AI"><faceplate-img alt="r/aivideo icon" src="https://styles.redditmedia.com/t5_test/styles/communityIcon_real.png?x=1&amp;y=2">';
   const result=await importArtist('r/aivideo',async url=>url.includes('.json')?blocked():new Response(html,{headers:{'content-type':'text/html'}}));
   assert.equal(result.artist.image,'https://styles.redditmedia.com/t5_test/styles/communityIcon_real.png?x=1&y=2');
-  assert.equal(result.artist.description,'Community & AI');assert.equal(result.metadataLoaded,true);
+  assert.equal(Object.hasOwn(result.artist,'description'),false);assert.equal(result.metadataLoaded,true);
   const feedOnly=await importArtist('r/aivideo',async url=>url.includes('.json')?blocked():new Response(html.replace(/<faceplate-img[^>]*>/,''),{headers:{'content-type':'text/html'}}));
   assert.equal(feedOnly.artist.image,'');
 });
@@ -100,7 +100,7 @@ test('blocked metadata produces a savable Reddit draft without substituting an i
   assert.equal(result.artist.name,'r/aivideo');assert.equal(result.artist.url,'https://www.reddit.com/r/aivideo');
   assert.equal(result.metadataLoaded,false);assert.equal(result.artist.image,'');assert.match(result.imageNotice,/Reddit ограничил/);
   const partial=await importArtist('r/aivideo',async url=>url.startsWith('https://www.reddit.com/')&&url.includes('.json')?json(community({community_icon:''})):blocked());
-  assert.equal(partial.metadataLoaded,true);assert.equal(partial.artist.description,'AI video community');assert.equal(partial.artist.image,'');
+  assert.equal(partial.metadataLoaded,true);assert.equal(Object.hasOwn(partial.artist,'description'),false);assert.equal(partial.artist.image,'');
 });
 
 test('Reddit share links follow validated redirects and reject redirects to private hosts',async()=>{
@@ -116,14 +116,14 @@ test('Reddit share links follow validated redirects and reject redirects to priv
 test('Reddit login redirects and the generic welcome page are not imported as community data',async()=>{
   const requested=[];
   const login=await importArtist('r/aivideo',async url=>{requested.push(url);return new Response('',{status:302,headers:{location:'https://www.reddit.com/login/?dest=/r/aivideo'}});});
-  assert.ok(requested.every(url=>!url.includes('/login/')));assert.equal(login.metadataLoaded,false);assert.equal(login.artist.description,'');
+  assert.ok(requested.every(url=>!url.includes('/login/')));assert.equal(login.metadataLoaded,false);assert.equal(Object.hasOwn(login.artist,'description'),false);
   const welcome=await importArtist('r/aivideo',async url=>url.includes('.json')?blocked():new Response('<title>Welcome to Reddit</title><meta name="description" content="Log in or sign up">',{headers:{'content-type':'text/html'}}));
-  assert.equal(welcome.metadataLoaded,false);assert.equal(welcome.artist.description,'');
+  assert.equal(welcome.metadataLoaded,false);assert.equal(Object.hasOwn(welcome.artist,'description'),false);
 });
 
 test('saving Reddit links persists the platform and catches duplicate aliases',async t=>{
   const {file}=await fixture(t);const store=createCatalogStore(file);
-  const artist={name:'r/aivideo',url:'r/aivideo',section:'world',description:'',image:'',tags:'',kind:'media',rating:'AA'};
+  const artist={name:'r/aivideo',url:'r/aivideo',section:'world',image:'',tags:'',kind:'media',rating:'AA'};
   const saved=await store.mutate({action:'save',artist});
   assert.equal(saved.artist.platform,'Reddit');assert.equal(saved.artist.kind,'media');assert.equal(saved.artist.rating,'AA');
   const reloaded=await createCatalogStore(file).read();assert.equal(reloaded.artists[0].url,'https://www.reddit.com/r/aivideo');

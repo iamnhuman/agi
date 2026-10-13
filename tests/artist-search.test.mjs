@@ -13,8 +13,8 @@ test('accidental words or letters after a complete handle do not hide its record
  assert.equal(matchesArtistSearch({...artist,name:'Березовый промпт'},'БЕРЕЗОВЫЙ   ПРОМПТ мусор'),true);
 });
 
-test('partial handles, full metadata phrases and empty searches remain supported',()=>{
- for(const query of ['goo.vis','vision','AI art','Digital landscapes','digital   landscapes','',' \n '])assert.equal(matchesArtistSearch(artist,query),true,query);
+test('partial handles, tag phrases and empty searches remain supported',()=>{
+ for(const query of ['goo.vis','vision','AI art','ai   ART','',' \n '])assert.equal(matchesArtistSearch(artist,query),true,query);
 });
 
 test('unknown queries and extra words after a partial handle do not broaden the results',()=>{
@@ -22,9 +22,10 @@ test('unknown queries and extra words after a partial handle do not broaden the 
  assert.equal(matchesArtistSearch({...artist,name:'AI',tags:'',description:''},'aiden missing'),false);
 });
 
-test('the curator retains URL search and each surface retains its own searchable fields',()=>{
+test('search retains names, tags and curator URLs while ignoring legacy descriptions',()=>{
  const adminFields=['name','url','tags'];
  assert.equal(matchesArtistSearch(artist,'instagram.com/goo.vision',adminFields),true);
  assert.equal(matchesArtistSearch(artist,'digital landscapes',adminFields),false);
- assert.equal(matchesArtistSearch(artist,'digital landscapes'),true);
+ assert.equal(matchesArtistSearch(artist,'digital landscapes'),false);
+ assert.equal(matchesArtistSearch(artist,'AI art'),true);
 });

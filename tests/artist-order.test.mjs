@@ -15,7 +15,7 @@ async function fixture(t){
     artists:Array.from({length:24},(_,index)=>({
       id:`artist-${index+1}`,name:`Artist ${index+1}`,url:`https://www.instagram.com/artist_${index+1}`,
       section:index%2?'runet':'world',kind:index%3?'artist':'media',rating:'AA',
-      platform:'Instagram',description:`Description ${index+1}`,image:'',tags:'AI',
+      platform:'Instagram',image:'',tags:'AI',
     })),
     videos:[],
   };

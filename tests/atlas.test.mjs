@@ -11,7 +11,7 @@ import {startServers} from '../server/http.mjs';
 import {MAX_AVATAR_BYTES,remoteAvatarUrl,validateAvatarBytes} from '../server/avatar-files.mjs';
 
 const original = JSON.parse(await readFile(new URL('../data/catalog.json',import.meta.url),'utf8'));
-const draft = (name='atlas_test') => ({id:'',name,url:`https://www.instagram.com/${name}`,section:'world',description:'',image:'',tags:''});
+const draft = (name='atlas_test') => ({id:'',name,url:`https://www.instagram.com/${name}`,section:'world',image:'',tags:''});
 async function fixture(t) {
   const dir=await mkdtemp(join(tmpdir(),'iizm-test-'));
   t.after(()=>rm(dir,{recursive:true,force:true}));
@@ -19,6 +19,41 @@ async function fixture(t) {
   await writeFile(file,JSON.stringify(original));
   return {dir,file};
 }
+
+test('legacy descriptions are removed durably without changing other fields or returning from stale clients',async t=>{
+  const {file}=await fixture(t);
+  const legacy=structuredClone(original);
+  legacy.artists[0].description='Old artist description';
+  legacy.videos[0].description='Old video description';
+  await writeFile(file,JSON.stringify(legacy));
+  const expected=structuredClone(legacy);
+  for(const record of [...expected.artists,...expected.videos])delete record.description;
+  const store=createCatalogStore(file);
+  assert.deepEqual(await store.read(),expected);
+  await store.migrate();
+  assert.deepEqual(JSON.parse(await readFile(file,'utf8')),expected);
+  const migrated=await readFile(file,'utf8');
+  await store.migrate();
+  assert.equal(await readFile(file,'utf8'),migrated);
+  const {artist}=await store.mutate({action:'save',artist:{...expected.artists[0],description:'Stale editor artist text'}});
+  const {video}=await store.mutate({action:'video-save',video:{...expected.videos[0],description:'Stale editor video text'}});
+  assert.equal(Object.hasOwn(artist,'description'),false);
+  assert.equal(Object.hasOwn(video,'description'),false);
+  const saved=JSON.parse(await readFile(file,'utf8'));
+  assert.ok([...saved.artists,...saved.videos].every(record=>!Object.hasOwn(record,'description')));
+  assert.deepEqual(await createCatalogStore(file).read(),saved);
+});
+
+test('description migration leaves an invalid catalog unchanged',async t=>{
+  const {file}=await fixture(t);
+  const invalid=structuredClone(original);
+  invalid.artists[0].description='Legacy text';
+  invalid.artists[0].section='missing-section';
+  const before=JSON.stringify(invalid);
+  await writeFile(file,before);
+  await assert.rejects(createCatalogStore(file).migrate(),/Некорректная карточка/);
+  assert.equal(await readFile(file,'utf8'),before);
+});
 
 test('import URLs are restricted, normalized and preserve post identifiers',()=>{
   assert.equal(parseArtistLink('muniraalkharaz').url,'https://www.instagram.com/muniraalkharaz');
@@ -72,7 +107,7 @@ test('durable edits, fixed geography, duplicate checks and concurrent saves',asy
 
 test('metadata import and blocked-page fallback both create usable drafts',async()=>{
   const full=await importArtist('https://t.me/symbimind',async()=>new Response('<meta content="SYMBIMIND" property="og:title"><meta property="og:description" content="Art &amp; AI"><meta property="og:image" content="https://cdn4.telesco.pe/file/photo.jpg">',{headers:{'content-type':'text/html'}}));
-  assert.equal(full.artist.name,'SYMBIMIND');assert.equal(full.artist.description,'Art & AI');assert.equal(full.profileAvatar,true);assert.equal(full.artist.image,'https://cdn4.telesco.pe/file/photo.jpg');
+  assert.equal(full.artist.name,'SYMBIMIND');assert.equal(Object.hasOwn(full.artist,'description'),false);assert.equal(full.profileAvatar,true);assert.equal(full.artist.image,'https://cdn4.telesco.pe/file/photo.jpg');
   const blocked=await importArtist('https://instagram.com/test_artist/',async()=>new Response('',{status:403}));
   assert.equal(blocked.artist.name,'test_artist');assert.equal(blocked.artist.platform,'Instagram');
   const redirected=await importArtist('https://t.me/artist',async(_url,options)=>{assert.equal(options.redirect,'manual');return new Response('',{status:302,headers:{location:'http://127.0.0.1/'}});});
@@ -143,7 +178,7 @@ test('video dates, comments, persistence and alternate sources',async t=>{
   assert.equal(imported.isVideo,false);
   assert.equal(videoMetadata('<meta name="twitter:image" content="//cdn.example/image.jpg">',profile).image,'https://cdn.example/image.jpg');
   const {file}=await fixture(t);const store=createCatalogStore(file);
-  const {video}=await store.mutate({action:'video-save',video:{name:'Test video',url:'https://youtu.be/abcdefghijk',publishedAt:'2024-02-29',dateSource:'manual',description:''}});
+  const {video}=await store.mutate({action:'video-save',video:{name:'Test video',url:'https://youtu.be/abcdefghijk',publishedAt:'2024-02-29',dateSource:'manual'}});
   assert.equal((await createCatalogStore(file).read()).videos.find(v=>v.id===video.id).publishedAt,'2024-02-29');
   await store.mutate({action:'video-save',video:{...video,publishedAt:''}});
   assert.equal((await store.read()).videos.find(v=>v.id===video.id).dateSource,'unknown');

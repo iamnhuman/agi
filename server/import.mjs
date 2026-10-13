@@ -41,7 +41,7 @@ export function instagramAvatar(html, username, fallback) {
 export async function importArtist(raw, fetcher = fetch) {
   const link = parseArtistLink(raw);
   if(link.platform==='Reddit')return importRedditArtist(link,fetcher);
-  let name = link.name, description = '', image = '', loaded = false;
+  let name = link.name, image = '', loaded = false;
   try {
     const response = await fetcher(link.fetchUrl, {redirect:'manual', signal:AbortSignal.timeout(7000), headers:{'User-Agent':'Mozilla/5.0 (compatible; ArtAtlas/1.0)'}});
     if (response.ok && response.headers.get('content-type')?.includes('text/html')) {
@@ -50,8 +50,8 @@ export async function importArtist(raw, fetcher = fetch) {
       const valid = title && !/^(instagram|telegram|log in|login|войти|telegram: contact)/i.test(title);
       if (valid) {
         name = title.replace(/\s*[•|–]\s*Instagram.*$/i,'').replace(/\s*\(@[^)]+\).*$/,'').slice(0,120);
-        description = meta(html, 'og:description').slice(0,1500);
-        if (link.platform === 'Instagram') name = link.isPost ? ((title + ' ' + description).match(/@([a-zA-Z0-9._]+)/)?.[1] || '') : link.name;
+        const metadataText = meta(html, 'og:description');
+        if (link.platform === 'Instagram') name = link.isPost ? ((title + ' ' + metadataText).match(/@([a-zA-Z0-9._]+)/)?.[1] || '') : link.name;
         const img = meta(html, 'og:image');
         if (img.startsWith('https://')) image = img;
         if (link.platform === 'Instagram' && !link.isPost) image = instagramAvatar(html, link.name, image);
@@ -59,5 +59,5 @@ export async function importArtist(raw, fetcher = fetch) {
       }
     } else { await response.body?.cancel(); }
   } catch { /* Blocked metadata pages still produce a URL-derived draft. */ }
-  return {profileAvatar:link.platform==='Telegram'&&Boolean(image),lowResolution:link.platform==='Instagram'&&lowResolutionInstagramImage(image),metadataLoaded:loaded,artist:{name,url:link.url,platform:link.platform,description,image,tags:''}, notice: loaded ? 'Доступные данные загружены. Проверьте карточку перед сохранением.' : link.isPost ? 'Это публикация. Площадка не отдала данные автора — укажите его имя вручную.' : 'Имя и площадка определены по ссылке. Описание и обложку можно дополнить вручную.'};
+  return {profileAvatar:link.platform==='Telegram'&&Boolean(image),lowResolution:link.platform==='Instagram'&&lowResolutionInstagramImage(image),metadataLoaded:loaded,artist:{name,url:link.url,platform:link.platform,image,tags:''}, notice: loaded ? 'Доступные данные загружены. Проверьте карточку перед сохранением.' : link.isPost ? 'Это публикация. Площадка не отдала данные автора — укажите его имя вручную.' : 'Имя и площадка определены по ссылке. Обложку можно дополнить вручную.'};
 }

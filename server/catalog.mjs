@@ -13,7 +13,7 @@ export function validateCatalog(data) {
   }
   const artists = new Set();
   for (const a of data.artists) {
-    if (!a || ['id','name','url','section','platform','description','image','tags'].some(k => typeof a[k] !== 'string') || artists.has(a.id) || !ids.has(a.section)) throw new Error('Некорректная карточка в каталоге.');
+    if (!a || ['id','name','url','section','platform','image','tags'].some(k => typeof a[k] !== 'string') || artists.has(a.id) || !ids.has(a.section)) throw new Error('Некорректная карточка в каталоге.');
     if (a.kind !== undefined && !['artist','media','collective'].includes(a.kind)) throw new Error('Неизвестный тип записи.');
     if (a.rating !== undefined && !['A','AA','AAA','AAA+','CRINGE'].includes(a.rating)) throw new Error('Неизвестный рейтинг записи.');
     parseArtistLink(a.url);
@@ -22,7 +22,8 @@ export function validateCatalog(data) {
   if(data.videos!==undefined&&!Array.isArray(data.videos))throw Error('Некорректный список видео.');
   const videoIds=new Set();
   for(const v of data.videos||[]){if(!v||typeof v.id!=='string'||typeof v.name!=='string'||!validVideoDate(v.publishedAt)||videoIds.has(v.id))throw Error('Некорректная запись видео.');if(v.section!==undefined&&!['world','runet'].includes(v.section))throw Error('Неизвестный регион видео.');videoLink(v.url);videoIds.add(v.id);}
-  return data;
+  const withoutDescription=({description,...record})=>record;
+  return {...data,artists:data.artists.map(withoutDescription),...(data.videos?{videos:data.videos.map(withoutDescription)}:{})};
 }
 
 export function createCatalogStore(file) {
@@ -31,6 +32,24 @@ export function createCatalogStore(file) {
     const catalog = validateCatalog(JSON.parse(await readFile(file, 'utf8')));
     for (const artist of catalog.artists) if (artist.rating === 'CRINGE') artist.rating = 'A';
     return catalog;
+  }
+  async function persist(catalog) {
+    await mkdir(dirname(file), {recursive: true});
+    const temp = `${file}.${randomUUID()}.tmp`;
+    try {
+      await writeFile(temp, JSON.stringify(catalog, null, 2) + '\n', {flag:'wx'});
+      await rename(temp, file);
+    } finally { await unlink(temp).catch(() => {}); }
+  }
+  function migrate() {
+    const result=queue.then(async()=>{
+      const original=JSON.parse(await readFile(file,'utf8'));
+      const catalog=validateCatalog(original);
+      if([...original.artists,...(original.videos||[])].some(record=>Object.hasOwn(record,'description')))await persist(catalog);
+      return catalog;
+    });
+    queue=result.catch(()=>{});
+    return result;
   }
   function mutate(input) {
     const result = queue.then(async () => {
@@ -50,7 +69,7 @@ export function createCatalogStore(file) {
         const sourceDate=v.dateSource==='source'&&v.dateUrl===link.fetchUrl;
         const section=v.section??old?.section;
         if(section!==undefined&&!['','world','runet'].includes(section))throw Error('Выберите регион: «Рунет» или «Мир».');
-        const video={...old,...link,id:old?.id||randomUUID(),name:String(v.name).trim().slice(0,160),title:String(v.title||'').slice(0,250),publishedAt:v.publishedAt,dateSource:v.publishedAt?(sourceDate?'source':'manual'):'unknown',dateUrl:sourceDate?v.dateUrl:'',image:image.slice(0,4000),description:String(v.description||'').slice(0,1500),isVideo:typeof v.isVideo==='boolean'?v.isVideo:Boolean(link.videoId||/^(?:video|clip)-?\d+_\d+$/.test(new URL(link.url).pathname.split('/').filter(Boolean)[0]||'')||new URL(link.url).pathname.split('/').filter(Boolean)[0]==='reel'),alternateUrls:old?.alternateUrls||[],sourceOrder:old?.sourceOrder??list.length};
+        const video={...old,...link,id:old?.id||randomUUID(),name:String(v.name).trim().slice(0,160),title:String(v.title||'').slice(0,250),publishedAt:v.publishedAt,dateSource:v.publishedAt?(sourceDate?'source':'manual'):'unknown',dateUrl:sourceDate?v.dateUrl:'',image:image.slice(0,4000),isVideo:typeof v.isVideo==='boolean'?v.isVideo:Boolean(link.videoId||/^(?:video|clip)-?\d+_\d+$/.test(new URL(link.url).pathname.split('/').filter(Boolean)[0]||'')||new URL(link.url).pathname.split('/').filter(Boolean)[0]==='reel'),alternateUrls:old?.alternateUrls||[],sourceOrder:old?.sourceOrder??list.length};
         if(section)video.section=section;else delete video.section;
         catalog.videos=old?list.map(x=>x.id===old.id?video:x):[...list,video];
         if(input.position!==undefined){
@@ -108,22 +127,17 @@ export function createCatalogStore(file) {
         if (!['artist','media','collective'].includes(kind)) throw new Error('Выберите тип: артист, медиа или проект.');
         const rating = a.rating === 'CRINGE' ? 'A' : a.rating ?? (original?.rating === 'CRINGE' ? 'A' : original?.rating) ?? 'A';
         if (!['A','AA','AAA','AAA+'].includes(rating)) throw new Error('Выберите тег A, AA, AAA или AAA+.');
-        const artist = {id, kind, rating, name, url: link.url, platform: link.platform, section: a.section, image, description: String(a.description || '').slice(0,1500), tags: String(a.tags || '').slice(0,250)};
+        const artist = {id, kind, rating, name, url: link.url, platform: link.platform, section: a.section, image, tags: String(a.tags || '').slice(0,250)};
         const at = catalog.artists.findIndex(x => x.id === id);
         if (at >= 0) catalog.artists[at] = artist; else catalog.artists.unshift(artist);
         response = {artist};
       } else throw new Error('Неизвестное действие.');
       validateCatalog(catalog);
-      await mkdir(dirname(file), {recursive: true});
-      const temp = `${file}.${randomUUID()}.tmp`;
-      try {
-        await writeFile(temp, JSON.stringify(catalog, null, 2) + '\n', {flag:'wx'});
-        await rename(temp, file);
-      } finally { await unlink(temp).catch(() => {}); }
+      await persist(catalog);
       return response;
     });
     queue = result.catch(() => {});
     return result;
   }
-  return {read, mutate};
+  return {read, mutate, migrate};
 }

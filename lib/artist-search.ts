@@ -1,8 +1,8 @@
 import type {Artist} from './types';
 
-type SearchableArtist=Pick<Artist,'name'|'url'|'tags'|'description'>;
+type SearchableArtist=Pick<Artist,'name'|'url'|'tags'>;
 type SearchField=keyof SearchableArtist;
-const defaultFields:readonly SearchField[]=['name','tags','description'];
+const defaultFields:readonly SearchField[]=['name','tags'];
 const normalizeSearch=(value:string)=>value.normalize('NFKC').toLowerCase().trim().replace(/\s+/g,' ');
 
 export function matchesArtistSearch(artist:SearchableArtist,query:string,fields:readonly SearchField[]=defaultFields):boolean{

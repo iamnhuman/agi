@@ -23,7 +23,7 @@ export function videoLink(raw){
 function decode(s){let value=s;for(let i=0;i<3;i++){const next=value.replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;|&apos;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&#x([\da-f]+);/gi,(_,n)=>String.fromCodePoint(Math.min(parseInt(n,16),0x10ffff))).replace(/&#(\d+);/g,(_,n)=>String.fromCodePoint(Math.min(+n,0x10ffff)));if(next===value)break;value=next;}return value;}
 export function videoMetadata(html,link){
  const meta={};for(const tag of html.match(/<meta\b[^>]*>/gi)||[]){const a={};for(const m of tag.matchAll(/([\w:-]+)\s*=\s*(["'])(.*?)\2/g))a[m[1].toLowerCase()]=decode(m[3]);const key=a.property||a.itemprop||a.name;if(key&&!meta[key])meta[key]=a.content;}
- let date='',title=meta['og:title']||'',description=meta['og:description']||meta.description||'',image=meta['og:image']||meta['og:image:url']||meta['og:image:secure_url']||meta['twitter:image']||meta['twitter:image:src']||meta.thumbnail||'';
+ let date='',title=meta['og:title']||'',image=meta['og:image']||meta['og:image:url']||meta['og:image:secure_url']||meta['twitter:image']||meta['twitter:image:src']||meta.thumbnail||'';
  if(link.platform==='YouTube')date=meta.datePublished||html.match(/"publishDate"\s*:\s*"(\d{4}-\d{2}-\d{2})/)?.[1]||'';
  if(link.platform==='Telegram'){
   date=html.match(/<time\b[^>]*datetime="([^"]+)"/)?.[1]||'';
@@ -34,7 +34,6 @@ export function videoMetadata(html,link){
   const message=html.match(/<div\b[^>]*class="[^"]*tgme_widget_message_text[^\"]*"[^>]*>([\s\S]*?)<\/div>/i)?.[1]||'';
   const text=decode(message.replace(/<br\s*\/?>/gi,'\n').replace(/<[^>]*>/g,' ').replace(/[\t\r ]+/g,' ').replace(/\n\s+/g,'\n')).trim();
   title=text.slice(0,250);
-  description=text.length>250?text.slice(250,1500):'';
  }
  if(link.platform==='Instagram')date=meta['article:published_time']||html.match(/"uploadDate"\s*:\s*"(\d{4}-\d{2}-\d{2}[^" ]*)"/)?.[1]||'';
  if(link.platform==='VK')date=meta['article:published_time']||meta['og:published_time']||meta['ya:ovs:upload_date']||html.match(/"(?:datePublished|uploadDate)"\s*:\s*"(\d{4}-\d{2}-\d{2}[^" ]*)"/)?.[1]||'';
@@ -46,7 +45,7 @@ export function videoMetadata(html,link){
  // Telegram's generic emoji and logo Open Graph assets are not post previews.
  if(link.platform==='Telegram'&&image&&new URL(image).hostname==='telegram.org')image='';
  const isVideo=Boolean(link.videoId||/^(?:video|clip)-?\d+_\d+$/.test(new URL(link.url).pathname.split('/').filter(Boolean)[0]||'')||new URL(link.url).pathname.split('/').filter(Boolean)[0]==='reel'||meta['og:type']?.startsWith('video')||meta['og:video']||meta['og:video:url']||/<video\b|<source\b[^>]*type=["']video\//i.test(html));
- return {title:title.replace(/ - YouTube$/,'').slice(0,250),description:description.slice(0,1500),image,publishedAt:date,dateSource:date?'source':'unknown',dateUrl:date?link.fetchUrl:'',isVideo};
+ return {title:title.replace(/ - YouTube$/,'').slice(0,250),image,publishedAt:date,dateSource:date?'source':'unknown',dateUrl:date?link.fetchUrl:'',isVideo};
 }
 export async function importVideo(raw,fetcher=fetch){
  const link=videoLink(raw);let metadata={title:'',image:'',publishedAt:'',dateSource:'unknown',dateUrl:'',isVideo:Boolean(link.videoId||/^(?:video|clip)-?\d+_\d+$/.test(new URL(link.url).pathname.split('/').filter(Boolean)[0]||'')||new URL(link.url).pathname.split('/').filter(Boolean)[0]==='reel')};

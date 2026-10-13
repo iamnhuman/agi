@@ -8,7 +8,7 @@ import {startServers} from '../server/http.mjs';
 import {orderVideos} from '../lib/video-order.mjs';
 
 const ids=videos=>videos.map(video=>video.id);
-const video=(id,date,index)=>({id,name:id,url:`https://t.me/video_position_test/${index+1}`,platform:'Telegram',videoId:'',reference:false,title:'',publishedAt:date,dateSource:date?'source':'unknown',dateUrl:date?`https://t.me/video_position_test/${index+1}?embed=1&mode=tme`:'',image:'',description:'',alternateUrls:[],sourceOrder:index});
+const video=(id,date,index)=>({id,name:id,url:`https://t.me/video_position_test/${index+1}`,platform:'Telegram',videoId:'',reference:false,title:'',publishedAt:date,dateSource:date?'source':'unknown',dateUrl:date?`https://t.me/video_position_test/${index+1}?embed=1&mode=tme`:'',image:'',alternateUrls:[],sourceOrder:index});
 async function fixture(t){
  const dir=await mkdtemp(join(tmpdir(),'video-position-'));t.after(()=>rm(dir,{recursive:true,force:true}));
  const file=join(dir,'catalog.json'),catalog={artists:[],sections:[],videos:[video('middle','2025-01-01',0),video('unknown','',1),video('first','2023-01-01',2),video('last','2026-01-01',3)]};

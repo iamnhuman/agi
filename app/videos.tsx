@@ -9,7 +9,7 @@ import {cardMaterial} from './card-material';
 import DossierInstruments,{trackDossierPointer,resetDossierPointer} from './dossier-instruments';
 import {orderVideos,type VideoOrder} from './video-order';
 import type {Video} from '@/lib/types';
-const blank:Video={id:'',name:'',url:'',platform:'',videoId:'',reference:false,isVideo:false,title:'',publishedAt:'',dateSource:'unknown',dateUrl:'',image:'',description:'',alternateUrls:[],sourceOrder:0};
+const blank:Video={id:'',name:'',url:'',platform:'',videoId:'',reference:false,isVideo:false,title:'',publishedAt:'',dateSource:'unknown',dateUrl:'',image:'',alternateUrls:[],sourceOrder:0};
 const fallbackImage='./video-fallback.svg';
 const platformShortNames:Record<string,string>={Instagram:'IG',YouTube:'YT',Telegram:'TG',VK:'VK'};
 const MIN_SCENE_ZOOM=.25,MAX_SCENE_ZOOM=1.5;
@@ -222,7 +222,7 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
   try{
    const response=await fetch('/api/video-import',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:draft.url})});
    const result=await response.json();if(!response.ok)throw Error(result.error);
-   setDraft(current=>({...current!,...result,name:current!.name||result.title||'',title:result.title||current!.title,publishedAt:result.publishedAt||current!.publishedAt,dateSource:result.publishedAt?result.dateSource:current!.dateSource,dateUrl:result.publishedAt?result.dateUrl:current!.dateUrl,image:result.image||current!.image,description:result.description||current!.description}));
+   setDraft(current=>({...current!,...result,name:current!.name||result.title||'',title:result.title||current!.title,publishedAt:result.publishedAt||current!.publishedAt,dateSource:result.publishedAt?result.dateSource:current!.dateSource,dateUrl:result.publishedAt?result.dateUrl:current!.dateUrl,image:result.image||current!.image}));
    setImportMessage(result.imageSavedLocally?'Обложка найдена и сохранена локально. Проверьте данные.':result.image?'Обложка найдена, но сохранить её локально не удалось. '+(result.imageNotice||''):'Источник не отдал изображение. Загрузите свой файл или укажите ссылку на обложку.');
   }catch(error){setFormError((error as Error).message);}finally{setBusy(false);}
  }
@@ -304,7 +304,7 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
    </div>
    </div>
   </div>}
- <Dialog open={!!selected} onOpenChange={open=>{if(!open)setSelected(null);}}><DialogContent className={`editor-dialog video-dialog${instagramEmbed?' video-dialog--instagram':''}`}><DialogTitle>{selected?.name}</DialogTitle><DialogDescription>{selected?.title||selected?.platform}</DialogDescription>{selected?.videoId?<iframe title={selected.name} src={'https://www.youtube-nocookie.com/embed/'+selected.videoId} referrerPolicy="strict-origin-when-cross-origin" allow="encrypted-media; picture-in-picture; fullscreen" allowFullScreen/>:instagramEmbed?<div className="instagram-player"><iframe key={instagramEmbed} title={`Instagram · ${selected?.name}`} src={instagramEmbed} scrolling="no" referrerPolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen/></div>:<p>Встроенный просмотр недоступен. Откройте материал у источника.</p>}{selected?.reference&&<p className="notice">В архиве указан профиль или сайт, а не отдельная публикация.</p>}<a className="primary-btn" href={selected?.url} target="_blank" rel="noreferrer">Открыть источник · {selected?.platform}<ArrowUpRight size={17}/></a>{selected?.alternateUrls.map((url,i)=><a key={url} href={url} target="_blank" rel="noreferrer">Резервный источник {i+1} ↗</a>)}{selected?.description&&<p>{selected.description}</p>}</DialogContent></Dialog>
+ <Dialog open={!!selected} onOpenChange={open=>{if(!open)setSelected(null);}}><DialogContent className={`editor-dialog video-dialog${instagramEmbed?' video-dialog--instagram':''}`}><DialogTitle>{selected?.name}</DialogTitle><DialogDescription>{selected?.title||selected?.platform}</DialogDescription>{selected?.videoId?<iframe title={selected.name} src={'https://www.youtube-nocookie.com/embed/'+selected.videoId} referrerPolicy="strict-origin-when-cross-origin" allow="encrypted-media; picture-in-picture; fullscreen" allowFullScreen/>:instagramEmbed?<div className="instagram-player"><iframe key={instagramEmbed} title={`Instagram · ${selected?.name}`} src={instagramEmbed} scrolling="no" referrerPolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen/></div>:<p>Встроенный просмотр недоступен. Откройте материал у источника.</p>}{selected?.reference&&<p className="notice">В архиве указан профиль или сайт, а не отдельная публикация.</p>}<a className="primary-btn" href={selected?.url} target="_blank" rel="noreferrer">Открыть источник · {selected?.platform}<ArrowUpRight size={17}/></a>{selected?.alternateUrls.map((url,i)=><a key={url} href={url} target="_blank" rel="noreferrer">Резервный источник {i+1} ↗</a>)}</DialogContent></Dialog>
  <Dialog open={!!draft} onOpenChange={open=>{if(!open&&!busy)setDraft(null);}}>
   <DialogContent className="editor-dialog video-editor-dialog" onCloseAutoFocus={event=>{
    event.preventDefault();
@@ -334,7 +334,7 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
    }}>
     <label>Номер в списке<input aria-label="Номер в списке" aria-describedby="video-editor-position-hint" required type="number" inputMode="numeric" min={1} max={videos.length+(draft.id?0:1)} step={1} value={draftPosition} onChange={event=>setDraftPosition(event.target.value)}/></label>
     <p className="video-editor-position-hint" id="video-editor-position-hint">В порядке «{order==='desc'?'По убыванию':'По возрастанию'}», от 1 до {videos.length+(draft.id?0:1)}. Остальные карточки сдвинутся автоматически.</p>
-    <label>Ссылка на видео или публикацию<input required type="url" value={draft.url} onChange={event=>{setImportMessage('');setDraft({...draft,url:event.target.value,publishedAt:'',dateSource:'unknown',dateUrl:'',videoId:'',isVideo:false,image:'',title:'',description:''});}}/></label>
+    <label>Ссылка на видео или публикацию<input required type="url" value={draft.url} onChange={event=>{setImportMessage('');setDraft({...draft,url:event.target.value,publishedAt:'',dateSource:'unknown',dateUrl:'',videoId:'',isVideo:false,image:'',title:''});}}/></label>
     <button type="button" disabled={busy||!draft.url} className="secondary-btn metadata-import-btn" onClick={importDraft}>{busy?'Загрузка…':'Подгрузить данные и обложку из YouTube, VK, Telegram или Instagram'}</button>
     <label>Автор / название<input required maxLength={160} value={draft.name} onChange={event=>setDraft({...draft,name:event.target.value})}/></label>
     <label>Регион<select aria-label="Регион" value={draft.section||''} onChange={event=>setDraft({...draft,section:event.target.value as Video['section']})}><option value="">Не указан</option><option value="runet">Рунет</option><option value="world">Мир</option></select></label>
@@ -349,7 +349,6 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
       {draft.image.startsWith('https://')&&<button type="button" className="secondary-btn" disabled={busy} onClick={cacheCover}>Сохранить по ссылке</button>}</div>
      </div>
     </div>
-    <label>Описание<textarea value={draft.description} maxLength={1500} onChange={event=>setDraft({...draft,description:event.target.value})}/></label>
     {(formError||importMessage)&&<p className="notice" role="status">{formError||importMessage}</p>}
     <div className="form-actions"><button type="button" className="secondary-btn" onClick={()=>setDraft(null)} disabled={busy}>Отмена</button><button className="primary-btn" disabled={busy}>Сохранить работу</button></div>
    </form>}

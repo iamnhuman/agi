@@ -34,7 +34,7 @@ async function readImage(req) {
 
 export async function startServers({catalogFile,distDir,sitePort=3333,adminPort=3334,fetcher=fetch,dev=false}) {
   const store = createCatalogStore(catalogFile);
-  await store.read(); // Never overwrite an existing or malformed catalog with the seed.
+  await store.migrate(); // Validate and migrate existing records without replacing them with the seed.
   let vite;
   if (dev) {
     const {createServer} = await import('vite');
