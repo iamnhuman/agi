@@ -151,7 +151,7 @@ function rasterPortrait(image:HTMLImageElement,portraitHeight:number){
  return portrait;
 }
 
-function cardBitmap(artist:Artist,index:number,type:CardTypography,image?:HTMLImageElement,regionImage?:HTMLImageElement){
+function cardBitmap(artist:Artist,index:number,type:CardTypography,showRatings:boolean,image?:HTMLImageElement,regionImage?:HTMLImageElement){
  const canvas=document.createElement('canvas');canvas.width=cardWidth;canvas.height=cardHeight;
  const context=canvas.getContext('2d');if(!context)return canvas;
  context.imageSmoothingEnabled=false;
@@ -220,9 +220,11 @@ function cardBitmap(artist:Artist,index:number,type:CardTypography,image?:HTMLIm
  const nameBaseline=labelTop+nameLayout.fontSize+7;
  nameLayout.lines.forEach((line,index)=>text(line,18,nameBaseline+index*(nameLayout.fontSize+3),nameLayout.fontSize,'#fff0bb'));
  text(artist.kind==='collective'?'ПРОЕКТ':artist.kind==='media'?'МЕДИА':'АРТИСТ',18,250,type.meta,'#d6ddbb');
- const ratingWidth=Math.max(42,type.rating*4+8),ratingHeight=type.rating+9;
- bevel(174-ratingWidth,254-ratingHeight,ratingWidth,ratingHeight,'#11190c','#576647','#050b03');
- text(artist.rating||'A',174-ratingWidth/2,249,type.rating,accent,'center');
+ if(showRatings){
+  const ratingWidth=Math.max(42,type.rating*4+8),ratingHeight=type.rating+9;
+  bevel(174-ratingWidth,254-ratingHeight,ratingWidth,ratingHeight,'#11190c','#576647','#050b03');
+  text(artist.rating||'A',174-ratingWidth/2,249,type.rating,accent,'center');
+ }
  for(let tick=0;tick<11;tick++){
   const height=2+tick%3,width=tick%4===3?7:10,x=15+tick*15,y=265-height;
   const lit=tick<signalBars;
@@ -248,7 +250,7 @@ function containsPoint(corners:CardPoint[],point:CardPoint){
  return sides.every(side=>side>=0)||sides.every(side=>side<=0);
 }
 
-export default function ArtistCanvasDeck({artists,zoom,onZoomStep}:{artists:Artist[];zoom:number;onZoomStep:(step:number)=>void}){
+export default function ArtistCanvasDeck({artists,zoom,onZoomStep,showRatings}:{artists:Artist[];zoom:number;onZoomStep:(step:number)=>void;showRatings:boolean}){
  const canvasRef=useRef<HTMLCanvasElement>(null);
  const editRef=useRef<HTMLAnchorElement>(null);
  const zoomRef=useRef(zoom),zoomStepRef=useRef(onZoomStep);
@@ -407,7 +409,7 @@ export default function ArtistCanvasDeck({artists,zoom,onZoomStep}:{artists:Arti
      const cardHeight=height*scene.sizeY*.89*viewportFit,cardWidth=height*scene.sizeX*.89*viewportFit;
      const x=width/2+dx*step-cardWidth/2,y=height/2+((row-(scene.rows-1)/2)*scene.rowStep)*height*.89/2-cardHeight/2;
      if(!images.has(index)&&artists[index].image){const image=new Image();image.crossOrigin='anonymous';image.referrerPolicy='no-referrer';image.onload=()=>{if(!cancelled)bitmaps.delete(index);};image.src=artists[index].image;images.set(index,image);}
-     if(!bitmaps.has(index))bitmaps.set(index,cardBitmap(artists[index],index,type,images.get(index)?.complete?images.get(index):undefined,regionImages.get(artists[index].section)));
+     if(!bitmaps.has(index))bitmaps.set(index,cardBitmap(artists[index],index,type,showRatings,images.get(index)?.complete?images.get(index):undefined,regionImages.get(artists[index].section)));
      const left=Math.round(x),top=Math.round(y),w=Math.round(cardWidth),h=Math.round(cardHeight);
      hitAreas.push({index,corners:[{x:left,y:top},{x:left+w,y:top},{x:left+w,y:top+h},{x:left,y:top+h}]});
      context.fillStyle='#000';context.fillRect(left+3,top+4,w,h);context.drawImage(bitmaps.get(index)!,left,top,w,h);
@@ -429,7 +431,7 @@ export default function ArtistCanvasDeck({artists,zoom,onZoomStep}:{artists:Arti
   const backgroundUniforms={motion:gl.getUniformLocation(backgroundProgram,'uMotion'),resolution:gl.getUniformLocation(backgroundProgram,'uResolution')};
   const textures=new Map<number,TextureRecord>();
   let type=typographyForLayout();
-  function upload(index:number,image?:HTMLImageElement){const record=textures.get(index);if(!record||cancelled)return;gl!.bindTexture(gl!.TEXTURE_2D,record.texture);gl!.texImage2D(gl!.TEXTURE_2D,0,gl!.RGBA,gl!.RGBA,gl!.UNSIGNED_BYTE,cardBitmap(artists[index],index,type,image,regionImages.get(artists[index].section)));}
+  function upload(index:number,image?:HTMLImageElement){const record=textures.get(index);if(!record||cancelled)return;gl!.bindTexture(gl!.TEXTURE_2D,record.texture);gl!.texImage2D(gl!.TEXTURE_2D,0,gl!.RGBA,gl!.RGBA,gl!.UNSIGNED_BYTE,cardBitmap(artists[index],index,type,showRatings,image,regionImages.get(artists[index].section)));}
   function textureFor(index:number){const cached=textures.get(index);if(cached)return cached.texture;const texture=gl!.createTexture();if(!texture)throw Error('Texture unavailable');gl!.bindTexture(gl!.TEXTURE_2D,texture);gl!.texParameteri(gl!.TEXTURE_2D,gl!.TEXTURE_MIN_FILTER,gl!.NEAREST);gl!.texParameteri(gl!.TEXTURE_2D,gl!.TEXTURE_MAG_FILTER,gl!.NEAREST);gl!.texParameteri(gl!.TEXTURE_2D,gl!.TEXTURE_WRAP_S,gl!.CLAMP_TO_EDGE);gl!.texParameteri(gl!.TEXTURE_2D,gl!.TEXTURE_WRAP_T,gl!.CLAMP_TO_EDGE);textures.set(index,{texture});upload(index);
    if(artists[index].image){const image=new Image();image.crossOrigin='anonymous';image.referrerPolicy='no-referrer';image.onload=()=>{if(!cancelled)upload(index,image);};image.onerror=()=>{};image.src=artists[index].image;textures.get(index)!.image=image;}
    return texture;
@@ -475,7 +477,7 @@ export default function ArtistCanvasDeck({artists,zoom,onZoomStep}:{artists:Arti
   };
   frame=requestAnimationFrame(render);
   return()=>{cancelled=true;cancelAnimationFrame(frame);cleanEvents();textures.forEach(record=>{if(record.image){record.image.onload=null;record.image.onerror=null;}gl.deleteTexture(record.texture);});gl.deleteProgram(cardProgram);gl.deleteProgram(backgroundProgram);gl.deleteVertexArray(vao);};
- },[signature]);
+ },[signature,showRatings]);
  return <div className="canvas-deck-shell">
   <div className="canvas-deck-header"><span>АРХИВ ДОСЬЕ</span><span className="canvas-deck-count">ЗАПИСЕЙ: {artists.length}</span>
    <div className="deck-zoom-controls" role="group" aria-label="Масштаб 3D-колоды">

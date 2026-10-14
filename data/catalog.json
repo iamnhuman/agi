@@ -223,7 +223,7 @@
     {
       "id": "1ac52fd3-cadc-4702-9fb3-f85d70c85fb3",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "Исх’арт",
       "url": "https://t.me/haolism",
       "platform": "Telegram",
@@ -5725,6 +5725,22 @@
       "alternateUrls": [],
       "sourceOrder": 145,
       "section": "world"
+    },
+    {
+      "url": "https://t.me/club_dex/1707",
+      "platform": "Telegram",
+      "videoId": "",
+      "fetchUrl": "https://t.me/club_dex/1707?embed=1&mode=tme",
+      "reference": false,
+      "id": "38e78968-b527-4b8d-9157-290c5dd16023",
+      "name": "DEX",
+      "publishedAt": "2026-10-14",
+      "dateSource": "source",
+      "dateUrl": "https://t.me/club_dex/1707?embed=1&mode=tme",
+      "image": "./avatars/upload-02d64e1465750d5d.jpg",
+      "isVideo": true,
+      "alternateUrls": [],
+      "sourceOrder": 149
     }
   ]
 }

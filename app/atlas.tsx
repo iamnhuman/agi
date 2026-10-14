@@ -4,6 +4,7 @@ import {createPortal} from 'react-dom';
 import {catalogUrl,adminUrl,showLocalAdmin} from '@/client/config';
 import ArtistMap from './artist-map';
 import ArtistCanvasDeck from './artist-canvas-deck';
+import CatalogRatingToggle from './catalog-rating-toggle';
 import {cardMaterial} from './card-material';
 import DossierInstruments,{trackDossierPointer,resetDossierPointer} from './dossier-instruments';
 import {defaultSections,type Artist,type Section} from '@/lib/types';
@@ -445,7 +446,7 @@ function PreviewNameScreen({name}:{name:string}){
  return <strong ref={screenRef} className="artist-name-preview-name"><span ref={windowRef} className="artist-name-preview-name-window"><span ref={copyRef} className="artist-name-preview-name-copy">{name}</span></span></strong>;
 }
 
-function ArtistNameFlow({artists}:{artists:Artist[]}){
+function ArtistNameFlow({artists,showRatings}:{artists:Artist[];showRatings:boolean}){
  const [preview,setPreview]=useState<{artist:Artist;left:number;top:number;below:boolean;width:number}|null>(null);
  const activeName=useRef<HTMLElement|null>(null);
  const measureCanvas=useRef<HTMLCanvasElement|null>(null);
@@ -465,7 +466,7 @@ function ArtistNameFlow({artists}:{artists:Artist[]}){
  function hidePreview(){activeName.current=null;setPreview(null);}
  const previewTags=preview?preview.artist.tags.split(/[,;#]+/).map(tag=>tag.trim()).filter(Boolean):[];
  return <><div className="artist-name-flow" aria-label="Имена в архиве">{artists.map(artist=><span key={artist.id} className="artist-name-item"><a className="artist-name-link" data-rating={artist.rating||'A'} href={artist.url} target="_blank" rel="noopener noreferrer" onMouseEnter={event=>showPreview(artist,event.currentTarget)} onMouseLeave={hidePreview} onFocus={event=>showPreview(artist,event.currentTarget)} onBlur={hidePreview}>{artist.name}</a>{showLocalAdmin&&<a className="artist-name-edit" href={`${adminUrl}/?edit=${encodeURIComponent(artist.id)}`} aria-label={`Редактировать ${artist.name}`} title="Редактировать запись"><Pencil size={15} aria-hidden="true"/></a>}</span>)}</div>
- {preview&&createPortal(<div key={preview.artist.id} className={'artist-name-preview'+(preview.below?' is-below':'')} data-rating={preview.artist.rating||'A'} data-kind={preview.artist.kind||'artist'} style={{...cardMaterial(preview.artist.id),left:preview.left,top:preview.top,width:preview.width}} aria-hidden="true"><div className="artist-name-preview-image"><span>{preview.artist.name.slice(0,1)}</span>{preview.artist.image&&<img src={preview.artist.image} alt="" referrerPolicy="no-referrer" onError={event=>{event.currentTarget.style.display='none';}}/>}</div><div className="artist-name-preview-details"><PreviewNameScreen key={preview.artist.id} name={preview.artist.name}/><div className="artist-name-preview-tags"><span className="artist-name-preview-rating">{preview.artist.rating||'A'}</span><span className="artist-name-preview-kind">{preview.artist.kind==='collective'?'Проект':preview.artist.kind==='media'?'Медиа':'Артист'}</span>{previewTags.map((tag,index)=><span key={`${tag}-${index}`}>{tag}</span>)}{(preview.artist.section==='world'||preview.artist.section==='runet')&&<span className="artist-name-preview-region" title={preview.artist.section==='world'?'США':'СССР'}><img src={preview.artist.section==='world'?'./badges/region-en-eagle-cutout.png':'./badges/region-ru-emblem-cutout.png'} alt={preview.artist.section==='world'?'США':'СССР'}/></span>}</div></div>
+ {preview&&createPortal(<div key={preview.artist.id} className={'artist-name-preview'+(preview.below?' is-below':'')} data-rating={preview.artist.rating||'A'} data-kind={preview.artist.kind||'artist'} style={{...cardMaterial(preview.artist.id),left:preview.left,top:preview.top,width:preview.width}} aria-hidden="true"><div className="artist-name-preview-image"><span>{preview.artist.name.slice(0,1)}</span>{preview.artist.image&&<img src={preview.artist.image} alt="" referrerPolicy="no-referrer" onError={event=>{event.currentTarget.style.display='none';}}/>}</div><div className="artist-name-preview-details"><PreviewNameScreen key={preview.artist.id} name={preview.artist.name}/><div className="artist-name-preview-tags">{showRatings&&<span className="artist-name-preview-rating">{preview.artist.rating||'A'}</span>}<span className="artist-name-preview-kind">{preview.artist.kind==='collective'?'Проект':preview.artist.kind==='media'?'Медиа':'Артист'}</span>{previewTags.map((tag,index)=><span key={`${tag}-${index}`}>{tag}</span>)}{(preview.artist.section==='world'||preview.artist.section==='runet')&&<span className="artist-name-preview-region" title={preview.artist.section==='world'?'США':'СССР'}><img src={preview.artist.section==='world'?'./badges/region-en-eagle-cutout.png':'./badges/region-ru-emblem-cutout.png'} alt={preview.artist.section==='world'?'США':'СССР'}/></span>}</div></div>
  <DossierInstruments id={preview.artist.id} preview/>
  </div>,document.body)}
  </>;
@@ -485,6 +486,8 @@ const [data,setData]=useState(initial),[sections,setSections]=useState<Section[]
 async function refresh(){try{const r=await fetch(catalogUrl,{cache:'no-store'});const d:any=await r.json();if(!r.ok)throw Error(d.error);setData(d.artists);setSections(d.sections);setError('');}catch{setError('Связь с архивом потеряна. Показаны последние доступные досье.');}}
 useEffect(()=>{refresh();const onFocus=()=>refresh();window.addEventListener('focus',onFocus);return ()=>window.removeEventListener('focus',onFocus);},[]);
 const [section,setSection]=useState('all'),[q,setQ]=useState(''),[view,setView]=useState('grid'),[kind,setKind]=useState('all'),[rating,setRating]=useState('all'),[sortMode,setSortMode]=useState<'posting'|'random'>('posting'),[shuffleSeed,setShuffleSeed]=useState(0);
+const [showRatings,setShowRatings]=useState(true);
+function toggleRatings(){setShowRatings(visible=>!visible);setRating('all');}
 const [deckZoom,setDeckZoom]=useState(1.1);
 const changeDeckZoom=(step:number)=>setDeckZoom(current=>Math.round(Math.max(.4,Math.min(1.5,current+step))*100)/100);
 const [cardSize,setCardSize]=useState<'sm'|'md'|'lg'>('sm');
@@ -502,9 +505,10 @@ useEffect(()=>{
 const [controlsOpen,setControlsOpen]=useState(false);
 const controlsToggle=useRef<HTMLButtonElement>(null);
 function changeView(next:string){if(next===view)return;setView(next);setCardSize('sm');setListSize('sm');}
-const catalogIsDefault=section==='all'&&kind==='all'&&rating==='all'&&!q&&cardSize==='sm'&&listSize==='sm'&&sortMode==='posting'&&deckZoom===1.1;
+const catalogIsDefault=section==='all'&&kind==='all'&&rating==='all'&&showRatings&&!q&&cardSize==='sm'&&listSize==='sm'&&sortMode==='posting'&&deckZoom===1.1;
 function resetCatalog(){
  setSection('all');setKind('all');setRating('all');setQ('');
+ setShowRatings(true);
  setCardSize('sm');setListSize('sm');
  setSortMode('posting');setShuffleSeed(0);setDeckZoom(1.1);
 }
@@ -541,9 +545,9 @@ return <>
 {sortControls('footer')}
 <div className="catalog-type-controls">
 <div className="catalog-type-radios" role="radiogroup" aria-label="Тип записей">{[['all','Все'],['artist','Артисты'],['media','Медиа'],['collective','Проекты']].map(([id,label])=><label key={id} className={kind===id?'is-active':''}><input type="radio" name="catalog-kind" value={id} checked={kind===id} onChange={()=>setKind(id)}/><span>{label}</span></label>)}</div>
-<div className="catalog-tag-filter"><span>ТЕГ</span><div className="catalog-type-radios" role="radiogroup" aria-label="Рейтинг тегов">{[['all','Все'],['A','A'],['AA','AA'],['AAA','AAA'],['AAA+','AAA+']].map(([id,label])=><label key={id} className={rating===id?'is-active':''}><input type="radio" name="catalog-rating" value={id} checked={rating===id} onChange={()=>setRating(id)}/><span>{label}</span></label>)}</div></div>
+<div className="catalog-tag-filter" data-ratings-visible={showRatings}><CatalogRatingToggle visible={showRatings} onToggle={toggleRatings}/>{showRatings?<div className="catalog-type-radios" role="radiogroup" aria-label="Рейтинг тегов">{[['all','Все'],['A','A'],['AA','AA'],['AAA','AAA'],['AAA+','AAA+']].map(([id,label])=><label key={id} className={rating===id?'is-active':''}><input type="radio" name="catalog-rating" value={id} checked={rating===id} onChange={()=>setRating(id)}/><span>{label}</span></label>)}</div>:<small className="catalog-tags-disabled" role="status">ОТКЛЮЧЕНЫ</small>}</div>
 </div>
- </div></div></div>{view==='names'?<ArtistNameFlow artists={artists}/>:view==='map'?<ArtistMap artists={artists} sections={sections}/>:view==='deck'?<ArtistCanvasDeck artists={artists} zoom={deckZoom} onZoomStep={changeDeckZoom}/>:<div className={view==='list'?'artist-list':'artist-grid'} data-size={view==='grid'?cardSize:listSize}>{artists.map((a,i)=>
+ </div></div></div>{view==='names'?<ArtistNameFlow artists={artists} showRatings={showRatings}/>:view==='map'?<ArtistMap artists={artists} sections={sections}/>:view==='deck'?<ArtistCanvasDeck artists={artists} zoom={deckZoom} onZoomStep={changeDeckZoom} showRatings={showRatings}/>:<div className={view==='list'?'artist-list':'artist-grid'} data-size={view==='grid'?cardSize:listSize}>{artists.map((a,i)=>
 <article className="artist-card" data-rating={a.rating||'A'} data-kind={a.kind||'artist'} data-section={a.section} style={cardMaterial(a.id)} key={a.id} onPointerMove={trackDossierPointer} onPointerLeave={resetDossierPointer}>
 <div className={'art art-'+i%8}>
 <span className="art-index">{String(i+1).padStart(3,'0')}</span>
@@ -551,9 +555,9 @@ return <>
 <span aria-hidden="true">×</span>
 </div>{a.image&&<img src={a.image} alt={a.name} loading="lazy" draggable={false} referrerPolicy="no-referrer" onError={e=>{e.currentTarget.style.display="none";}}/>}{view==='grid'&&<div className="dossier-tags">
 {a.kind==='collective'?<span className="record-type record-type--avatar" title="Проект"><UsersRound size={13} aria-hidden="true"/><span className="record-type-label">Проект</span></span>:a.kind==='media'?<span className="record-type record-type--avatar" title="Медиа"><Radio size={13} aria-hidden="true"/><span className="record-type-label">Медиа</span></span>:null}
-<span className="art-badges">
+{showRatings&&<span className="art-badges">
 <span className={`rating-tag rating-${(a.rating||'A').toLowerCase()}`}>{a.rating||'A'}</span>
-</span></div>}
+</span>}</div>}
 {showLocalAdmin&&view==='grid'&&<a className="card-edit card-edit--image" aria-label={"Редактировать "+a.name} href={adminUrl+"/?edit="+encodeURIComponent(a.id)+"#catalog"}><Pencil size={15}/></a>}
 {view==='grid'&&<span className="art-platform-tag" aria-hidden="true"><span className="platform-label"><span className="platform-short">{a.platform==='Instagram'?'IG':a.platform==='Telegram'?'TG':a.platform.slice(0,2)}</span><ArrowUpRight size={13}/></span></span>}
 </div>
@@ -562,7 +566,7 @@ return <>
 <div>
 <h2 aria-label={a.name}>
 {view==='grid'?<ArtistTicker name={a.name}/>:<ArtistName name={a.name} fitToCard={false}/>}
-</h2>{view==='list'&&<div className="list-tags">{(a.section==='world'||a.section==='runet')&&<span className="list-region-badge" title={a.section==='world'?'Мир':'Рунет'}><img src={a.section==='world'?'./badges/region-en-eagle-cutout.png':'./badges/region-ru-emblem-cutout.png'} alt={a.section==='world'?'Мир':'Рунет'} loading="lazy" decoding="async"/></span>}<span className="list-rating-tag">{a.rating||'A'}</span>{a.kind==='collective'?<span className="list-kind-tag" title="Проект"><UsersRound size={11} aria-hidden="true"/><span className="list-kind-label">Проект</span></span>:a.kind==='media'?<span className="list-kind-tag" title="Медиа"><Radio size={11} aria-hidden="true"/><span className="list-kind-label">Медиа</span></span>:null}</div>}{view!=='list'&&<p>
+</h2>{view==='list'&&<div className="list-tags">{(a.section==='world'||a.section==='runet')&&<span className="list-region-badge" title={a.section==='world'?'Мир':'Рунет'}><img src={a.section==='world'?'./badges/region-en-eagle-cutout.png':'./badges/region-ru-emblem-cutout.png'} alt={a.section==='world'?'Мир':'Рунет'} loading="lazy" decoding="async"/></span>}{showRatings&&<span className="list-rating-tag">{a.rating||'A'}</span>}{a.kind==='collective'?<span className="list-kind-tag" title="Проект"><UsersRound size={11} aria-hidden="true"/><span className="list-kind-label">Проект</span></span>:a.kind==='media'?<span className="list-kind-tag" title="Медиа"><Radio size={11} aria-hidden="true"/><span className="list-kind-label">Медиа</span></span>:null}</div>}{view!=='list'&&<p>
 <span className="artist-social">{a.platform} <ArrowUpRight size={14}/>
 </span>
 {a.kind==='collective'?<span className="list-kind-tag"><UsersRound size={11} aria-hidden="true"/>Проект</span>:a.kind==='media'?<span className="list-kind-tag"><Radio size={11} aria-hidden="true"/>Медиа</span>:null}
