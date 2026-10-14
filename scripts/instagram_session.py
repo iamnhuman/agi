@@ -9,6 +9,7 @@ import re
 import shutil
 import sys
 from pathlib import Path
+from urllib.parse import unquote, urlparse
 
 import instaloader
 
@@ -92,95 +93,75 @@ def status(check_online: bool) -> None:
     print(f"Instagram подключён: @{username}")
 
 
+def profile_avatar_candidates(user: dict, username: str) -> list[dict]:
+    if str(user.get("username", "")).lower() != username.lower():
+        return []
+    versions = user.get("hd_profile_pic_versions")
+    values = [user.get("hd_profile_pic_url_info"), *(versions if isinstance(versions, list) else []),
+              {"url": user.get("profile_pic_url_hd"), "preferred": True},
+              {"url": user.get("profile_pic_url")}]
+    candidates = []
+    for value in values:
+        if not isinstance(value, dict) or not isinstance(value.get("url"), str):
+            continue
+        parsed = urlparse(value["url"])
+        if parsed.scheme != "https" or not re.search(r"(^|\.)(cdninstagram\.com|fbcdn\.net)$", parsed.hostname or ""):
+            continue
+        width = value.get("width") if isinstance(value.get("width"), int) else 0
+        height = value.get("height") if isinstance(value.get("height"), int) else 0
+        crop = re.search(r"(?:^|[_/])s(\d+)x(\d+)(?:[_/&]|$)", unquote(parsed.path + "?" + parsed.query), re.IGNORECASE)
+        if crop:
+            width, height = int(crop[1]), int(crop[2])
+        candidates.append({"url": value["url"], "width": max(0, width), "height": max(0, height),
+                           "hd": width >= 320 and height >= 320,
+                           "preferred": value.get("preferred", False)})
+    return candidates
+
+
+def avatar_lookup_error(error: Exception) -> str:
+    message = str(error)
+    if "feedback_required" in message or isinstance(error, instaloader.exceptions.TooManyRequestsException):
+        return "Instagram ограничил автоматические запросы (feedback_required). Повторите загрузку позже."
+    if isinstance(error, instaloader.exceptions.LoginRequiredException) or "login_required" in message:
+        return "Instagram-сессия истекла. Подключите её заново."
+    return "Instagram не отдал данные профиля. Повторите загрузку позже."
+
+
+def resolve_avatar(loader: instaloader.Instaloader, username: str) -> dict:
+    # A failed endpoint must not consume all 30 seconds in automatic retries.
+    loader.context.max_connection_attempts = 1
+    loader.context.request_timeout = 12
+    try:
+        profile = instaloader.Profile.from_username(loader.context, username)
+        resolved_username = profile.username
+    except instaloader.exceptions.ProfileNotExistsException as error:
+        raise RuntimeError(f"Instagram не нашёл профиль @{username}.") from error
+    except instaloader.exceptions.InstaloaderException as error:
+        raise RuntimeError(avatar_lookup_error(error)) from error
+    if resolved_username.lower() != username.lower():
+        raise RuntimeError("Instagram вернул другой профиль.")
+    candidates = profile_avatar_candidates(profile._node, username)
+    notice = None
+    # The authenticated profile-info response contains actual HD avatar sizes.
+    # The no_iphone property is explicitly the lower-quality web version.
+    try:
+        candidates.extend(profile_avatar_candidates(profile._iphone_struct, username))
+    except (instaloader.exceptions.InstaloaderException, KeyError) as error:
+        notice = avatar_lookup_error(error)
+    if not candidates:
+        raise RuntimeError(notice or "Instagram не отдал изображение аватарки.")
+    best = max(candidates, key=lambda value: (value["hd"], value["preferred"] and not value["width"], value["width"] * value["height"]))
+    result = {"username": username, **{key: best[key] for key in ("url", "width", "height", "hd")}}
+    if notice and not best["hd"]:
+        result["notice"] = notice
+    return result
+
+
 def avatar(username: str) -> None:
     if not re.fullmatch(r"[A-Za-z0-9._]+", username):
         raise RuntimeError("Некорректный Instagram-ник.")
     loader, _ = load_session()
-    # Search is the least restricted authenticated endpoint and normally gives
-    # us the exact profile id. It is incomplete for some accounts, so a direct
-    # username lookup remains available as a fallback.
-    profile = None
-    try:
-        search = loader.context.get_json("web/search/topsearch/", {"query": username})
-        user = next(
-            (
-                row.get("user", {})
-                for row in search.get("users", [])
-                if row.get("user", {}).get("username", "").lower() == username.lower()
-            ),
-            None,
-        )
-    except instaloader.exceptions.InstaloaderException:
-        user = None
-    if user:
-        profile = instaloader.Profile(loader.context, user)
-    else:
-        try:
-            profile = instaloader.Profile.from_username(loader.context, username)
-            if profile.username.lower() != username.lower():
-                profile = None
-            else:
-                user = profile._node
-        except instaloader.exceptions.InstaloaderException:
-            profile = None
-    if not user or profile is None:
-        raise RuntimeError(f"Instagram не нашёл профиль @{username}.")
-    best = None
-    # Ask for the profile node first. Instaloader keeps the current profile
-    # GraphQL document id and normalizes hd_profile_pic_url_info for us. The
-    # old media/{profile_pic_id}/info endpoint is not reliable: Instagram now
-    # returns "Media not found" for many perfectly normal profile pictures.
-    try:
-        hd_url = str(profile.profile_pic_url_no_iphone)
-        if hd_url.startswith("https://"):
-            best = {"url": hd_url, "width": 1080, "height": 1080, "hd": True}
-    except instaloader.exceptions.InstaloaderException:
-        pass
-
-    media_id = user.get("profile_pic_id")
-    try:
-        media = loader.context.get_json(f"api/v1/media/{media_id}/info/", {}) if media_id and best is None else {}
-        item = next(
-            (
-                value
-                for value in media.get("items", [])
-                if value.get("product_type") == "profile_pic"
-                and value.get("user", {}).get("username", "").lower() == username.lower()
-            ),
-            None,
-        )
-        candidates = item.get("image_versions2", {}).get("candidates", []) if item else []
-        valid = [
-            value
-            for value in candidates
-            if isinstance(value.get("url"), str)
-            and value["url"].startswith("https://")
-            and isinstance(value.get("width"), int)
-            and isinstance(value.get("height"), int)
-        ]
-        if valid and best is None:
-            best = max(valid, key=lambda value: value["width"] * value["height"])
-    except instaloader.exceptions.InstaloaderException:
-        # Some normal profiles expose a current avatar in search but make the
-        # corresponding profile_pic media record unavailable. This verified
-        # profile URL is still safe; it is never a timeline publication.
-        pass
-    if best is None:
-        fallback = user.get("profile_pic_url")
-        if not isinstance(fallback, str) or not fallback.startswith("https://"):
-            raise RuntimeError("Instagram не отдал изображение аватарки.")
-        best = {"url": fallback, "width": 150, "height": 150}
-    print(
-        json.dumps(
-            {
-                "username": user["username"],
-                "url": best["url"],
-                "width": best["width"],
-                "height": best["height"],
-                "hd": best.get("hd", best["width"] >= 320 and best["height"] >= 320),
-            }
-        )
-    )
+    print(json.dumps(resolve_avatar(loader, username)))
 
 
 def post(shortcode: str) -> None:

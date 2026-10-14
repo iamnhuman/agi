@@ -1,6 +1,17 @@
 {
   "artists": [
     {
+      "id": "b38b2521-52da-43e2-8844-567589453970",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "Егор Кузьмин XR",
+      "url": "https://t.me/EgorKuzminxr1",
+      "platform": "Telegram",
+      "section": "runet",
+      "image": "./public/avatars/upload-725c703acf0f5a8d.jpg",
+      "tags": ""
+    },
+    {
       "id": "91f755cb-5c04-4e06-91b7-e1e4795e1bb7",
       "kind": "artist",
       "rating": "A",
@@ -3096,7 +3107,7 @@
       "url": "https://vk.com/necrofuturism",
       "alternateUrls": [],
       "sourceOrder": 0,
-      "publishedAt": "2023-12-12",
+      "publishedAt": "2023-09-12",
       "dateSource": "manual",
       "dateUrl": "",
       "image": "./public/avatars/upload-9be09c5eaac5067b.jpg",
