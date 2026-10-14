@@ -7,7 +7,7 @@ import {catalogUrl,adminUrl,showLocalAdmin} from '@/client/config';
 import {drawTimelineRunway} from './timeline-runway';
 import {cardMaterial} from './card-material';
 import DossierInstruments,{trackDossierPointer,resetDossierPointer} from './dossier-instruments';
-import {orderVideos,type VideoOrder} from './video-order';
+import {orderVideos,videoPositionByDate,type VideoOrder} from './video-order';
 import type {Video} from '@/lib/types';
 import VideoPlayer from './video-player';
 import TimelineNavigator from './timeline-navigator';
@@ -56,7 +56,7 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
  const [videos,setVideos]=useState<Video[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState(''),[q,setQ]=useState(''),[order,setOrder]=useState<VideoOrder>('desc'),[orientation,setOrientation]=useState<'vertical'|'horizontal'>('horizontal'),[draft,setDraft]=useState<Video|null>(null),[selected,setSelected]=useState<Video|null>(null),[deleting,setDeleting]=useState<Video|null>(null),[busy,setBusy]=useState(false),[formError,setFormError]=useState(''),[importMessage,setImportMessage]=useState('');
  const [sceneZoom,setSceneZoom]=useState(.65);
  const [gridZoom,setGridZoom]=useState(1);
- const [draftPosition,setDraftPosition]=useState(''),[initialDraftPosition,setInitialDraftPosition]=useState('');
+ const [draftPosition,setDraftPosition]=useState(''),[draftPositionMode,setDraftPositionMode]=useState<'date'|'manual'>('date'),[draftPositionTouched,setDraftPositionTouched]=useState(false);
  const [positionDraft,setPositionDraft]=useState<Video|null>(null),[positionValue,setPositionValue]=useState(''),[positionError,setPositionError]=useState(''),[moving,setMoving]=useState(false),[moveNotice,setMoveNotice]=useState(''),[revealId,setRevealId]=useState<string|null>(null);
  const positionInputRef=useRef<HTMLInputElement>(null),videoRefs=useRef(new Map<string,HTMLElement>()),skipPositionFocusRestore=useRef(false);
  const editorReturn=useRef<{videoId:string;focus:HTMLElement|null;pageX:number;pageY:number;railX:number;railY:number}|null>(null),skipEditorFocusRestore=useRef(false);
@@ -105,6 +105,9 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
  const matchesVideo=(v:Video)=>v.name.toLowerCase().includes(q.toLowerCase());
  const filtered=videos.filter(matchesVideo),allOrdered=orderVideos(videos,order);
  const ordered=allOrdered.filter(matchesVideo),positions=new Map(allOrdered.map((video,index)=>[video.id,index+1]));
+ useEffect(()=>{
+  if(draft&&draftPositionMode==='date')setDraftPosition(String(videoPositionByDate(videos,draft,order)));
+ },[draft,videos,order,draftPositionMode]);
  useEffect(()=>{
   if(orientation!=='vertical'||loading)return;
   const frame=gridFrame.current;
@@ -253,8 +256,8 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
  function edit(v?:Video,items=videos){
   editorReturn.current={videoId:v?.id||'',focus:document.activeElement instanceof HTMLElement?document.activeElement:null,pageX:window.scrollX,pageY:window.scrollY,railX:timelineViewport.current?.scrollLeft||0,railY:timelineViewport.current?.scrollTop||0};
   skipEditorFocusRestore.current=false;
-  const position=v?orderVideos(items,order).findIndex(item=>item.id===v.id)+1:order==='desc'?1:items.length+1;
-  setDraft(v?{...v}:{...blank});setDraftPosition(String(position));setInitialDraftPosition(String(position));setFormError('');setImportMessage('');
+  const position=v?orderVideos(items,order).findIndex(item=>item.id===v.id)+1:videoPositionByDate(items,blank,order);
+  setDraft(v?{...v}:{...blank});setDraftPosition(String(position));setDraftPositionMode(v?.manualPosition?'manual':'date');setDraftPositionTouched(false);setFormError('');setImportMessage('');
  }
  async function importDraft(){
   if(!draft?.url)return;
@@ -312,8 +315,8 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
    <div className="video-toolbar-radios">
     <fieldset className="video-radio-group video-order-group"><legend className="sr-only">Порядок работ</legend><div>
      <span className="video-control-label" aria-hidden="true">ПОРЯДОК</span>
-     <label title="Сначала новые добавления"><input type="radio" name="video-order" value="desc" aria-label="По убыванию" checked={order==='desc'} onChange={()=>setOrder('desc')}/><span><ArrowDownWideNarrow size={16} aria-hidden="true"/><b>По<br/>убыванию</b></span></label>
-     <label title="Сначала ранние добавления"><input type="radio" name="video-order" value="asc" aria-label="По возрастанию" checked={order==='asc'} onChange={()=>setOrder('asc')}/><span><ArrowUpNarrowWide size={16} aria-hidden="true"/><b>По<br/>возрастанию</b></span></label>
+     <label title="Сначала поздние даты"><input type="radio" name="video-order" value="desc" aria-label="По убыванию" checked={order==='desc'} onChange={()=>setOrder('desc')}/><span><ArrowDownWideNarrow size={16} aria-hidden="true"/><b>По<br/>убыванию</b></span></label>
+     <label title="Сначала ранние даты"><input type="radio" name="video-order" value="asc" aria-label="По возрастанию" checked={order==='asc'} onChange={()=>setOrder('asc')}/><span><ArrowUpNarrowWide size={16} aria-hidden="true"/><b>По<br/>возрастанию</b></span></label>
     </div></fieldset>
     <fieldset className="video-radio-group video-view-group"><legend className="sr-only">ВИД</legend><div>
      <span className="video-control-label" aria-hidden="true">ВИД</span>
@@ -369,19 +372,20 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
     event.preventDefault();
     const value=draftPosition.trim(),position=Number(value),total=videos.length+(draft.id?0:1);
     if(!/^\d+$/.test(value)||!Number.isInteger(position)||position<1||position>total){setFormError(`Укажите целый номер от 1 до ${total}.`);return;}
-    const changedPosition=position!==Number(initialDraftPosition);
+    const manualPosition=draftPositionMode==='manual'&&draftPositionTouched;
     setBusy(true);setFormError('');
     try{
-     const result=await mutate({action:'video-save',video:draft,...(changedPosition?{position,reverseNumbering:order==='desc'}:{})});
+     const result=await mutate({action:'video-save',video:draft,reverseNumbering:order==='desc',...(manualPosition?{position}:draftPositionTouched?{positionMode:'date'}:{})});
+     const changedPosition=Boolean(draft.id&&result.position!==positions.get(draft.id));
      await load();
      skipEditorFocusRestore.current=changedPosition||!draft.id;
      setDraft(null);
      if(changedPosition||!draft.id){setRevealId(result.video.id);}
-     if(changedPosition){setMoveNotice(`${result.video.name} — позиция ${position}.`);}
+     if(changedPosition){setMoveNotice(`${result.video.name} — позиция ${result.position}.`);}
     }catch(error){setFormError((error as Error).message);}finally{setBusy(false);}
    }}>
-    <label>Номер в списке<input aria-label="Номер в списке" aria-describedby="video-editor-position-hint" required type="number" inputMode="numeric" min={1} max={videos.length+(draft.id?0:1)} step={1} value={draftPosition} onChange={event=>setDraftPosition(event.target.value)}/></label>
-    <p className="video-editor-position-hint" id="video-editor-position-hint">В порядке «{order==='desc'?'По убыванию':'По возрастанию'}», от 1 до {videos.length+(draft.id?0:1)}. Остальные карточки сдвинутся автоматически.</p>
+    <label>Номер в списке<input aria-label="Номер в списке" aria-describedby="video-editor-position-hint" required type="number" inputMode="numeric" min={1} max={videos.length+(draft.id?0:1)} step={1} value={draftPosition} onChange={event=>{setDraftPosition(event.target.value);setDraftPositionMode('manual');setDraftPositionTouched(true);}}/></label>
+    <p className="video-editor-position-hint" id="video-editor-position-hint">{draftPositionMode==='date'?'Номер рассчитан по дате. Измените его для ручного порядка.':'Номер задан вручную.'}{draftPositionMode==='manual'&&<button type="button" className="video-position-auto" onClick={()=>{setDraftPositionMode('date');setDraftPositionTouched(true);}}>Вернуть по дате</button>}</p>
     <label>Ссылка на видео или публикацию<input required type="url" value={draft.url} onChange={event=>{setImportMessage('');setDraft({...draft,url:event.target.value,publishedAt:'',dateSource:'unknown',dateUrl:'',videoId:'',isVideo:false,media:'',image:''});}}/></label>
     <button type="button" disabled={busy||!draft.url} className="secondary-btn metadata-import-btn" onClick={importDraft}>{busy?'Загрузка…':'Подгрузить данные и обложку из YouTube, VK, Telegram или Instagram'}</button>
     <label>Автор / название<input required maxLength={160} value={draft.name} onChange={event=>setDraft({...draft,name:event.target.value})}/></label>

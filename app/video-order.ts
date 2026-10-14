@@ -1,4 +1,5 @@
 import {orderVideos as sortVideos} from '../lib/video-order.mjs';
+export {videoPositionByDate} from '../lib/video-order.mjs';
 
 export type VideoOrder='desc'|'asc';
 

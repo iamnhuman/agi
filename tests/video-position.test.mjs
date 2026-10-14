@@ -21,7 +21,7 @@ test('edited positions persist in both directions without changing video metadat
  assert.deepEqual(ids(moved.videos),['last','middle','unknown','first']);
  const saved=await createCatalogStore(file).read();
  assert.deepEqual(saved.videos,moved.videos);
- for(const original of catalog.videos)assert.deepEqual(saved.videos.find(v=>v.id===original.id),original);
+ for(const original of catalog.videos)assert.deepEqual(saved.videos.find(v=>v.id===original.id),original.id==='last'?{...original,manualPosition:true}:original);
  const descending=await store.mutate({action:'video-move',id:'last',position:1,reverseNumbering:true});
  assert.deepEqual(ids(orderVideos(descending.videos,'desc')),['last','first','unknown','middle']);
  const end=await store.mutate({action:'video-move',id:'first',position:4,reverseNumbering:true});
@@ -49,10 +49,10 @@ test('queued moves, edits, new additions and deletions retain the collection ord
  await store.mutate({action:'video-save',video:edited});
  assert.deepEqual(ids((await store.read()).videos),ids(saved.videos));
  const added=await store.mutate({action:'video-save',video:{...video('','2021-01-01',9),name:'New video'}});
- saved=await store.read();assert.equal(orderVideos(saved.videos,'desc')[0].id,added.video.id);
+ saved=await store.read();assert.equal(saved.videos[3].id,added.video.id);
  assert.deepEqual(ids(saved.videos).filter(id=>id!==added.video.id),['middle','last','unknown','first']);
  await store.mutate({action:'video-delete',id:'last'});
- saved=await store.read();assert.deepEqual(ids(saved.videos),['middle','unknown','first',added.video.id]);
+ saved=await store.read();assert.deepEqual(ids(saved.videos),['middle','unknown',added.video.id,'first']);
 });
 
 test('obsolete date-order metadata is removed on the next save',async t=>{

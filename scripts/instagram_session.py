@@ -8,15 +8,21 @@ import os
 import re
 import shutil
 import sys
+import time
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 
 import instaloader
+from requests.exceptions import RequestException
 
 ROOT = Path(__file__).resolve().parent.parent
 STATE_DIR = ROOT / ".local" / "instagram"
 SESSION_FILE = STATE_DIR / "session"
 ACCOUNT_FILE = STATE_DIR / "account.json"
+AVATAR_LIMIT_FILE = STATE_DIR / "avatar-api-limit.json"
+LOOKUP_ERRORS = (instaloader.exceptions.InstaloaderException, instaloader.exceptions.AbortDownloadException)
+AVATAR_LIMIT_NOTICE = "Instagram временно ограничил загрузку HD-аватарок. Доступна только уменьшенная версия; повторите позже."
+PROFILE_QUERY_ID = "27937681195819736"  # PolarisProfilePageContentQuery in Instaloader 4.15.3.
 
 
 def make_loader() -> instaloader.Instaloader:
@@ -39,6 +45,7 @@ def save_account(username: str) -> None:
     os.chmod(ACCOUNT_FILE, 0o600)
     if SESSION_FILE.exists():
         os.chmod(SESSION_FILE, 0o600)
+    AVATAR_LIMIT_FILE.unlink(missing_ok=True)
 
 
 def stored_username() -> str:
@@ -97,7 +104,8 @@ def profile_avatar_candidates(user: dict, username: str) -> list[dict]:
     if str(user.get("username", "")).lower() != username.lower():
         return []
     versions = user.get("hd_profile_pic_versions")
-    values = [user.get("hd_profile_pic_url_info"), *(versions if isinstance(versions, list) else []),
+    hd_info = user.get("hd_profile_pic_url_info")
+    values = [{**hd_info, "preferred": True} if isinstance(hd_info, dict) else None, *(versions if isinstance(versions, list) else []),
               {"url": user.get("profile_pic_url_hd"), "preferred": True},
               {"url": user.get("profile_pic_url")}]
     candidates = []
@@ -120,11 +128,90 @@ def profile_avatar_candidates(user: dict, username: str) -> list[dict]:
 
 def avatar_lookup_error(error: Exception) -> str:
     message = str(error)
-    if "feedback_required" in message or isinstance(error, instaloader.exceptions.TooManyRequestsException):
-        return "Instagram ограничил автоматические запросы (feedback_required). Повторите загрузку позже."
+    if avatar_api_restricted(error):
+        return AVATAR_LIMIT_NOTICE
+    if "checkpoint_required" in message or "challenge_required" in message:
+        return "Instagram просит подтвердить вход в аккаунт. После подтверждения повторите загрузку."
     if isinstance(error, instaloader.exceptions.LoginRequiredException) or "login_required" in message:
         return "Instagram-сессия истекла. Подключите её заново."
     return "Instagram не отдал данные профиля. Повторите загрузку позже."
+
+
+def avatar_api_restricted(error: Exception) -> bool:
+    return ("feedback_required" in str(error) or "429" in str(error)
+            or isinstance(error, instaloader.exceptions.TooManyRequestsException))
+
+
+def avatar_api_cooling_down() -> bool:
+    try:
+        limit = json.loads(AVATAR_LIMIT_FILE.read_text())
+        # An earlier pause applied to the failing mobile API, not this query.
+        if limit.get("source") != "profile-query":
+            return False
+        if SESSION_FILE.exists() and SESSION_FILE.stat().st_mtime > AVATAR_LIMIT_FILE.stat().st_mtime:
+            return False
+        return float(limit["retryAfter"]) > time.time()
+    except (OSError, ValueError, KeyError, TypeError):
+        return False
+
+
+def pause_avatar_api() -> None:
+    # Persist the pause across helper processes; repeated button clicks must not
+    # keep sending requests to an endpoint that has already refused them.
+    try:
+        STATE_DIR.mkdir(parents=True, exist_ok=True)
+        AVATAR_LIMIT_FILE.write_text(json.dumps({"source": "profile-query", "retryAfter": time.time() + 600}) + "\n")
+        os.chmod(AVATAR_LIMIT_FILE, 0o600)
+    except OSError:
+        pass
+
+
+def public_avatar_data(html: str, username: str) -> tuple[str, list[dict]]:
+    ids, candidates = set(), []
+
+    def visit(value):
+        if isinstance(value, dict):
+            if isinstance(value.get("username"), str) and value["username"].lower() == username.lower():
+                # Polaris's "id" can be an opaque GraphQL ID. The numeric pk is
+                # the actual user ID, as in Instaloader's public-page resolver.
+                identifier = str(value.get("pk") or value.get("id") or "")
+                if identifier.isascii() and identifier.isdigit():
+                    ids.add(identifier)
+                    candidates.extend(profile_avatar_candidates(value, username))
+            for child in value.values():
+                if isinstance(child, (dict, list)):
+                    visit(child)
+        elif isinstance(value, list):
+            for child in value:
+                visit(child)
+
+    for script in re.finditer(r'<script\b[^>]*type=["\']application/json["\'][^>]*>(.*?)</script>', html, re.DOTALL | re.IGNORECASE):
+        try:
+            visit(json.loads(script[1]))
+        except (ValueError, RecursionError):
+            continue
+    if len(ids) != 1:
+        raise RuntimeError("Instagram не отдал данные нужного профиля. Повторите загрузку позже.")
+    return ids.pop(), candidates
+
+
+def public_profile_avatar(context, username: str) -> tuple[str, list[dict]]:
+    # Browser-navigation headers are necessary for Instagram to embed profile
+    # data. This request is anonymous and does not use or change login cookies.
+    with context.get_anonymous_session() as session:
+        with session.get(f"https://www.instagram.com/{username}/", allow_redirects=False, stream=True,
+                         headers={"Accept": "text/html", "Sec-Fetch-Dest": "document",
+                                  "Sec-Fetch-Mode": "navigate", "Sec-Fetch-Site": "none"}) as response:
+            if response.status_code == 404:
+                raise RuntimeError(f"Instagram не нашёл профиль @{username}.")
+            if response.status_code != 200:
+                raise RuntimeError("Instagram не отдал публичную страницу профиля. Повторите позже.")
+            body = bytearray()
+            for chunk in response.iter_content(65536):
+                body.extend(chunk)
+                if len(body) > 5 * 1024 * 1024:
+                    raise RuntimeError("Instagram вернул слишком большую страницу профиля.")
+    return public_avatar_data(body.decode("utf-8", errors="replace"), username)
 
 
 def resolve_avatar(loader: instaloader.Instaloader, username: str) -> dict:
@@ -132,22 +219,35 @@ def resolve_avatar(loader: instaloader.Instaloader, username: str) -> dict:
     loader.context.max_connection_attempts = 1
     loader.context.request_timeout = 12
     try:
-        profile = instaloader.Profile.from_username(loader.context, username)
-        resolved_username = profile.username
-    except instaloader.exceptions.ProfileNotExistsException as error:
-        raise RuntimeError(f"Instagram не нашёл профиль @{username}.") from error
-    except instaloader.exceptions.InstaloaderException as error:
+        profile_id, candidates = public_profile_avatar(loader.context, username)
+    except (*LOOKUP_ERRORS, RequestException) as error:
         raise RuntimeError(avatar_lookup_error(error)) from error
-    if resolved_username.lower() != username.lower():
-        raise RuntimeError("Instagram вернул другой профиль.")
-    candidates = profile_avatar_candidates(profile._node, username)
     notice = None
-    # The authenticated profile-info response contains actual HD avatar sizes.
-    # The no_iphone property is explicitly the lower-quality web version.
-    try:
-        candidates.extend(profile_avatar_candidates(profile._iphone_struct, username))
-    except (instaloader.exceptions.InstaloaderException, KeyError) as error:
-        notice = avatar_lookup_error(error)
+    if not any(candidate["hd"] for candidate in candidates):
+        if avatar_api_cooling_down():
+            notice = AVATAR_LIMIT_NOTICE
+        else:
+            try:
+                # Keep the working web profile query. The mobile users/info API
+                # can refuse the same valid browser session that this accepts.
+                # Call the query directly to avoid Instaloader's obsolete search
+                # fallback when a profile field is unavailable.
+                data = loader.context.doc_id_graphql_query(PROFILE_QUERY_ID, {
+                    "id": profile_id, "render_surface": "PROFILE",
+                    "__relay_internal__pv__PolarisCannesGuardianExperienceEnabledrelayprovider": True,
+                    "__relay_internal__pv__PolarisCASB976ProfileEnabledrelayprovider": False,
+                    "__relay_internal__pv__PolarisRepostsConsumptionEnabledrelayprovider": False,
+                    "__relay_internal__pv__PolarisWebSchoolsEnabledrelayprovider": False,
+                    "enable_integrity_filters": True,
+                })
+                user = (data.get("data") or {}).get("user") or {}
+                if str(user.get("pk") or user.get("id")) != profile_id:
+                    raise KeyError("profile id mismatch")
+                candidates.extend(profile_avatar_candidates(user, username))
+            except (*LOOKUP_ERRORS, KeyError) as error:
+                notice = avatar_lookup_error(error)
+                if avatar_api_restricted(error):
+                    pause_avatar_api()
     if not candidates:
         raise RuntimeError(notice or "Instagram не отдал изображение аватарки.")
     best = max(candidates, key=lambda value: (value["hd"], value["preferred"] and not value["width"], value["width"] * value["height"]))
@@ -221,5 +321,5 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as error:
-        print(str(error), file=sys.stderr)
+        print(avatar_lookup_error(error) if isinstance(error, LOOKUP_ERRORS) else str(error), file=sys.stderr)
         raise SystemExit(1)

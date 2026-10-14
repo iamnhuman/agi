@@ -7,7 +7,7 @@ import {importVideo} from './video-import.mjs';
 import {downloadVideoImage} from './video-images.mjs';
 import {downloadInstagramVideo} from './video-files.mjs';
 import {importArtist} from './import.mjs';
-import {downloadRemoteAvatar,MAX_AVATAR_BYTES,saveAvatarBytes} from './avatar-files.mjs';
+import {downloadRemoteAvatar,downloadRemoteAvatarDetails,MAX_AVATAR_BYTES,saveAvatarBytes} from './avatar-files.mjs';
 import {instagramSessionAvatar,instagramSessionPost} from './instagram-session.mjs';
 import {parseArtistLink} from './links.mjs';
 
@@ -34,7 +34,7 @@ async function readImage(req) {
   return {type,bytes:Buffer.concat(chunks)};
 }
 
-export async function startServers({catalogFile,distDir,sitePort=3333,adminPort=3334,fetcher=fetch,dev=false}) {
+export async function startServers({catalogFile,distDir,sitePort=3333,adminPort=3334,fetcher=fetch,instagramAvatar=instagramSessionAvatar,dev=false}) {
   const store = createCatalogStore(catalogFile);
   await store.migrate(); // Validate and migrate existing records without replacing them with the seed.
   let vite;
@@ -83,7 +83,7 @@ export async function startServers({catalogFile,distDir,sitePort=3333,adminPort=
                 catch(error){imported.videoNotice=error.message;}
               }catch(error){imported.sessionNotice=error.message;}
               else if(parts.length===1&&/^[A-Za-z0-9._]+$/.test(parts[0]))try{
-                const avatar=await instagramSessionAvatar(parts[0]);
+                const avatar=await instagramAvatar(parts[0]);
                 imported.image=avatar.url;
               }catch(error){imported.sessionNotice=error.message;}
             }
@@ -99,7 +99,7 @@ export async function startServers({catalogFile,distDir,sitePort=3333,adminPort=
             const imported=await importArtist(raw,fetcher);
             if(link.platform==='Instagram'&&!link.isPost){
               try{
-                const profileAvatar=await instagramSessionAvatar(link.name);
+                const profileAvatar=await instagramAvatar(link.name);
                 if(profileAvatar){
                   imported.artist.image=profileAvatar.url;
                   imported.profileAvatar=true;
@@ -107,11 +107,21 @@ export async function startServers({catalogFile,distDir,sitePort=3333,adminPort=
                   imported.avatarHeight=profileAvatar.height;
                   imported.hdAvatar=profileAvatar.hd===true;
                   imported.lowResolution=!imported.hdAvatar;
+                  if(profileAvatar.notice&&!imported.hdAvatar)imported.imageNotice=profileAvatar.notice;
                 }
               }catch(error){imported.imageNotice=error.message;imported.sessionExpired=/сесси|login|logged in/i.test(error.message);}
             }
             if(imported.artist.image?.startsWith('https://')){
-              try{imported.artist.image=await downloadRemoteAvatar(imported.artist.image,distDir,fetcher);imported.imageSavedLocally=true;}
+              try{
+                const downloaded=await downloadRemoteAvatarDetails(imported.artist.image,distDir,fetcher);
+                imported.artist.image=downloaded.image;imported.imageSavedLocally=true;
+                if(link.platform==='Instagram'&&!link.isPost&&downloaded.width&&downloaded.height){
+                  imported.avatarWidth=downloaded.width;imported.avatarHeight=downloaded.height;
+                  imported.hdAvatar=downloaded.width>=320&&downloaded.height>=320;
+                  imported.lowResolution=!imported.hdAvatar;
+                  if(imported.hdAvatar)delete imported.imageNotice;
+                }
+              }
               catch(error){imported.imageNotice=error.message;}
             }
             return json(res,200,imported);
