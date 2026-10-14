@@ -37,7 +37,7 @@ export default function TimelineNavigator({viewportRef}:{viewportRef:RefObject<H
   const viewport=viewportRef.current;
   viewport?.scrollBy({left:direction*viewport.clientWidth*.85,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
  };
- return <div className="timeline-navigation" style={{'--timeline-nav-thumb':`${metrics.thumb}px`} as CSSProperties}>
+ return <div className="timeline-navigation timeline-control-panel" style={{'--timeline-nav-thumb':`${metrics.thumb}px`} as CSSProperties}>
   <label htmlFor="timeline-position">ЛЕНТА</label>
   <button type="button" aria-label="Назад по линии времени" title="На экран назад" disabled={!metrics.scrollable||metrics.position===0} onClick={()=>step(-1)}><ChevronLeft size={16} aria-hidden="true"/></button>
   <input ref={rangeRef} id="timeline-position" type="range" min="0" max="1000" step="1" value={metrics.position} disabled={!metrics.scrollable} aria-label="Позиция на линии времени" aria-valuetext={`${Math.round(metrics.position/10)}% ленты`} title="Быстрый переход по ленте · Home — начало, End — конец" onChange={event=>jump(Number(event.target.value))}/>
