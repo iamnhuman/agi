@@ -1,6 +1,17 @@
 {
   "artists": [
     {
+      "id": "55ae5f72-26e2-467f-9295-88cdeb392c24",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "Юра Покровский",
+      "url": "https://t.me/yurapokrovsky",
+      "platform": "Telegram",
+      "section": "runet",
+      "image": "./avatars/upload-8facee27f555b338.jpg",
+      "tags": ""
+    },
+    {
       "id": "68d48b3e-13f6-4111-a782-28aa1a6d57f9",
       "kind": "artist",
       "rating": "A",
@@ -157,7 +168,7 @@
     {
       "id": "b2c06013-e3e4-4c04-9856-e08c37dba252",
       "kind": "collective",
-      "rating": "AAA+",
+      "rating": "AAA",
       "name": "notitleyet.ai",
       "url": "https://www.instagram.com/notitleyet.ai",
       "platform": "Instagram",
@@ -1926,6 +1937,17 @@
       "tags": ""
     },
     {
+      "id": "a8b98393-5f97-4376-ae6d-37e497aa27dc",
+      "kind": "media",
+      "rating": "AA",
+      "name": "Ринат Шакиров | Промпты для Midjourney | ChatGPT |",
+      "url": "https://t.me/dailyprompts",
+      "platform": "Telegram",
+      "section": "runet",
+      "image": "./avatars/upload-55dafdd8f5039913.jpg",
+      "tags": ""
+    },
+    {
       "id": "5011fc60-741b-446e-a533-a784cbdab0cf",
       "kind": "media",
       "rating": "AAA+",
@@ -2049,7 +2071,7 @@
     {
       "id": "seed-9",
       "kind": "artist",
-      "rating": "AAA",
+      "rating": "AAA+",
       "name": "boeyman",
       "url": "https://www.instagram.com/boeyman",
       "platform": "Instagram",
@@ -2416,6 +2438,17 @@
       "platform": "Instagram",
       "section": "world",
       "image": "./avatars/upload-83a0a9446636e390.jpg",
+      "tags": ""
+    },
+    {
+      "id": "3edcf583-3009-4e2d-ad78-639032870d15",
+      "kind": "media",
+      "rating": "AA",
+      "name": "Сеньор генеративщик 🏴‍☠️",
+      "url": "https://t.me/ai_senior",
+      "platform": "Telegram",
+      "section": "runet",
+      "image": "./avatars/upload-aad0a3396e2be137.jpg",
       "tags": ""
     },
     {
@@ -3145,6 +3178,56 @@
     }
   ],
   "videos": [
+    {
+      "url": "https://t.me/pixelord/451",
+      "platform": "Telegram",
+      "videoId": "",
+      "fetchUrl": "https://t.me/pixelord/451?embed=1&mode=tme",
+      "reference": false,
+      "id": "5b451bd7-5dcb-44f3-9679-745320f79bfe",
+      "name": "pixelord",
+      "publishedAt": "2022-09-13",
+      "dateSource": "source",
+      "dateUrl": "https://t.me/pixelord/451?embed=1&mode=tme",
+      "image": "./avatars/upload-50f32b332dccb2be.jpg",
+      "isVideo": true,
+      "alternateUrls": [],
+      "sourceOrder": 147
+    },
+    {
+      "url": "https://t.me/bad_zu/168",
+      "platform": "Telegram",
+      "videoId": "",
+      "fetchUrl": "https://t.me/bad_zu/168?embed=1&mode=tme",
+      "reference": false,
+      "id": "fe47d0ce-ee07-4792-8603-c54407298742",
+      "name": "bad zu",
+      "publishedAt": "2023-03-22",
+      "dateSource": "source",
+      "dateUrl": "https://t.me/bad_zu/168?embed=1&mode=tme",
+      "image": "./avatars/upload-0744009d3fd56c2f.jpg",
+      "isVideo": true,
+      "alternateUrls": [],
+      "sourceOrder": 146,
+      "section": "runet"
+    },
+    {
+      "url": "https://t.me/digitonica/757",
+      "platform": "Telegram",
+      "videoId": "",
+      "fetchUrl": "https://t.me/digitonica/757?embed=1&mode=tme",
+      "reference": false,
+      "id": "9d3ebf92-3d58-469a-b1d0-aecf6f32df72",
+      "name": "digitonica",
+      "publishedAt": "2023-08-15",
+      "dateSource": "source",
+      "dateUrl": "https://t.me/digitonica/757?embed=1&mode=tme",
+      "image": "./avatars/upload-b3a2b6819fbaa137.jpg",
+      "isVideo": true,
+      "alternateUrls": [],
+      "sourceOrder": 145,
+      "section": "runet"
+    },
     {
       "id": "video-1",
       "name": "necrofuturism",
@@ -5274,7 +5357,7 @@
       "publishedAt": "2026-05-16",
       "dateSource": "source",
       "dateUrl": "https://t.me/ainreimusic/722?embed=1&mode=tme",
-      "image": "https://cdn4.telesco.pe/file/QV4a-RPY2M97Q4tg6NP7sLgqEeH6RmmfODhHgIaoYlCnhfAO3XQt3GkH4o-mqhNtwssuRt7zXeHA_eBR5H9T72DRIH10Fn9L20EAS4fBcJ3PLruMydkRk8bpWAx28Z9R_LUcm9JqnzAqMxV8Yyq7ZeibzhmStZ0yNQ_MexvLMdLRQadW2hDQm1EUPFWnafF6T0gN6E_FiGQZLJyjd3KzrbmD6T3qguiSI9aNMbg9YHKGRwILyQWhJazVtKQEK9EJyOsW91rfeb62vapxrTRo5N4o4CY3t6MT0m-EDj1SjOBUKy3PIC6b8q2RnuE417hWR8OPNMK89Eqy88LMHp6xXw",
+      "image": "./avatars/upload-e25377f8778eea58.jpg",
       "platform": "Telegram",
       "videoId": "",
       "fetchUrl": "https://t.me/ainreimusic/722?embed=1&mode=tme",
@@ -5523,6 +5606,23 @@
       "section": "runet"
     },
     {
+      "url": "https://t.me/RUSSIANSTYLEPARTY/2972",
+      "platform": "Telegram",
+      "videoId": "",
+      "fetchUrl": "https://t.me/RUSSIANSTYLEPARTY/2972?embed=1&mode=tme",
+      "reference": false,
+      "id": "57fb605e-8c3a-4c6c-b890-c91b839e2959",
+      "name": "tau",
+      "publishedAt": "2026-08-24",
+      "dateSource": "source",
+      "dateUrl": "https://t.me/RUSSIANSTYLEPARTY/2972?embed=1&mode=tme",
+      "image": "./avatars/upload-d94a04ad6e8ce316.jpg",
+      "isVideo": true,
+      "alternateUrls": [],
+      "sourceOrder": 148,
+      "section": "runet"
+    },
+    {
       "id": "video-141",
       "name": "i61",
       "url": "https://www.instagram.com/p/Dc02-B7CBzL/",
@@ -5589,7 +5689,8 @@
       "image": "./avatars/upload-a7eeef3c47d60bf2.jpg",
       "isVideo": true,
       "alternateUrls": [],
-      "sourceOrder": 144
+      "sourceOrder": 144,
+      "section": "runet"
     },
     {
       "url": "https://www.youtube.com/watch?v=AIIZ3Nl1QRg",
