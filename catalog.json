@@ -1,6 +1,17 @@
 {
   "artists": [
     {
+      "id": "13e5cb61-9331-4f4f-a293-89162091730d",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "narc1segoe",
+      "url": "https://www.instagram.com/narc1segoe",
+      "platform": "Instagram",
+      "section": "runet",
+      "image": "./public/avatars/upload-3ca4f7e4f98bd050.jpg",
+      "tags": ""
+    },
+    {
       "id": "55ae5f72-26e2-467f-9295-88cdeb392c24",
       "kind": "artist",
       "rating": "AA",
