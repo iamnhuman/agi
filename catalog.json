@@ -441,6 +441,17 @@
       "tags": ""
     },
     {
+      "id": "81931a3a-7b7a-4bb0-9df3-2251cdf4981f",
+      "kind": "artist",
+      "rating": "A",
+      "name": "jean_philanthrope",
+      "url": "https://www.instagram.com/jean_philanthrope",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-9803613383101828.jpg",
+      "tags": ""
+    },
+    {
       "id": "fc73f981-91c2-49fa-b628-16eb2f581b76",
       "kind": "artist",
       "rating": "AA",

@@ -1,16 +1,18 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-/* The rating switch keeps the existing metal label and opens an interactive panel. */
+/* The rating switch introduces its panel once, then stays a highlighted toggle. */
 .catalog-tag-toggle{
   display:flex;align-items:center;justify-content:center;align-self:stretch;
   width:100%;min-height:100%;margin:0;padding:0;border:0;border-radius:0;
   background:transparent;color:inherit;font:inherit;letter-spacing:inherit;
+  transition:color .16s ease,background-color .16s ease,box-shadow .16s ease,text-shadow .16s ease;
 }
+.catalog-tag-toggle[aria-pressed="false"]{color:#78868b;text-decoration:line-through;text-decoration-thickness:2px}
 .catalog-tag-toggle:hover,.catalog-tag-toggle:focus-visible{
-  color:#ffbb90;text-shadow:0 0 10px #f7795466;
+  background-color:#f779541a;color:#ffbb90;text-shadow:0 0 10px #f7795488;
+  box-shadow:inset 0 0 12px #f7795433;
 }
 .catalog-tag-toggle:focus-visible{outline:2px solid #ffbb90;outline-offset:2px}
-.catalog-tag-toggle[aria-pressed="false"]{color:#78868b;text-decoration:line-through;text-decoration-thickness:2px}
 .catalog-tags-disabled{flex:1;min-width:0;padding:0 10px;color:#78868b;font-size:8px;line-height:1.7}
 .catalog-tag-hint{
   position:fixed;z-index:1000;top:50%;left:50%;transform:translate(-50%,-50%);
