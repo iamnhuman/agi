@@ -5949,6 +5949,53 @@ footer{width:var(--site-panel-width);margin-inline:auto}
 .artist-grid:not(.artist-deck) .artist-card[data-kind][data-rating]:is(:hover,:focus-within)>.card-info{
   border-top-color:var(--card-accent);
 }
+/* Keep data-rating present for the dossier layout, with a neutral palette when tags are off. */
+:is(.artist-grid,.artist-list) .artist-card[data-rating="none"],
+.artist-name-preview[data-rating="none"]{
+  --card-accent:#fff;--card-ink:#fff;--card-on-accent:#101416;
+  --card-edge:#687573;--card-border:#687573;--card-glow:transparent;--card-halo:transparent;
+  --card-surface:#232c2e;--card-surface-deep:#101718;--card-panel:#232c2e;--card-panel-deep:#101718;
+  --kind-accent:#fff;
+}
+.artist-grid:not(.artist-deck) .artist-card[data-rating="none"]:is(:hover,:focus-within){
+  box-shadow:inset 1px 1px #f4f5e180,inset -1px -1px #05090b,
+    0 3px 0 #070b0d,0 16px 30px #000c;
+}
+.artist-grid:not(.artist-deck) .artist-card[data-kind][data-rating="none"]:is(:hover,:focus-within)>.card-info{
+  border-top-color:#6b2420;
+}
+.artist-grid:not(.artist-deck) .artist-card[data-rating="none"] .card-name-screen{
+  background:linear-gradient(180deg,#030809,#0a1719 55%,#03090b);
+}
+.artist-grid:not(.artist-deck) .artist-card[data-rating="none"]>.art>.dossier-tags{
+  display:inline-flex;right:auto;width:max-content;max-width:calc(100% - 16px);gap:0;padding:0;
+  border:1px solid #899392;border-radius:2px;
+  background:#0b1215e8;
+  box-shadow:inset 0 1px #ffffff12,0 1px 3px #0008;
+}
+.artist-grid:not(.artist-deck) .artist-card[data-rating="none"] .dossier-tags .record-type--avatar{
+  flex:0 1 auto;height:22px!important;min-height:22px!important;padding:0 6px!important;gap:4px!important;
+  border:0;background:none;color:#fff;text-shadow:0 1px #000;box-shadow:none;
+}
+.artist-grid:not(.artist-deck) .artist-card[data-rating="none"]>.art>.card-edit--image,
+.artist-list[data-size] .artist-card[data-rating="none"]>.card-edit,
+.artist-list .artist-card[data-rating="none"] .list-source-cue,
+.artist-list .artist-card[data-rating="none"] .list-kind-tag,
+.artist-name-flow[data-ratings-visible="false"] .artist-name-edit{
+  color:#fff;
+}
+.artist-name-flow[data-ratings-visible="false"] .artist-name-edit{border-color:#687573}
+.artist-name-link[data-rating="none"],.artist-name-preview[data-rating="none"]{
+  --name-rank:#fff;--name-rank-border:#687573;--name-rank-bg:#101718;
+}
+.artist-name-link[data-rating="none"]:is(:hover,:focus-visible){color:#fff;text-shadow:0 1px #000}
+.artist-name-preview[data-rating="none"][data-kind]{
+  --name-kind:#fff;--name-kind-border:#687573;--name-kind-bg:#222a2d;
+}
+.artist-name-preview[data-rating="none"]::before,
+.artist-name-preview[data-rating="none"] .artist-name-preview-image,
+.artist-name-preview[data-rating="none"] .artist-name-preview-details strong{color:#fff}
+.artist-name-preview[data-rating="none"] .artist-name-preview-details strong{text-shadow:0 1px #2a0505}
 /* Three recessed instruments share a bolted rail, without decorative acronyms. */
 .dossier-instruments{
   --instrument-duration:300ms;--instrument-step:calc(var(--instrument-duration) / 10);

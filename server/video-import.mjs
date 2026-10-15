@@ -1,8 +1,17 @@
+import {parseArtistLink} from './links.mjs';
+import {readRedditMetadata} from './reddit-import.mjs';
+
 export function videoLink(raw){
  let u;try{u=new URL(String(raw).trim().replace(/(youtu\.be\/[\w-]{11})&/,'$1?'));}catch{throw Error('Укажите полную ссылку на видео.');}
  if(!['http:','https:'].includes(u.protocol)||u.username||u.password||u.port)throw Error('Некорректная ссылка.');
  u.protocol='https:';const host=u.hostname.replace(/^www\./,'').toLowerCase();
  if(host==='localhost'||!host.includes('.')||/^\d+\.\d+\.\d+\.\d+$/.test(host)||host.includes(':'))throw Error('Нужна публичная ссылка.');
+ if(['reddit.com','old.reddit.com','new.reddit.com','m.reddit.com','redd.it'].includes(host)){
+  const link=parseArtistLink(u.href),parts=u.pathname.split('/').filter(Boolean),comments=parts.indexOf('comments');
+  const commentId=(comments>=0?parts[comments+3]:'')||u.searchParams.get('comment')||'';
+  if(commentId&&!/^[a-zA-Z0-9]{1,20}$/.test(commentId))throw Error('Некорректная ссылка на комментарий Reddit.');
+  return {url:commentId?`${link.url}/_/${commentId.toLowerCase()}`:link.url,platform:'Reddit',videoId:'',fetchUrl:link.fetchUrl,reference:!link.isPost,...(commentId?{redditCommentId:commentId.toLowerCase()}:{})};
+ }
  let parts=u.pathname.split('/').filter(Boolean);let videoId='';
  if(host==='t.me'&&parts[0]==='s')parts=parts.slice(1);
  if(host==='youtu.be')videoId=parts[0]||'';
@@ -47,6 +56,12 @@ export function videoMetadata(html,link){
 }
 export async function importVideo(raw,fetcher=fetch){
  const link=videoLink(raw);let metadata={image:'',publishedAt:'',dateSource:'unknown',dateUrl:'',isVideo:Boolean(link.videoId||/^(?:video|clip)-?\d+_\d+$/.test(new URL(link.url).pathname.split('/').filter(Boolean)[0]||'')||new URL(link.url).pathname.split('/').filter(Boolean)[0]==='reel')};
+ if(link.platform==='Reddit'){
+  const result=await readRedditMetadata(parseArtistLink(link.url),fetcher,{includeDate:!link.redditCommentId});
+  const resolved=videoLink(link.redditCommentId?link.url:result.sourceUrl),data=result.metadata;
+  const publishedAt=resolved.reference||resolved.redditCommentId?'':data?.publishedAt||'';
+  return {...resolved,name:data?.name||result.link.name,image:data?.image||'',publishedAt,dateSource:publishedAt?'source':'unknown',dateUrl:publishedAt?resolved.fetchUrl:'',isVideo:!resolved.reference&&!resolved.redditCommentId&&Boolean(data?.isVideo),metadataLoaded:Boolean(data),...(!data?{notice:'Reddit не отдал данные публикации. Ссылка принята — название, дату и обложку можно заполнить вручную.'}:{})};
+ }
  async function readMetadata(source){
   if(!source.fetchUrl)return null;
   try{

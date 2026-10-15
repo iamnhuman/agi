@@ -1940,7 +1940,7 @@
       "id": "a8b98393-5f97-4376-ae6d-37e497aa27dc",
       "kind": "media",
       "rating": "AA",
-      "name": "Ринат Шакиров | Промпты для Midjourney | ChatGPT |",
+      "name": "Ринат Шакиров",
       "url": "https://t.me/dailyprompts",
       "platform": "Telegram",
       "section": "runet",
@@ -3192,7 +3192,8 @@
       "image": "./public/avatars/upload-50f32b332dccb2be.jpg",
       "isVideo": true,
       "alternateUrls": [],
-      "sourceOrder": 147
+      "sourceOrder": 147,
+      "section": "runet"
     },
     {
       "url": "https://t.me/bad_zu/168",
@@ -3347,6 +3348,23 @@
       "reference": false,
       "isVideo": true,
       "section": "world"
+    },
+    {
+      "url": "https://www.reddit.com/comments/1g0m6oq",
+      "platform": "Reddit",
+      "videoId": "",
+      "fetchUrl": "https://www.reddit.com/comments/1g0m6oq.json?raw_json=1&limit=1",
+      "reference": false,
+      "id": "e2b38b82-32e7-4e79-a196-f47a25390385",
+      "name": "кожаный",
+      "publishedAt": "2024-07-10",
+      "dateSource": "manual",
+      "dateUrl": "",
+      "image": "./public/avatars/upload-c4158dc8e3a75eaa.png",
+      "isVideo": true,
+      "alternateUrls": [],
+      "sourceOrder": 150,
+      "section": "runet"
     },
     {
       "id": "video-8",
@@ -5329,7 +5347,8 @@
       "videoId": "",
       "fetchUrl": "https://t.me/ghyenaband/376?embed=1&mode=tme",
       "reference": false,
-      "isVideo": false
+      "isVideo": false,
+      "section": "runet"
     },
     {
       "id": "video-124",
@@ -5740,7 +5759,25 @@
       "image": "./public/avatars/upload-02d64e1465750d5d.jpg",
       "isVideo": true,
       "alternateUrls": [],
-      "sourceOrder": 149
+      "sourceOrder": 149,
+      "section": "runet"
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=b-YeraecB4M",
+      "platform": "YouTube",
+      "videoId": "b-YeraecB4M",
+      "fetchUrl": "https://www.youtube.com/watch?v=b-YeraecB4M",
+      "reference": false,
+      "id": "73aa10e4-76a2-45dc-aa4c-170ef904c1a0",
+      "name": "muuo:23",
+      "publishedAt": "2026-10-14",
+      "dateSource": "source",
+      "dateUrl": "https://www.youtube.com/watch?v=b-YeraecB4M",
+      "image": "./public/avatars/upload-326eed17e4c2a8e1.jpg",
+      "isVideo": true,
+      "alternateUrls": [],
+      "sourceOrder": 151,
+      "section": "world"
     }
   ]
 }

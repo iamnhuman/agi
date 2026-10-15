@@ -14,7 +14,7 @@ import TimelineNavigator from './timeline-navigator';
 import TimelineGridFlow from './timeline-grid-flow';
 const blank:Video={id:'',name:'',url:'',platform:'',videoId:'',reference:false,isVideo:false,publishedAt:'',dateSource:'unknown',dateUrl:'',image:'',alternateUrls:[],sourceOrder:0};
 const fallbackImage='./video-fallback.svg';
-const platformShortNames:Record<string,string>={Instagram:'IG',YouTube:'YT',Telegram:'TG',VK:'VK'};
+const platformShortNames:Record<string,string>={Instagram:'IG',YouTube:'YT',Telegram:'TG',VK:'VK',Reddit:'RD'};
 const MIN_SCENE_ZOOM=.25,MAX_SCENE_ZOOM=1.5;
 const MIN_GRID_ZOOM=.5,MAX_GRID_ZOOM=1.5;
 function coverSource(video:Video){return video.image||video.videoId&&`https://i.ytimg.com/vi/${video.videoId}/hqdefault.jpg`||fallbackImage;}
@@ -266,7 +266,7 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
    const response=await fetch('/api/video-import',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:draft.url})});
    const result=await response.json();if(!response.ok)throw Error(result.error);
    setDraft(current=>({...current!,...result,name:current!.name||result.name||'',publishedAt:result.publishedAt||current!.publishedAt,dateSource:result.publishedAt?result.dateSource:current!.dateSource,dateUrl:result.publishedAt?result.dateUrl:current!.dateUrl,image:result.image||current!.image}));
-   setImportMessage((result.media?'Видео сохранено для просмотра на сайте. ':result.videoNotice?'Не удалось сохранить видео: '+result.videoNotice+' ':'')+(result.imageSavedLocally?'Обложка найдена и сохранена локально. Проверьте данные.':result.image?'Обложка найдена, но сохранить её локально не удалось. '+(result.imageNotice||''):'Источник не отдал изображение. Загрузите свой файл или укажите ссылку на обложку.'));
+   setImportMessage(result.notice||(result.media?'Видео сохранено для просмотра на сайте. ':result.videoNotice?'Не удалось сохранить видео: '+result.videoNotice+' ':'')+(result.imageSavedLocally?'Обложка найдена и сохранена локально. Проверьте данные.':result.image?'Обложка найдена, но сохранить её локально не удалось. '+(result.imageNotice||''):'Источник не отдал изображение. Загрузите свой файл или укажите ссылку на обложку.'));
   }catch(error){setFormError((error as Error).message);}finally{setBusy(false);}
  }
  async function uploadCover(file:File){
@@ -387,7 +387,7 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
     <label>Номер в списке<input aria-label="Номер в списке" aria-describedby="video-editor-position-hint" required type="number" inputMode="numeric" min={1} max={videos.length+(draft.id?0:1)} step={1} value={draftPosition} onChange={event=>{setDraftPosition(event.target.value);setDraftPositionMode('manual');setDraftPositionTouched(true);}}/></label>
     <p className="video-editor-position-hint" id="video-editor-position-hint">{draftPositionMode==='date'?'Номер рассчитан по дате. Измените его для ручного порядка.':'Номер задан вручную.'}{draftPositionMode==='manual'&&<button type="button" className="video-position-auto" onClick={()=>{setDraftPositionMode('date');setDraftPositionTouched(true);}}>Вернуть по дате</button>}</p>
     <label>Ссылка на видео или публикацию<input required type="url" value={draft.url} onChange={event=>{setImportMessage('');setDraft({...draft,url:event.target.value,publishedAt:'',dateSource:'unknown',dateUrl:'',videoId:'',isVideo:false,media:'',image:''});}}/></label>
-    <button type="button" disabled={busy||!draft.url} className="secondary-btn metadata-import-btn" onClick={importDraft}>{busy?'Загрузка…':'Подгрузить данные и обложку из YouTube, VK, Telegram или Instagram'}</button>
+    <button type="button" disabled={busy||!draft.url} className="secondary-btn metadata-import-btn" onClick={importDraft}>{busy?'Загрузка…':'Подгрузить данные и обложку из YouTube, VK, Telegram, Instagram или Reddit'}</button>
     <label>Автор / название<input required maxLength={160} value={draft.name} onChange={event=>setDraft({...draft,name:event.target.value})}/></label>
     <label>Регион<select aria-label="Регион" value={draft.section||''} onChange={event=>setDraft({...draft,section:event.target.value as Video['section']})}><option value="">Не указан</option><option value="runet">Рунет</option><option value="world">Мир</option></select></label>
     <label>Дата публикации<input type="date" value={draft.publishedAt} onChange={event=>setDraft({...draft,publishedAt:event.target.value,dateSource:'manual',dateUrl:''})}/></label>

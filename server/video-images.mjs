@@ -1,4 +1,4 @@
-import {saveAvatarBytes} from './avatar-files.mjs';
+import {saveAvatarBytes,isRedditImageHost} from './avatar-files.mjs';
 
 // Only image hosts used by the supported video platforms may be fetched by the
 // local admin server. A page's Open Graph image is otherwise untrusted input.
@@ -7,7 +7,7 @@ const imageHosts=/(^|\.)(ytimg\.com|ggpht\.com|telesco\.pe|telegram-cdn\.org|use
 function imageUrl(raw){
   let url;
   try{url=new URL(String(raw).trim());}catch{throw Error('Нужна прямая HTTPS-ссылка на изображение.');}
-  if(url.protocol!=='https:'||url.username||url.password||url.port||!imageHosts.test(url.hostname))throw Error('Этот источник изображения не поддерживается. Загрузите файл вручную.');
+  if(url.protocol!=='https:'||url.username||url.password||url.port||!(imageHosts.test(url.hostname)||isRedditImageHost(url.hostname)))throw Error('Этот источник изображения не поддерживается. Загрузите файл вручную.');
   return url;
 }
 

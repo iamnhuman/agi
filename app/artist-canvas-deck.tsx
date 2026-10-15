@@ -46,6 +46,7 @@ uniform sampler2D uTexture;
 uniform vec3 uAccent;
 uniform float uYaw;
 uniform float uFocus;
+uniform bool uShowRatings;
 uniform int uPass;
 out vec4 outColor;
 void main(){
@@ -62,7 +63,7 @@ void main(){
  vec3 color=paper.rgb*facing;
  if(uFocus>.5){
   bool bracket=(edge.x<4.&&edge.y<17.)||(edge.y<4.&&edge.x<17.);
-  if(bracket)color=vec3(.98,.83,.34);
+  if(bracket)color=uShowRatings?vec3(.98,.83,.34):vec3(1.);
   if(pixel.x>13.&&pixel.x<178.&&pixel.y>20.&&pixel.y<30.)color=mix(color,uAccent,.12);
  }
  outColor=vec4(color,paper.a);
@@ -113,7 +114,8 @@ function program(gl:WebGL2RenderingContext,vertex:string,fragment:string){
  return result;
 }
 
-function accentFor(artist:Artist):[number,number,number]{
+function accentFor(artist:Artist,showRatings:boolean):[number,number,number]{
+ if(!showRatings)return [1,1,1];
  if(artist.rating==='AAA+')return [.6,.8,.4];
  if(artist.rating==='AAA')return [.95,.77,.35];
  if(artist.rating==='AA')return [.72,.61,.82];
@@ -155,11 +157,11 @@ function cardBitmap(artist:Artist,index:number,type:CardTypography,showRatings:b
  const canvas=document.createElement('canvas');canvas.width=cardWidth;canvas.height=cardHeight;
  const context=canvas.getContext('2d');if(!context)return canvas;
  context.imageSmoothingEnabled=false;
- const [r,g,b]=accentFor(artist);
+ const [r,g,b]=accentFor(artist,showRatings);
  const accent=`rgb(${Math.round(r*255)} ${Math.round(g*255)} ${Math.round(b*255)})`;
  const accentDim=`rgb(${Math.round(r*185)} ${Math.round(g*185)} ${Math.round(b*185)})`;
  const accentBright=`rgb(${Math.round((r*.8+.2)*255)} ${Math.round((g*.8+.2)*255)} ${Math.round((b*.8+.2)*255)})`;
- const signalBars=artist.rating==='AAA+'?9:artist.rating==='AAA'?7:artist.rating==='AA'?5:3;
+ const signalBars=showRatings?(artist.rating==='AAA+'?9:artist.rating==='AAA'?7:artist.rating==='AA'?5:3):3;
  const lineHeight=type.name+3;
  const labelHeight=Math.max(62,22+lineHeight*2+Math.max(type.meta,type.rating));
  const labelTop=258-labelHeight,imageHeight=labelTop-52;
@@ -168,7 +170,7 @@ function cardBitmap(artist:Artist,index:number,type:CardTypography,showRatings:b
   rect(x,y,width,height,fill);rect(x,y,width,2,light);rect(x,y,2,height,light);
   rect(x,y+height-2,width,2,dark);rect(x+width-2,y,2,height,dark);
  };
- const text=(value:string,x:number,y:number,size=8,color='#e8dfb6',align:CanvasTextAlign='left')=>{
+ const text=(value:string,x:number,y:number,size=8,color=showRatings?'#e8dfb6':'#fff',align:CanvasTextAlign='left')=>{
   context.font=`${size}px "Press Start 2P",monospace`;context.textAlign=align;
   context.fillStyle='#080b07';context.fillText(value,x+1,y+1);
   context.fillStyle=color;context.fillText(value,x,y);
@@ -199,7 +201,7 @@ function cardBitmap(artist:Artist,index:number,type:CardTypography,showRatings:b
  }else{
   for(let y=44;y<44+imageHeight;y+=8)rect(16,y,160,1,'#1c2c17');
   for(let x=16;x<176;x+=8)rect(x,44,1,imageHeight,'#1c2c17');
-  text(artist.name.slice(0,1).toUpperCase(),96,44+imageHeight/2+16,40,'#9dba71','center');
+  text(artist.name.slice(0,1).toUpperCase(),96,44+imageHeight/2+16,40,showRatings?'#9dba71':'#fff','center');
  }
  for(const [x,y] of [[16,44],[168,44],[16,42+imageHeight],[168,42+imageHeight]])rect(x,y,8,2,accentDim);
  // Region insignia sit in a small metal plate on the portrait, leaving the
@@ -218,8 +220,8 @@ function cardBitmap(artist:Artist,index:number,type:CardTypography,showRatings:b
   return context.measureText(value).width;
  });
  const nameBaseline=labelTop+nameLayout.fontSize+7;
- nameLayout.lines.forEach((line,index)=>text(line,18,nameBaseline+index*(nameLayout.fontSize+3),nameLayout.fontSize,'#fff0bb'));
- text(artist.kind==='collective'?'ПРОЕКТ':artist.kind==='media'?'МЕДИА':'АРТИСТ',18,250,type.meta,'#d6ddbb');
+ nameLayout.lines.forEach((line,index)=>text(line,18,nameBaseline+index*(nameLayout.fontSize+3),nameLayout.fontSize,showRatings?'#fff0bb':'#fff'));
+ text(artist.kind==='collective'?'ПРОЕКТ':artist.kind==='media'?'МЕДИА':'АРТИСТ',18,250,type.meta,showRatings?'#d6ddbb':'#fff');
  if(showRatings){
   const ratingWidth=Math.max(42,type.rating*4+8),ratingHeight=type.rating+9;
   bevel(174-ratingWidth,254-ratingHeight,ratingWidth,ratingHeight,'#11190c','#576647','#050b03');
@@ -413,7 +415,7 @@ export default function ArtistCanvasDeck({artists,zoom,onZoomStep,showRatings}:{
      const left=Math.round(x),top=Math.round(y),w=Math.round(cardWidth),h=Math.round(cardHeight);
      hitAreas.push({index,corners:[{x:left,y:top},{x:left+w,y:top},{x:left+w,y:top+h},{x:left,y:top+h}]});
      context.fillStyle='#000';context.fillRect(left+3,top+4,w,h);context.drawImage(bitmaps.get(index)!,left,top,w,h);
-     if(index===position.hover){context.fillStyle='#fad657';const length=Math.max(5,Math.round(w*.09));
+     if(index===position.hover){context.fillStyle=showRatings?'#fad657':'#fff';const length=Math.max(5,Math.round(w*.09));
       for(const [cornerX,cornerY,sideX,sideY] of [[left,top,1,1],[left+w-2,top,-1,1],[left,top+h-2,1,-1],[left+w-2,top+h-2,-1,-1]]){
        context.fillRect(cornerX+(sideX<0?2-length:0),cornerY,length,2);context.fillRect(cornerX,cornerY+(sideY<0?2-length:0),2,length);
       }
@@ -427,7 +429,7 @@ export default function ArtistCanvasDeck({artists,zoom,onZoomStep,showRatings}:{
   try{cardProgram=program(gl,vertexSource,cardFragmentSource);backgroundProgram=program(gl,backgroundVertexSource,backgroundFragmentSource);}catch{cleanEvents();return;}
   const vao=gl.createVertexArray();gl.bindVertexArray(vao);
   gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,1);
-  const cardUniforms={center:gl.getUniformLocation(cardProgram,'uCenter'),size:gl.getUniformLocation(cardProgram,'uSize'),aspect:gl.getUniformLocation(cardProgram,'uAspect'),yaw:gl.getUniformLocation(cardProgram,'uYaw'),pitch:gl.getUniformLocation(cardProgram,'uPitch'),roll:gl.getUniformLocation(cardProgram,'uRoll'),resolution:gl.getUniformLocation(cardProgram,'uResolution'),texture:gl.getUniformLocation(cardProgram,'uTexture'),accent:gl.getUniformLocation(cardProgram,'uAccent'),focus:gl.getUniformLocation(cardProgram,'uFocus'),pass:gl.getUniformLocation(cardProgram,'uPass')};
+  const cardUniforms={center:gl.getUniformLocation(cardProgram,'uCenter'),size:gl.getUniformLocation(cardProgram,'uSize'),aspect:gl.getUniformLocation(cardProgram,'uAspect'),yaw:gl.getUniformLocation(cardProgram,'uYaw'),pitch:gl.getUniformLocation(cardProgram,'uPitch'),roll:gl.getUniformLocation(cardProgram,'uRoll'),resolution:gl.getUniformLocation(cardProgram,'uResolution'),texture:gl.getUniformLocation(cardProgram,'uTexture'),accent:gl.getUniformLocation(cardProgram,'uAccent'),focus:gl.getUniformLocation(cardProgram,'uFocus'),showRatings:gl.getUniformLocation(cardProgram,'uShowRatings'),pass:gl.getUniformLocation(cardProgram,'uPass')};
   const backgroundUniforms={motion:gl.getUniformLocation(backgroundProgram,'uMotion'),resolution:gl.getUniformLocation(backgroundProgram,'uResolution')};
   const textures=new Map<number,TextureRecord>();
   let type=typographyForLayout();
@@ -450,7 +452,8 @@ export default function ArtistCanvasDeck({artists,zoom,onZoomStep,showRatings}:{
    const visible=artists.map((_,i)=>i).filter(i=>Math.abs(columnAt(i)-position.value)<visibleColumns);
    for(const index of [...textures.keys()])if(Math.abs(columnAt(index)-position.value)>visibleColumns+3){const old=textures.get(index)!;old.image&&(old.image.onload=null);gl.deleteTexture(old.texture);textures.delete(index);}
    gl.useProgram(cardProgram);gl.uniform1f(cardUniforms.aspect,aspect);gl.uniform2f(cardUniforms.resolution,width,height);gl.uniform1i(cardUniforms.texture,0);
-   const drawCard=(index:number,pass:number)=>{const column=columnAt(index),row=index%scene.rows,dx=column-position.value,focus=index===position.hover?1:0;const accent=accentFor(artists[index]);
+   gl.uniform1i(cardUniforms.showRatings,showRatings?1:0);
+   const drawCard=(index:number,pass:number)=>{const column=columnAt(index),row=index%scene.rows,dx=column-position.value,focus=index===position.hover?1:0;const accent=accentFor(artists[index],showRatings);
     const viewportFit=Math.min(1,aspect*.86/(scene.sizeX*.89));
     const centerX=dx*scene.columnStep+(pass===0?.025:0),centerY=((scene.rows-1)/2-row)*scene.rowStep+focus*.025-(pass===0?.025:0),centerZ=-Math.min(.6,Math.abs(dx)*.055)+focus*.06;
     gl.uniform3f(cardUniforms.center,centerX,centerY,centerZ);

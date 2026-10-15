@@ -22,10 +22,25 @@ test('unknown queries and extra words after a partial handle do not broaden the 
  assert.equal(matchesArtistSearch({...artist,name:'AI',tags:'',description:''},'aiden missing'),false);
 });
 
-test('search retains names, tags and curator URLs while ignoring legacy descriptions',()=>{
+test('search retains names, tags and profile URLs while ignoring legacy descriptions',()=>{
  const adminFields=['name','url','tags'];
  assert.equal(matchesArtistSearch(artist,'instagram.com/goo.vision',adminFields),true);
+ assert.equal(matchesArtistSearch(artist,'instagram.com/goo.vision'),true);
  assert.equal(matchesArtistSearch(artist,'digital landscapes',adminFields),false);
  assert.equal(matchesArtistSearch(artist,'digital landscapes'),false);
  assert.equal(matchesArtistSearch(artist,'AI art'),true);
+});
+
+test('a channel handle remains searchable when its display name is different',()=>{
+ const channel={name:'Ринат Шакиров',url:'https://t.me/dailyprompts',tags:''};
+ for(const query of ['Ринат','шакиров','dailyprompts','daily prompts',' DAILY  PROMPTS ','@dailyprompts','@daily prompts','t.me/dailyprompts','https://t.me/dailyprompts']){
+  assert.equal(matchesArtistSearch(channel,query),true,query);
+ }
+ for(const query of ['daily other prompts','@anotherchannel','https://t.me/anotherchannel']){
+  assert.equal(matchesArtistSearch(channel,query),false,query);
+ }
+ for(const query of ['dailyprompts','daily prompts','@dailyprompts']){
+  assert.equal(matchesArtistSearch(channel,query,['name','tags']),false,query);
+ }
+ assert.equal(matchesArtistSearch({...channel,url:''},'daily prompts'),false);
 });
