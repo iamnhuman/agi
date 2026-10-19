@@ -52,8 +52,8 @@ function VideoName({name,onOpen,url}:{name:string;onOpen:()=>void;url?:string}){
  const content=<span ref={windowRef} className="video-name-window"><span ref={copyRef} className="video-name-copy">{name.split(/(\s+)/).map((part,index)=>/^\s+$/.test(part)?part:<span className="video-name-word" key={index}>{part}</span>)}</span></span>;
  return url?<a ref={node=>{ref.current=node;}} className="video-name-button" href={url} target="_blank" rel="noopener noreferrer" title={name+' · открыть в новой вкладке'}>{content}</a>:<button ref={node=>{ref.current=node;}} className="video-name-button" type="button" title={name} onClick={onOpen}>{content}</button>;
 }
-export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTotalChange?:(total:number)=>void}){
- const [videos,setVideos]=useState<Video[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState(''),[q,setQ]=useState(''),[order,setOrder]=useState<VideoOrder>('desc'),[orientation,setOrientation]=useState<'vertical'|'horizontal'>('horizontal'),[draft,setDraft]=useState<Video|null>(null),[selected,setSelected]=useState<Video|null>(null),[deleting,setDeleting]=useState<Video|null>(null),[busy,setBusy]=useState(false),[formError,setFormError]=useState(''),[importMessage,setImportMessage]=useState('');
+export default function Videos({admin=false,initial,onTotalChange}:{admin?:boolean;initial?:Video[];onTotalChange?:(total:number)=>void}){
+ const [videos,setVideos]=useState<Video[]>(initial||[]),[loading,setLoading]=useState(!initial),[error,setError]=useState(''),[q,setQ]=useState(''),[order,setOrder]=useState<VideoOrder>('desc'),[orientation,setOrientation]=useState<'vertical'|'horizontal'>('horizontal'),[draft,setDraft]=useState<Video|null>(null),[selected,setSelected]=useState<Video|null>(null),[deleting,setDeleting]=useState<Video|null>(null),[busy,setBusy]=useState(false),[formError,setFormError]=useState(''),[importMessage,setImportMessage]=useState('');
  const [sceneZoom,setSceneZoom]=useState(.65);
  const [gridZoom,setGridZoom]=useState(1);
  const [draftPosition,setDraftPosition]=useState(''),[draftPositionMode,setDraftPositionMode]=useState<'date'|'manual'>('date'),[draftPositionTouched,setDraftPositionTouched]=useState(false);
@@ -74,7 +74,7 @@ export default function Videos({admin=false,onTotalChange}:{admin?:boolean;onTot
   setGridZoom(current=>Math.round(Math.max(MIN_GRID_ZOOM,Math.min(MAX_GRID_ZOOM,current+amount))*100)/100);
  };
  async function load(){try{setError('');const r=await fetch(catalogUrl,{cache:'no-store'});if(!r.ok)throw Error('Не удалось загрузить видео.');const data=await r.json(),items:Video[]=data.videos||[];setVideos(items);onTotalChange?.(items.length);if(admin){const editId=new URLSearchParams(location.search).get("edit");if(editId){const item=items.find((v:Video)=>v.id===editId);if(item)edit(item,items);const url=new URL(location.href);url.searchParams.delete("edit");history.replaceState(null,"",url);}}}catch(e){setError((e as Error).message);}finally{setLoading(false);}}
- useEffect(()=>{load();},[]);
+ useEffect(()=>{if(!initial)load();},[]);
  // Zoom changes the panel height. Keep its centre in view without moving the rail.
  useLayoutEffect(()=>{
   const changed=previousSceneZoom.current!==sceneZoom;

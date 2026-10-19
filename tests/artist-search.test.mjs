@@ -44,3 +44,69 @@ test('a channel handle remains searchable when its display name is different',()
  }
  assert.equal(matchesArtistSearch({...channel,url:''},'daily prompts'),false);
 });
+
+test('the catalog name with a Latin accented letter matches Cyrillic and transliterated fragments',async()=>{
+ const catalog=JSON.parse(await readFile(new URL('../data/catalog.json',import.meta.url),'utf8'));
+ const shamin=catalog.artists.find(artist=>artist.url==='https://www.instagram.com/shamincreator');
+ assert.ok(shamin,'the reported artist is present in the catalog');
+ for(const query of ['ша','шá','шa','шa\u0301','ША','sha','shа','sham','шамин','шаминкреатор','shaminkreator','shamincreator','@shamincreator','шамин креатор']){
+  assert.equal(matchesArtistSearch(shamin,query),true,query);
+ }
+});
+
+test('sha matches the same fragment in Cyrillic, Latin and mixed-script names without a profile URL',()=>{
+ for(const name of ['шамин','shamin','шáмин','шaмин']){
+  for(const query of ['ша','sha','шá','shа']){
+   assert.equal(matchesArtistSearch({name,url:'',tags:''},query,['name']),true,`${query}: ${name}`);
+  }
+ }
+});
+
+test('transliteration and accents work for names, handles and tags in either script',()=>{
+ const russian={name:'Берёзовый промпт',url:'https://t.me/visuals',tags:'нейроарт'};
+ for(const query of ['березовый','berezovyy','promp','нейроарт','neyroart','висуалс']){
+  assert.equal(matchesArtistSearch(russian,query),true,query);
+ }
+ const latin={name:'Beyoncé',url:'https://example.com/cafe',tags:'Crème brûlée'};
+ for(const query of ['beyonce','café','creme brulee']){
+  assert.equal(matchesArtistSearch(latin,query),true,query);
+ }
+ for(const query of ['алина','áлина','alína','aлина']){
+  assert.equal(matchesArtistSearch({name:'Álina',url:'',tags:''},query),true,query);
+ }
+});
+
+test('wrong, missing, extra or swapped letters do not match names or handles at any query length',()=>{
+ const shamin={name:'шáминкреатор',url:'https://www.instagram.com/shamincreator',tags:''};
+ for(const query of ['шомин','шминк','шаамин','шамни','shaimn','shamncreator','shamincreatro','shomincreotor','креатро']){
+  assert.equal(matchesArtistSearch(shamin,query),false,query);
+ }
+ const channel={name:'Ринат Шакиров',url:'https://t.me/dailyprompts',tags:''};
+ assert.equal(matchesArtistSearch(channel,'dailypromts'),false);
+ assert.equal(matchesArtistSearch(channel,'shakriov'),false);
+});
+
+test('four-letter Cyrillic and Latin queries do not match unrelated fragments with one typo',()=>{
+ const names=['derek.mercer','bagdelete','andreaciulu','nanophageresearch','Березовый промпт','exitdreamnow','spikeandred','EJANERESS'];
+ const artists=names.map(name=>({name,url:`https://www.instagram.com/${name}`,tags:''}));
+ for(const query of ['дере','dere','ДЕРЕ','дeрe','de re']){
+  assert.deepEqual(artists.filter(artist=>matchesArtistSearch(artist,query)).map(artist=>artist.name),['derek.mercer'],query);
+ }
+});
+
+test('normalization does not broaden unrelated fragments, tags, host names or excluded fields',()=>{
+ const shamin={name:'шáминкреатор',url:'https://www.instagram.com/shamincreator',tags:'landscape'};
+ for(const query of ['жо','жу','sh','sha']){
+  assert.equal(matchesArtistSearch({name:'Other artist',url:'https://t.me/another',tags:''},query),false,query);
+ }
+ assert.equal(matchesArtistSearch(shamin,'жо'),false);
+ assert.equal(matchesArtistSearch(shamin,'landscpae'),false);
+ assert.equal(matchesArtistSearch(shamin,'instagarm'),false);
+ for(const query of ['ь','ъ','\u0301','ь ъ','\u0301 \u0301'])assert.equal(matchesArtistSearch(shamin,query),false,query);
+ assert.equal(matchesArtistSearch({name:'ьъь',url:'',tags:''},'unrelated'),false);
+ assert.equal(matchesArtistSearch(shamin,'шамин',['tags']),false);
+ assert.equal(matchesArtistSearch(shamin,'шаминкреатор extra',['tags']),false);
+ const channel={name:'Ринат Шакиров',url:'https://t.me/dailyprompts',tags:''};
+ assert.equal(matchesArtistSearch(channel,'dailypromts',['name','tags']),false);
+ assert.equal(matchesArtistSearch({...channel,url:'not a URL'},'daily prompts'),false);
+});

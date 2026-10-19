@@ -1,6 +1,61 @@
 {
   "artists": [
     {
+      "id": "5e819df6-f9cc-403d-aa91-c7f7953cfc54",
+      "kind": "artist",
+      "rating": "AAA",
+      "name": "patchkims",
+      "url": "https://www.instagram.com/patchkims",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-6f153eeb3026d86d.jpg",
+      "tags": ""
+    },
+    {
+      "id": "fec26c7c-5fae-409f-9c98-2c2018ff18c2",
+      "kind": "artist",
+      "rating": "AAA",
+      "name": "solo.aifilms",
+      "url": "https://www.instagram.com/solo.aifilms",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-405ee8cd1cbf958b.jpg",
+      "tags": ""
+    },
+    {
+      "id": "1665755b-85c0-4784-93aa-40e11751d27c",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "dreamchase.ai",
+      "url": "https://www.instagram.com/dreamchase.ai",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-b959420ee7067810.jpg",
+      "tags": ""
+    },
+    {
+      "id": "143bee6e-7d4b-44bf-8885-fe706ca59580",
+      "kind": "collective",
+      "rating": "AA",
+      "name": "Клаентс",
+      "url": "https://t.me/theclients",
+      "platform": "Telegram",
+      "section": "runet",
+      "image": "./public/avatars/upload-e6210f5abeae486b.jpg",
+      "tags": ""
+    },
+    {
+      "id": "16b90be1-47b5-42c6-baa2-247c4a15be15",
+      "kind": "artist",
+      "rating": "A",
+      "name": "vepefilms",
+      "url": "https://www.instagram.com/vepefilms",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./public/avatars/upload-96fcab877cba08fb.jpg",
+      "tags": ""
+    },
+    {
       "id": "13e5cb61-9331-4f4f-a293-89162091730d",
       "kind": "artist",
       "rating": "AA",
@@ -212,7 +267,7 @@
     {
       "id": "53c90fb7-cf15-485b-bd67-6a1d293f012a",
       "kind": "artist",
-      "rating": "A",
+      "rating": "AA",
       "name": "Никита Шарипов",
       "url": "https://t.me/sharipovnikita",
       "platform": "Telegram",
@@ -757,6 +812,17 @@
       "platform": "Instagram",
       "section": "world",
       "image": "./public/avatars/upload-b32b129b6daf63b8.jpg",
+      "tags": ""
+    },
+    {
+      "id": "3fba25b0-b704-4e56-9d77-771aca18446c",
+      "kind": "collective",
+      "rating": "AA",
+      "name": "801.brand",
+      "url": "https://www.instagram.com/801.brand",
+      "platform": "Instagram",
+      "section": "runet",
+      "image": "./public/avatars/upload-9bef0261fd27103c.jpg",
       "tags": ""
     },
     {
@@ -1654,7 +1720,7 @@
       "id": "e0ce68b1-0661-43db-9e67-761696d74055",
       "kind": "artist",
       "rating": "A",
-      "name": "shamincreator",
+      "name": "шáминкреатор",
       "url": "https://www.instagram.com/shamincreator",
       "platform": "Instagram",
       "section": "runet",
@@ -4977,6 +5043,22 @@
       "section": "world"
     },
     {
+      "url": "https://t.me/r4tc4t/100",
+      "platform": "Telegram",
+      "videoId": "",
+      "fetchUrl": "https://t.me/r4tc4t/100?embed=1&mode=tme",
+      "reference": false,
+      "id": "24f1b3a0-6746-42d3-8d7f-ea84c63d073e",
+      "name": "Heronwater",
+      "publishedAt": "2025-11-25",
+      "dateSource": "source",
+      "dateUrl": "https://t.me/r4tc4t/100?embed=1&mode=tme",
+      "image": "./public/avatars/upload-548e84ffe218e5d2.jpg",
+      "isVideo": false,
+      "alternateUrls": [],
+      "sourceOrder": 152
+    },
+    {
       "id": "video-103",
       "name": "мальбэк",
       "url": "https://t.me/archivenormis/4914",
@@ -5653,7 +5735,7 @@
       "fetchUrl": "https://t.me/RUSSIANSTYLEPARTY/2972?embed=1&mode=tme",
       "reference": false,
       "id": "57fb605e-8c3a-4c6c-b890-c91b839e2959",
-      "name": "tau",
+      "name": "TAU",
       "publishedAt": "2026-08-24",
       "dateSource": "source",
       "dateUrl": "https://t.me/RUSSIANSTYLEPARTY/2972?embed=1&mode=tme",

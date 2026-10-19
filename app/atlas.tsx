@@ -481,10 +481,10 @@ function CatalogSearch({query,onChange,onReset,resetDisabled}:{query:string;onCh
  </div>;
 }
 
-export default function Atlas({initial}:{initial:Artist[]}){
-const [data,setData]=useState(initial),[sections,setSections]=useState<Section[]>(defaultSections),[error,setError]=useState('');
+export default function Atlas({initial,initialSections=defaultSections}:{initial:Artist[];initialSections?:Section[]}){
+const [data,setData]=useState(initial),[sections,setSections]=useState<Section[]>(initialSections),[error,setError]=useState('');
 async function refresh(){try{const r=await fetch(catalogUrl,{cache:'no-store'});const d:any=await r.json();if(!r.ok)throw Error(d.error);setData(d.artists);setSections(d.sections);setError('');}catch{setError('Связь с архивом потеряна. Показаны последние доступные досье.');}}
-useEffect(()=>{refresh();const onFocus=()=>refresh();window.addEventListener('focus',onFocus);return ()=>window.removeEventListener('focus',onFocus);},[]);
+useEffect(()=>{const onFocus=()=>refresh();window.addEventListener('focus',onFocus);return ()=>window.removeEventListener('focus',onFocus);},[]);
 const [section,setSection]=useState('all'),[q,setQ]=useState(''),[view,setView]=useState('grid'),[kind,setKind]=useState('all'),[rating,setRating]=useState('all'),[sortMode,setSortMode]=useState<'posting'|'random'>('posting'),[shuffleSeed,setShuffleSeed]=useState(0);
 const [showRatings,setShowRatings]=useState(true);
 function toggleRatings(){setShowRatings(visible=>!visible);setRating('all');}

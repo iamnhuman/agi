@@ -1,16 +1,57 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+/* This small status stays in one system font while the actual page prepares. */
+.workspace-startup{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
+  min-height:100dvh;padding:24px;text-align:center;background:#111211;color:#a5aa9b;
+}
+.workspace-startup,.workspace-startup *{font:14px/1.6 ui-monospace,monospace!important}
+.workspace-startup p{max-width:460px;margin:0}
+.workspace-startup button{padding:10px 18px;border:1px solid #64705b;border-radius:3px;background:#262a23;color:#f0f0e8}
 /* The rating switch introduces its panel once, then stays a highlighted toggle. */
 .catalog-tag-toggle{
-  display:flex;align-items:center;justify-content:center;align-self:stretch;
+  position:relative;display:flex;align-items:center;justify-content:center;align-self:stretch;overflow:hidden;
   width:100%;min-height:100%;margin:0;padding:0;border:0;border-radius:0;
   background:transparent;color:inherit;font:inherit;letter-spacing:inherit;
-  transition:color .16s ease,background-color .16s ease,box-shadow .16s ease,text-shadow .16s ease;
+  transition:color .08s ease,background-color .08s ease,box-shadow .08s ease,text-shadow .08s ease;
 }
-.catalog-tag-toggle[aria-pressed="false"]{color:#78868b;text-decoration:line-through;text-decoration-thickness:2px}
+.catalog-tag-toggle[aria-pressed="false"]{
+  color:#ad7773;background:linear-gradient(135deg,#35171d,#16181a);
+  box-shadow:inset 0 0 0 1px #843a3c44;
+}
+.catalog-tag-toggle-label{position:relative;display:inline-block}
+.catalog-tag-toggle-strike{
+  position:absolute;inset:1px;z-index:1;width:calc(100% - 2px);height:calc(100% - 2px);
+  pointer-events:none;opacity:0;transform:scale(.94);
+  filter:drop-shadow(0 1px 0 #000) drop-shadow(0 0 3px #e1333344);
+  transition:opacity .04s ease-out,transform .04s ease-out;
+}
+.catalog-tag-toggle[aria-pressed="false"] .catalog-tag-toggle-strike,
+.catalog-tag-toggle[aria-pressed="true"]:is(:hover,:focus-visible) .catalog-tag-toggle-strike{opacity:1;transform:none}
+.catalog-tag-strike-rail{
+  stroke-dasharray:100;stroke-dashoffset:100;
+  transition:stroke-dashoffset .12s cubic-bezier(.18,.8,.25,1) .035s;
+}
+.catalog-tag-strike-cap{
+  transform-box:fill-box;transform-origin:center;opacity:0;
+  transition:transform .085s cubic-bezier(.2,1.6,.35,1),opacity .04s linear;
+}
+.catalog-tag-strike-cap--lower{transform:translate(-2px,2px) scale(.85)}
+.catalog-tag-strike-cap--upper{transform:translate(2px,-2px) scale(.85)}
+.catalog-tag-toggle[aria-pressed="false"] .catalog-tag-strike-rail,
+.catalog-tag-toggle[aria-pressed="true"]:is(:hover,:focus-visible) .catalog-tag-strike-rail{stroke-dashoffset:0}
+.catalog-tag-toggle[aria-pressed="false"] .catalog-tag-strike-cap,
+.catalog-tag-toggle[aria-pressed="true"]:is(:hover,:focus-visible) .catalog-tag-strike-cap{opacity:1;transform:none}
+/* Keep this requested interaction visible without moving the fittings in reduced-motion mode. */
+@media(prefers-reduced-motion:reduce){
+  .catalog-tag-toggle-strike{transition:opacity .06s ease-out!important;transform:none!important}
+  .catalog-tag-strike-rail{transition:stroke-dashoffset .15s ease-out .035s!important}
+  .catalog-tag-strike-cap{transition:opacity .06s ease-out!important;transform:none!important}
+}
 .catalog-tag-toggle:hover,.catalog-tag-toggle:focus-visible{
-  background-color:#f779541a;color:#ffbb90;text-shadow:0 0 10px #f7795488;
-  box-shadow:inset 0 0 12px #f7795433;
+  background:repeating-linear-gradient(-45deg,transparent 0 5px,#ff826708 5px 6px),linear-gradient(135deg,#551d24,#201419);
+  color:#ffd0ac;text-shadow:0 0 8px #f7795466;
+  box-shadow:inset 0 0 0 1px #c25a4e66,inset 0 0 12px #c9223344;
 }
 .catalog-tag-toggle:focus-visible{outline:2px solid #ffbb90;outline-offset:2px}
 .catalog-tags-disabled{flex:1;min-width:0;padding:0 10px;color:#78868b;font-size:8px;line-height:1.7}
@@ -3144,7 +3185,7 @@ footer .manifesto,footer .manifesto[data-open="true"]{bottom:0;height:100%}
 @font-face{
   font-family:'Press Start 2P';
   src:url('/fonts/PressStart2P-Regular.ttf') format('truetype');
-  font-style:normal;font-weight:400;font-display:swap;
+  font-style:normal;font-weight:400;font-display:block;
 }
 .command-screen-content strong,
 .command-kicker,

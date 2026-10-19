@@ -33,6 +33,7 @@ if (pages) {
     .replaceAll('./avatars/','./public/avatars/')
     .replaceAll('./badges/','./public/badges/')
     .replaceAll('./videos/','./public/videos/')
+    .replaceAll('href="./fonts/','href="./public/fonts/')
     .replaceAll('url(./fonts/','url(./public/fonts/')
     .replaceAll('url(./textures/','url(./public/textures/')
     .replaceAll('./radar-world-red.webp','./public/radar-world-red.webp')

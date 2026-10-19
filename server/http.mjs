@@ -11,7 +11,7 @@ import {downloadRemoteAvatar,downloadRemoteAvatarDetails,MAX_AVATAR_BYTES,saveAv
 import {instagramSessionAvatar,instagramSessionPost} from './instagram-session.mjs';
 import {parseArtistLink} from './links.mjs';
 
-const mime = {'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.jpg':'image/jpeg','.jpeg':'image/jpeg','.png':'image/png','.webp':'image/webp','.ico':'image/x-icon','.woff2':'font/woff2','.mp4':'video/mp4'};
+const mime = {'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml','.jpg':'image/jpeg','.jpeg':'image/jpeg','.png':'image/png','.webp':'image/webp','.ico':'image/x-icon','.ttf':'font/ttf','.woff2':'font/woff2','.mp4':'video/mp4'};
 function json(res,status,data) { res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'}); res.end(JSON.stringify(data)); }
 async function readBody(req) {
   if (!req.headers['content-type']?.startsWith('application/json')) throw Object.assign(new Error('Нужен JSON-запрос.'), {status:415});
