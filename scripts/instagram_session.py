@@ -9,6 +9,7 @@ import re
 import shutil
 import sys
 import time
+from http.cookiejar import LoadError, MozillaCookieJar
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 
@@ -19,6 +20,7 @@ ROOT = Path(__file__).resolve().parent.parent
 STATE_DIR = ROOT / ".local" / "instagram"
 SESSION_FILE = STATE_DIR / "session"
 ACCOUNT_FILE = STATE_DIR / "account.json"
+COOKIE_FILE = ROOT / "cookies.txt"
 AVATAR_LIMIT_FILE = STATE_DIR / "avatar-api-limit.json"
 LOOKUP_ERRORS = (instaloader.exceptions.InstaloaderException, instaloader.exceptions.AbortDownloadException)
 AVATAR_LIMIT_NOTICE = "Instagram временно ограничил загрузку HD-аватарок. Доступна только уменьшенная версия; повторите позже."
@@ -36,6 +38,8 @@ def make_loader() -> instaloader.Instaloader:
         compress_json=False,
         quiet=True,
         iphone_support=True,
+        max_connection_attempts=1,
+        request_timeout=12,
     )
 
 
@@ -84,6 +88,21 @@ def connect_terminal(username: str) -> None:
 
 
 def load_session() -> tuple[instaloader.Instaloader, str]:
+    # Read the file for every lookup, so replacing cookies.txt takes effect
+    # without restarting the site or importing anything from a browser.
+    if COOKIE_FILE.exists():
+        jar = MozillaCookieJar(str(COOKIE_FILE))
+        try:
+            jar.load(ignore_discard=True, ignore_expires=False)
+        except (OSError, LoadError, ValueError):
+            raise RuntimeError("Не удалось прочитать cookies.txt. Нужен экспорт cookies Instagram в формате Netscape.") from None
+        cookies = {cookie.name: cookie.value for cookie in jar
+                   if cookie.domain.lstrip(".").lower() == "instagram.com"}
+        if not all(cookies.get(name) for name in ("sessionid", "csrftoken", "ds_user_id")):
+            raise RuntimeError("В cookies.txt нет действующих cookies Instagram: sessionid, csrftoken и ds_user_id. Замените файл свежим экспортом.")
+        loader = make_loader()
+        loader.load_session(cookies["ds_user_id"], cookies)
+        return loader, cookies["ds_user_id"]
     username = stored_username()
     if not SESSION_FILE.is_file():
         raise RuntimeError("Instagram-сессия не найдена. Подключите её заново.")
@@ -94,10 +113,15 @@ def load_session() -> tuple[instaloader.Instaloader, str]:
 
 def status(check_online: bool) -> None:
     loader, username = load_session()
-    valid = loader.test_login() == username if check_online else True
-    if not valid:
-        raise RuntimeError("Instagram-сессия истекла. Подключите её заново.")
-    print(f"Instagram подключён: @{username}")
+    if check_online:
+        current_username = loader.test_login()
+        if not current_username or (not COOKIE_FILE.exists() and current_username != username):
+            raise RuntimeError("Instagram не подтвердил вход. Замените cookies.txt свежим экспортом и повторите проверку.")
+        print(f"Instagram подключён: @{current_username}")
+    elif COOKIE_FILE.exists():
+        print("Готовый cookies.txt подключён. Сайт читает его при каждом запросе Instagram.")
+    else:
+        print(f"Instagram подключён: @{username}")
 
 
 def profile_avatar_candidates(user: dict, username: str) -> list[dict]:
@@ -133,7 +157,7 @@ def avatar_lookup_error(error: Exception) -> str:
     if "checkpoint_required" in message or "challenge_required" in message:
         return "Instagram просит подтвердить вход в аккаунт. После подтверждения повторите загрузку."
     if isinstance(error, instaloader.exceptions.LoginRequiredException) or "login_required" in message:
-        return "Instagram-сессия истекла. Подключите её заново."
+        return "Instagram-сессия истекла. Замените cookies.txt свежим экспортом."
     return "Instagram не отдал данные профиля. Повторите загрузку позже."
 
 
@@ -148,7 +172,8 @@ def avatar_api_cooling_down() -> bool:
         # An earlier pause applied to the failing mobile API, not this query.
         if limit.get("source") != "profile-query":
             return False
-        if SESSION_FILE.exists() and SESSION_FILE.stat().st_mtime > AVATAR_LIMIT_FILE.stat().st_mtime:
+        if any(path.exists() and path.stat().st_mtime > AVATAR_LIMIT_FILE.stat().st_mtime
+               for path in (COOKIE_FILE, SESSION_FILE)):
             return False
         return float(limit["retryAfter"]) > time.time()
     except (OSError, ValueError, KeyError, TypeError):
@@ -167,16 +192,17 @@ def pause_avatar_api() -> None:
 
 
 def public_avatar_data(html: str, username: str) -> tuple[str, list[dict]]:
-    ids, candidates = set(), []
+    pks, ids, candidates = set(), set(), []
 
     def visit(value):
         if isinstance(value, dict):
             if isinstance(value.get("username"), str) and value["username"].lower() == username.lower():
-                # Polaris's "id" can be an opaque GraphQL ID. The numeric pk is
-                # the actual user ID, as in Instaloader's public-page resolver.
+                # Relay references repeat the same username with a different,
+                # also numeric GraphQL id. A profile's pk takes precedence over
+                # every such reference, not just over id in the same object.
                 identifier = str(value.get("pk") or value.get("id") or "")
                 if identifier.isascii() and identifier.isdigit():
-                    ids.add(identifier)
+                    (pks if value.get("pk") else ids).add(identifier)
                     candidates.extend(profile_avatar_candidates(value, username))
             for child in value.values():
                 if isinstance(child, (dict, list)):
@@ -190,9 +216,10 @@ def public_avatar_data(html: str, username: str) -> tuple[str, list[dict]]:
             visit(json.loads(script[1]))
         except (ValueError, RecursionError):
             continue
-    if len(ids) != 1:
+    identifiers = pks or ids
+    if len(identifiers) != 1:
         raise RuntimeError("Instagram не отдал данные нужного профиля. Повторите загрузку позже.")
-    return ids.pop(), candidates
+    return identifiers.pop(), candidates
 
 
 def public_profile_avatar(context, username: str) -> tuple[str, list[dict]]:

@@ -5,9 +5,10 @@ import {resolve} from 'node:path';
 const python=resolve('.venv-instagram/bin/python');
 const helper=resolve('scripts/instagram_session.py');
 const account=resolve('.local/instagram/account.json');
+const cookies=resolve('cookies.txt');
 let queue=Promise.resolve();
 
-async function configured(){try{await Promise.all([access(python),access(helper),access(account)]);return true;}catch{return false;}}
+async function configured(){try{await Promise.all([access(python),access(helper),Promise.any([access(cookies),access(account)])]);return true;}catch{return false;}}
 
 function runLookup(command,identifier){
  return new Promise((resolvePromise,reject)=>{
@@ -30,14 +31,14 @@ function runLookup(command,identifier){
 }
 
 export async function instagramSessionAvatar(username){
- if(!await configured())throw new Error('Instagram-сессия не подключена к этому запуску. Остановите сайт, запустите ./start из корня проекта и подключите сессию.');
+ if(!await configured())throw new Error('Положите готовый cookies.txt Instagram в корень проекта.');
  const task=queue.then(()=>runLookup('avatar',username));
  queue=task.catch(()=>{}).then(()=>new Promise(resolveDelay=>setTimeout(resolveDelay,1200)));
  return task;
 }
 
 export async function instagramSessionPost(shortcode){
- if(!await configured())throw new Error('Instagram-сессия не подключена к этому запуску. Запустите npm run instagram:connect.');
+ if(!await configured())throw new Error('Положите готовый cookies.txt Instagram в корень проекта.');
  if(!/^[A-Za-z0-9_-]{5,30}$/.test(shortcode))throw new Error('Некорректный код публикации Instagram.');
  const task=queue.then(()=>runLookup('post',shortcode));
  queue=task.catch(()=>{}).then(()=>new Promise(resolveDelay=>setTimeout(resolveDelay,1200)));

@@ -5,23 +5,25 @@ PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$PROJECT_DIR"
 
 PYTHON="$PROJECT_DIR/.venv-instagram/bin/python"
-if [[ ! -x "$PYTHON" ]]; then
+if ! "$PYTHON" -c 'import sys' >/dev/null 2>&1; then
+  if ! command -v python3 >/dev/null 2>&1; then
+    echo "Не найден Python 3. Установите его командой brew install python и повторите ./start."
+    exit 1
+  fi
   echo "Настраиваю локальный модуль Instagram…"
-  python3 -m venv .venv-instagram
+  python3 -m venv --clear .venv-instagram
+fi
+
+if ! "$PYTHON" -c 'import instaloader, browser_cookie3' >/dev/null 2>&1; then
+  echo "Устанавливаю зависимости Instagram…"
   "$PYTHON" -m pip install -r requirements-instagram.txt
 fi
 
-if [[ ! -f "$PROJECT_DIR/.local/instagram/account.json" && -t 0 ]]; then
+if [[ -f "$PROJECT_DIR/cookies.txt" ]]; then
+  echo "Использую готовый cookies.txt Instagram из папки проекта."
+elif [[ ! -f "$PROJECT_DIR/.local/instagram/account.json" ]]; then
   echo
-  echo "Instagram ещё не подключён."
-  read -r -p "Импортировать активную сессию из Chrome сейчас? [Y/n] " answer
-  if [[ ! "$answer" =~ ^[Nn]$ ]]; then
-    "$PYTHON" scripts/instagram_session.py connect chrome || {
-      echo
-      echo "Не удалось импортировать cookies Chrome."
-      echo "Можно подключиться позже: npm run instagram:connect"
-    }
-  fi
+  echo "Для загрузки Instagram положите готовый cookies.txt в папку проекта."
 fi
 
 echo

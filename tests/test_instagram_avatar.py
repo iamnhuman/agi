@@ -95,6 +95,19 @@ class AvatarTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "нужного профиля"):
             helper.public_avatar_data('<script type="application/json">{"username":"other","pk":"123"}</script>', "artist")
 
+    def test_numeric_relay_references_do_not_conflict_with_profile_pk(self):
+        data = {"profile": {"pk": "255545193", "id": "17841401715793992", "username": "artist", "profile_pic_url": SMALL},
+                "references": [{"username": "artist", "id": "17841401715793992"}] * 3}
+        profile_id, candidates = helper.public_avatar_data('<script type="application/json">' + json.dumps(data) + '</script>', "artist")
+        self.assertEqual(profile_id, "255545193")
+        self.assertEqual([candidate["url"] for candidate in candidates], [SMALL])
+
+    def test_conflicting_profile_pks_are_still_rejected(self):
+        data = [{"pk": "123", "username": "artist", "profile_pic_url": SMALL},
+                {"pk": "456", "username": "artist", "profile_pic_url_hd": HD}]
+        with self.assertRaisesRegex(RuntimeError, "нужного профиля"):
+            helper.public_avatar_data('<script type="application/json">' + json.dumps(data) + '</script>', "artist")
+
     def test_public_hd_skips_authenticated_api(self):
         candidates = helper.profile_avatar_candidates({"username": "artist", "hd_profile_pic_url_info": {"url": HD, "width": 1080, "height": 1080}}, "artist")
         context = SimpleNamespace(doc_id_graphql_query=Mock())
@@ -159,6 +172,50 @@ class AvatarTests(unittest.TestCase):
             helper.SESSION_FILE.write_text("test-session")
             os.utime(helper.AVATAR_LIMIT_FILE, (1000, 1000))
             self.assertFalse(helper.avatar_api_cooling_down())
+
+
+class CookieFileTests(unittest.TestCase):
+    def write_cookies(self, path, account="123", token="test-session", expiry="4102444800"):
+        values = {"sessionid": token, "csrftoken": "test-csrf", "ds_user_id": account}
+        path.write_text("# Netscape HTTP Cookie File\n" + "".join(
+            f".instagram.com\tTRUE\t/\tTRUE\t{expiry}\t{name}\t{value}\n" for name, value in values.items())
+            + ".example.com\tTRUE\t/\tTRUE\t4102444800\tother\tignored\n")
+
+    def test_ready_cookie_file_overrides_saved_account_and_is_reread(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "cookies.txt"
+            self.write_cookies(path)
+            loader = Mock()
+            with patch.object(helper, "COOKIE_FILE", path), patch.object(helper, "make_loader", return_value=loader), \
+                    patch.object(helper, "stored_username", side_effect=AssertionError("Old account must not be read")):
+                self.assertEqual(helper.load_session(), (loader, "123"))
+                loader.load_session.assert_called_with("123", {"sessionid": "test-session", "csrftoken": "test-csrf", "ds_user_id": "123"})
+                self.write_cookies(path, account="456", token="replacement-session")
+                self.assertEqual(helper.load_session(), (loader, "456"))
+                self.assertEqual(loader.load_session.call_args.args[1]["sessionid"], "replacement-session")
+
+    def test_expired_or_malformed_file_does_not_silently_use_old_account(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "cookies.txt"
+            with patch.object(helper, "COOKIE_FILE", path), patch.object(helper, "stored_username") as old:
+                self.write_cookies(path, expiry="1")
+                with self.assertRaisesRegex(RuntimeError, "свежим экспортом"):
+                    helper.load_session()
+                path.write_text("invalid cookie file")
+                with self.assertRaisesRegex(RuntimeError, "формате Netscape"):
+                    helper.load_session()
+                old.assert_not_called()
+
+    def test_new_cookies_clear_previous_account_api_pause(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory)
+            with patch.object(helper, "COOKIE_FILE", path / "cookies.txt"), \
+                    patch.object(helper, "AVATAR_LIMIT_FILE", path / "limits.json"), \
+                    patch.object(helper, "SESSION_FILE", path / "session"):
+                helper.AVATAR_LIMIT_FILE.write_text(json.dumps({"source": "profile-query", "retryAfter": helper.time.time()+600}))
+                os.utime(helper.AVATAR_LIMIT_FILE, (1000, 1000))
+                self.write_cookies(helper.COOKIE_FILE)
+                self.assertFalse(helper.avatar_api_cooling_down())
 
 
 if __name__ == "__main__":
