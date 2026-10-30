@@ -151,8 +151,8 @@ export default function Videos({admin=false,initial,onTotalChange}:{admin?:boole
  }
  useEffect(()=>{
   if(orientation!=='horizontal'||loading)return;
-  const viewport=timelineViewport.current,canvas=timelineCanvas.current;
-  if(!viewport||!canvas)return;
+  const scene=timelineScene.current,viewport=timelineViewport.current,canvas=timelineCanvas.current;
+  if(!scene||!viewport||!canvas)return;
   let frame=0,lastPaint=-Infinity,visible=false,dirty=true;
   let railY:number|undefined,dateTicks:Array<{x:number;label:string}>=[];
   const paint=(time:number)=>{
@@ -188,8 +188,9 @@ export default function Videos({admin=false,initial,onTotalChange}:{admin?:boole
    if(visible&&document.visibilityState==='visible'&&!frame)frame=requestAnimationFrame(tick);
   };
   const onWheel=(event:WheelEvent)=>{
+   // Keep wheel gestures inside the whole scene, even at either end of the rail.
+   event.preventDefault();
    if(event.ctrlKey||event.metaKey){
-    event.preventDefault();
     changeSceneZoom(event.deltaY<0?.08:-.08);
     return;
    }
@@ -199,7 +200,6 @@ export default function Videos({admin=false,initial,onTotalChange}:{admin?:boole
    if(!amount||!max)return;
    const next=Math.max(0,Math.min(max,viewport.scrollLeft+amount));
    if(Math.abs(next-viewport.scrollLeft)<.5)return;
-   event.preventDefault();
    viewport.scrollLeft=next;
    schedulePaint();
   };
@@ -212,11 +212,11 @@ export default function Videos({admin=false,initial,onTotalChange}:{admin?:boole
   observer.observe(viewport);
   visibilityObserver.observe(canvas);
   viewport.querySelectorAll('.timeline-items').forEach(items=>observer.observe(items));
-  viewport.addEventListener('wheel',onWheel,{passive:false});
+  scene.addEventListener('wheel',onWheel,{passive:false});
   viewport.addEventListener('scroll',schedulePaint,{passive:true});
   document.addEventListener('visibilitychange',schedulePaint);
   paint(performance.now());
-  return()=>{observer.disconnect();visibilityObserver.disconnect();document.removeEventListener('visibilitychange',schedulePaint);viewport.removeEventListener('wheel',onWheel);viewport.removeEventListener('scroll',schedulePaint);if(frame)cancelAnimationFrame(frame);};
+  return()=>{observer.disconnect();visibilityObserver.disconnect();document.removeEventListener('visibilitychange',schedulePaint);scene.removeEventListener('wheel',onWheel);viewport.removeEventListener('scroll',schedulePaint);if(frame)cancelAnimationFrame(frame);};
  },[orientation,loading,order,q,videos,filtered.length,sceneZoom]);
  useEffect(()=>{
   if(orientation!=='horizontal'||loading||!timelineViewport.current)return;
