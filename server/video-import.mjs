@@ -1,5 +1,9 @@
 import {parseArtistLink} from './links.mjs';
 import {readRedditMetadata} from './reddit-import.mjs';
+import {isSoundCloudHost,parseSoundCloudUrl} from '../lib/soundcloud.mjs';
+import {importSoundCloud} from './soundcloud-import.mjs';
+import {youtubePageAuthor,youtubeEmbedAuthor} from './youtube-import.mjs';
+import {instagramPageAuthor,instagramDescriptionDate} from './instagram-import.mjs';
 
 export function videoLink(raw){
  let u;try{u=new URL(String(raw).trim().replace(/(youtu\.be\/[\w-]{11})&/,'$1?'));}catch{throw Error('Укажите полную ссылку на видео.');}
@@ -11,6 +15,10 @@ export function videoLink(raw){
   const commentId=(comments>=0?parts[comments+3]:'')||u.searchParams.get('comment')||'';
   if(commentId&&!/^[a-zA-Z0-9]{1,20}$/.test(commentId))throw Error('Некорректная ссылка на комментарий Reddit.');
   return {url:commentId?`${link.url}/_/${commentId.toLowerCase()}`:link.url,platform:'Reddit',videoId:'',fetchUrl:link.fetchUrl,reference:!link.isPost,...(commentId?{redditCommentId:commentId.toLowerCase()}:{})};
+ }
+ if(isSoundCloudHost(u.hostname)){
+  const link=parseSoundCloudUrl(u.href);
+  return {url:link.url,platform:'SoundCloud',videoId:'',fetchUrl:link.url,reference:link.kind==='profile'};
  }
  let parts=u.pathname.split('/').filter(Boolean);let videoId='';
  if(host==='t.me'&&parts[0]==='s')parts=parts.slice(1);
@@ -31,7 +39,7 @@ export function videoLink(raw){
 }
 function decode(s){let value=s;for(let i=0;i<3;i++){const next=value.replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;|&apos;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&#x([\da-f]+);/gi,(_,n)=>String.fromCodePoint(Math.min(parseInt(n,16),0x10ffff))).replace(/&#(\d+);/g,(_,n)=>String.fromCodePoint(Math.min(+n,0x10ffff)));if(next===value)break;value=next;}return value;}
 export function videoMetadata(html,link){
- const meta={};for(const tag of html.match(/<meta\b[^>]*>/gi)||[]){const a={};for(const m of tag.matchAll(/([\w:-]+)\s*=\s*(["'])(.*?)\2/g))a[m[1].toLowerCase()]=decode(m[3]);const key=a.property||a.itemprop||a.name;if(key&&!meta[key])meta[key]=a.content;}
+ const meta={};for(const tag of html.match(/<meta\b[^>]*>/gi)||[]){const a={};for(const m of tag.matchAll(/([\w:-]+)\s*=\s*(["'])([\s\S]*?)\2/g))a[m[1].toLowerCase()]=decode(m[3]);const key=a.property||a.itemprop||a.name;if(key&&!meta[key])meta[key]=a.content;}
  let date='',image=meta['og:image']||meta['og:image:url']||meta['og:image:secure_url']||meta['twitter:image']||meta['twitter:image:src']||meta.thumbnail||'';
  if(link.platform==='YouTube')date=meta.datePublished||html.match(/"publishDate"\s*:\s*"(\d{4}-\d{2}-\d{2})/)?.[1]||'';
  if(link.platform==='Telegram'){
@@ -42,7 +50,7 @@ export function videoMetadata(html,link){
   image=decode(postImage||image);
 
  }
- if(link.platform==='Instagram')date=meta['article:published_time']||html.match(/"uploadDate"\s*:\s*"(\d{4}-\d{2}-\d{2}[^" ]*)"/)?.[1]||'';
+ if(link.platform==='Instagram')date=meta['article:published_time']||html.match(/"uploadDate"\s*:\s*"(\d{4}-\d{2}-\d{2}[^" ]*)"/)?.[1]||instagramDescriptionDate(meta);
  if(link.platform==='VK')date=meta['article:published_time']||meta['og:published_time']||meta['ya:ovs:upload_date']||html.match(/"(?:datePublished|uploadDate)"\s*:\s*"(\d{4}-\d{2}-\d{2}[^" ]*)"/)?.[1]||'';
  if(!image)image=html.match(/"thumbnailUrl"\s*:\s*(?:\[\s*)?"([^"]+)"/)?.[1]?.replace(/\\u0026/g,'&').replace(/\\\//g,'/')||'';
  if(new URL(link.url).searchParams.has('comment'))date='';
@@ -52,10 +60,11 @@ export function videoMetadata(html,link){
  // Telegram's generic emoji and logo Open Graph assets are not post previews.
  if(link.platform==='Telegram'&&image&&new URL(image).hostname==='telegram.org')image='';
  const isVideo=Boolean(link.videoId||/^(?:video|clip)-?\d+_\d+$/.test(new URL(link.url).pathname.split('/').filter(Boolean)[0]||'')||new URL(link.url).pathname.split('/').filter(Boolean)[0]==='reel'||meta['og:type']?.startsWith('video')||meta['og:video']||meta['og:video:url']||/<video\b|<source\b[^>]*type=["']video\//i.test(html));
- return {image,publishedAt:date,dateSource:date?'source':'unknown',dateUrl:date?link.fetchUrl:'',isVideo};
+ return {image,publishedAt:date,dateSource:date?'source':'unknown',dateUrl:date?link.fetchUrl:'',isVideo,...(link.platform==='YouTube'?{name:youtubePageAuthor(html)}:link.platform==='Instagram'?{name:instagramPageAuthor(meta)}:{})};
 }
 export async function importVideo(raw,fetcher=fetch){
  const link=videoLink(raw);let metadata={image:'',publishedAt:'',dateSource:'unknown',dateUrl:'',isVideo:Boolean(link.videoId||/^(?:video|clip)-?\d+_\d+$/.test(new URL(link.url).pathname.split('/').filter(Boolean)[0]||'')||new URL(link.url).pathname.split('/').filter(Boolean)[0]==='reel')};
+ if(link.platform==='SoundCloud')return importSoundCloud(link.url,fetcher);
  if(link.platform==='Reddit'){
   const result=await readRedditMetadata(parseArtistLink(link.url),fetcher,{includeDate:!link.redditCommentId});
   const resolved=videoLink(link.redditCommentId?link.url:result.sourceUrl),data=result.metadata;
@@ -72,7 +81,10 @@ export async function importVideo(raw,fetcher=fetch){
    return videoMetadata(html,source);
   }catch{return null;}
  }
- metadata=await readMetadata(link)||metadata;
+ if(link.platform==='YouTube'){
+  const [page,author]=await Promise.all([readMetadata(link),youtubeEmbedAuthor(link,fetcher)]);
+  metadata={...(page||metadata),name:author||page?.name||''};
+ }else metadata=await readMetadata(link)||metadata;
  if(!metadata.image&&link.platform==='Telegram'){
   const channel=new URL(link.url).pathname.split('/').filter(Boolean).find(part=>part!=='s');
   if(channel&&/^[\w]+$/.test(channel)){

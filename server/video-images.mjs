@@ -2,7 +2,7 @@ import {saveAvatarBytes,isRedditImageHost} from './avatar-files.mjs';
 
 // Only image hosts used by the supported video platforms may be fetched by the
 // local admin server. A page's Open Graph image is otherwise untrusted input.
-const imageHosts=/(^|\.)(ytimg\.com|ggpht\.com|telesco\.pe|telegram-cdn\.org|userapi\.com|vkuserphoto\.ru|vk-cdn\.net|vk\.com|cdninstagram\.com|fbcdn\.net)$/;
+const imageHosts=/(^|\.)(ytimg\.com|ggpht\.com|telesco\.pe|telegram-cdn\.org|userapi\.com|vkuserphoto\.ru|vk-cdn\.net|vk\.com|cdninstagram\.com|fbcdn\.net|sndcdn\.com)$/;
 
 function imageUrl(raw){
   let url;

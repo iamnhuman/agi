@@ -9,12 +9,13 @@ import {cardMaterial} from './card-material';
 import DossierInstruments,{trackDossierPointer,resetDossierPointer} from './dossier-instruments';
 import {orderVideos,videoPositionByDate,type VideoOrder} from './video-order';
 import type {Video} from '@/lib/types';
+import {soundcloudPlayerUrl} from '@/lib/soundcloud.mjs';
 import VideoPlayer from './video-player';
 import TimelineNavigator from './timeline-navigator';
 import TimelineGridFlow from './timeline-grid-flow';
 const blank:Video={id:'',name:'',url:'',platform:'',videoId:'',reference:false,isVideo:false,publishedAt:'',dateSource:'unknown',dateUrl:'',image:'',alternateUrls:[],sourceOrder:0};
 const fallbackImage='./video-fallback.svg';
-const platformShortNames:Record<string,string>={Instagram:'IG',YouTube:'YT',Telegram:'TG',VK:'VK',Reddit:'RD'};
+const platformShortNames:Record<string,string>={Instagram:'IG',YouTube:'YT',Telegram:'TG',VK:'VK',Reddit:'RD',SoundCloud:'SC'};
 const MIN_SCENE_ZOOM=.25,MAX_SCENE_ZOOM=1.5;
 const MIN_GRID_ZOOM=.5,MAX_GRID_ZOOM=1.5;
 function coverSource(video:Video){return video.image||video.videoId&&`https://i.ytimg.com/vi/${video.videoId}/hqdefault.jpg`||fallbackImage;}
@@ -283,7 +284,7 @@ export default function Videos({admin=false,initial,onTotalChange}:{admin?:boole
  function card(v:Video){
   const [year,month,day]=v.publishedAt?.split('-')||[];
   const compactDate=year&&month&&day?`${day}.${month}.${year.slice(-2)}`:'БЕЗ ДАТЫ';
-  const playable=Boolean(v.videoId||v.media);
+  const playable=Boolean(v.videoId||v.media||v.platform==='SoundCloud'&&soundcloudPlayerUrl(v.url));
   const cover=<><img className="video-cover-image" src={coverSource(v)} alt="" loading="lazy" referrerPolicy="no-referrer" onError={e=>coverError(e,v)}/>{playable&&<span className="video-play video-cover-icon"><Play size={20} aria-hidden="true"/></span>}{v.section&&<span className="video-region-badge video-cover-icon" data-section={v.section} title={v.section==='world'?'Мир':'Рунет'}><img src={v.section==='world'?'./badges/region-en-eagle-cutout.png':'./badges/region-ru-emblem-cutout.png'} alt={v.section==='world'?'Мир':'Рунет'}/></span>}</>;
   return <article className="video-card" ref={node=>{if(node)videoRefs.current.set(v.id,node);else videoRefs.current.delete(v.id);}} data-video-id={v.id} data-curator={admin||undefined} data-position={admin?positions.get(v.id):undefined} style={cardMaterial(v.id)} key={v.id} onPointerMove={trackDossierPointer} onPointerLeave={resetDossierPointer}>
    {admin&&<Popover open={positionDraft?.id===v.id} onOpenChange={open=>{if(moving)return;if(open)editPosition(v);else setPositionDraft(null);}}>
@@ -299,7 +300,7 @@ export default function Videos({admin=false,initial,onTotalChange}:{admin?:boole
     </PopoverContent>
    </Popover>}
    <div className="video-date"><time dateTime={v.publishedAt||undefined} title={v.publishedAt?new Date(v.publishedAt+'T12:00:00').toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'}):'Дата неизвестна'}><span className="video-date-compact">{compactDate}</span><span className="video-date-full">{v.publishedAt?new Date(v.publishedAt+'T12:00:00').toLocaleDateString('ru-RU',{day:'2-digit',month:'short',year:'numeric'}):'—'}</span></time><small>{!v.publishedAt?'Дата неизвестна':v.dateSource==='manual'?'Указана куратором':v.platform==='Telegram'?'Дата поста':'Дата публикации'}</small></div>
-   {playable?<button className="video-thumb" aria-label={'Открыть видео '+v.name} onClick={()=>setSelected(v)}>{cover}</button>:<a className="video-thumb" href={v.url} target="_blank" rel="noopener noreferrer" aria-label={'Открыть ссылку '+v.name+' в новой вкладке'}>{cover}</a>}
+   {playable?<button className="video-thumb" aria-label={(v.platform==='SoundCloud'?'Слушать ':'Открыть видео ')+v.name} onClick={()=>setSelected(v)}>{cover}</button>:<a className="video-thumb" href={v.url} target="_blank" rel="noopener noreferrer" aria-label={'Открыть ссылку '+v.name+' в новой вкладке'}>{cover}</a>}
    <div className="video-copy">
     <a href={v.url} target="_blank" rel="noreferrer" className="video-platform" aria-label={`Открыть источник: ${v.name} · ${v.platform}`} title={`Открыть в ${v.platform}`}><span className="video-platform-full">{v.platform}</span><span className="video-platform-short" aria-hidden="true">{platformShortNames[v.platform]||v.platform.slice(0,2).toUpperCase()}</span><ArrowUpRight size={12} aria-hidden="true"/></a>
     <div className="video-name-screen"><h3><VideoName name={v.name} onOpen={()=>setSelected(v)} url={playable?undefined:v.url}/></h3></div>
@@ -366,7 +367,7 @@ export default function Videos({admin=false,initial,onTotalChange}:{admin?:boole
    timelineViewport.current?.scrollTo({left:point.railX,top:point.railY,behavior:'instant'});
    window.scrollTo({left:point.pageX,top:point.pageY,behavior:'instant'});
   }}>
-   <DialogTitle>{draft?.id?'Редактировать видео':'Добавить видео'}</DialogTitle>
+   <DialogTitle>{draft?.id?'Редактировать работу':'Добавить работу'}</DialogTitle>
    <DialogDescription>Работа появится в разделе «ИИ в творчестве» после сохранения.</DialogDescription>
    {draft&&<form className="artist-form video-editor-form" onSubmit={async event=>{
     event.preventDefault();
@@ -386,8 +387,8 @@ export default function Videos({admin=false,initial,onTotalChange}:{admin?:boole
    }}>
     <label>Номер в списке<input aria-label="Номер в списке" aria-describedby="video-editor-position-hint" required type="number" inputMode="numeric" min={1} max={videos.length+(draft.id?0:1)} step={1} value={draftPosition} onChange={event=>{setDraftPosition(event.target.value);setDraftPositionMode('manual');setDraftPositionTouched(true);}}/></label>
     <p className="video-editor-position-hint" id="video-editor-position-hint">{draftPositionMode==='date'?'Номер рассчитан по дате. Измените его для ручного порядка.':'Номер задан вручную.'}{draftPositionMode==='manual'&&<button type="button" className="video-position-auto" onClick={()=>{setDraftPositionMode('date');setDraftPositionTouched(true);}}>Вернуть по дате</button>}</p>
-    <label>Ссылка на видео или публикацию<input required type="url" value={draft.url} onChange={event=>{setImportMessage('');setDraft({...draft,url:event.target.value,publishedAt:'',dateSource:'unknown',dateUrl:'',videoId:'',isVideo:false,media:'',image:''});}}/></label>
-    <button type="button" disabled={busy||!draft.url} className="secondary-btn metadata-import-btn" onClick={importDraft}>{busy?'Загрузка…':'Подгрузить данные и обложку из YouTube, VK, Telegram, Instagram или Reddit'}</button>
+    <label>Ссылка на видео, музыку или публикацию<input required type="url" value={draft.url} onChange={event=>{setImportMessage('');setDraft({...draft,url:event.target.value,platform:'',publishedAt:'',dateSource:'unknown',dateUrl:'',videoId:'',isVideo:false,media:'',image:''});}}/></label>
+    <button type="button" disabled={busy||!draft.url} className="secondary-btn metadata-import-btn" onClick={importDraft}>{busy?'Загрузка…':'Подгрузить данные и обложку из YouTube, VK, Telegram, Instagram, Reddit или SoundCloud'}</button>
     <label>Автор / название<input required maxLength={160} value={draft.name} onChange={event=>setDraft({...draft,name:event.target.value})}/></label>
     <label>Регион<select aria-label="Регион" value={draft.section||''} onChange={event=>setDraft({...draft,section:event.target.value as Video['section']})}><option value="">Не указан</option><option value="runet">Рунет</option><option value="world">Мир</option></select></label>
     <label>Дата публикации<input type="date" value={draft.publishedAt} onChange={event=>setDraft({...draft,publishedAt:event.target.value,dateSource:'manual',dateUrl:''})}/></label>

@@ -34,7 +34,7 @@ async function readImage(req) {
   return {type,bytes:Buffer.concat(chunks)};
 }
 
-export async function startServers({catalogFile,distDir,sitePort=3333,adminPort=3334,fetcher=fetch,instagramAvatar=instagramSessionAvatar,dev=false}) {
+export async function startServers({catalogFile,distDir,sitePort=3333,adminPort=3334,fetcher=fetch,instagramAvatar=instagramSessionAvatar,instagramPost=instagramSessionPost,dev=false}) {
   const store = createCatalogStore(catalogFile);
   await store.migrate(); // Validate and migrate existing records without replacing them with the seed.
   let vite;
@@ -72,7 +72,7 @@ export async function startServers({catalogFile,distDir,sitePort=3333,adminPort=
             if(imported.platform==='Instagram'){
               const parts=new URL(imported.url).pathname.split('/').filter(Boolean);
               if(['p','reel'].includes(parts[0])&&parts[1])try{
-                const post=await instagramSessionPost(parts[1]);
+                const post=await instagramPost(parts[1]);
                 imported.image=post.url;
                 imported.publishedAt=imported.publishedAt||post.publishedAt;
                 imported.dateSource=imported.publishedAt?'source':'unknown';
