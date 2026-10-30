@@ -6230,6 +6230,23 @@
       "alternateUrls": [],
       "sourceOrder": 164,
       "section": "runet"
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=Fl2yXawv2y0",
+      "platform": "YouTube",
+      "videoId": "Fl2yXawv2y0",
+      "fetchUrl": "https://www.youtube.com/watch?v=Fl2yXawv2y0",
+      "reference": false,
+      "id": "a8e08e02-4491-4038-abe6-9559f4e636d4",
+      "name": "SLAVA MARLOW",
+      "publishedAt": "2026-10-30",
+      "dateSource": "source",
+      "dateUrl": "https://www.youtube.com/watch?v=Fl2yXawv2y0",
+      "image": "./public/avatars/upload-23e3b083dcde25fe.jpg",
+      "isVideo": true,
+      "alternateUrls": [],
+      "sourceOrder": 165,
+      "section": "runet"
     }
   ]
 }
