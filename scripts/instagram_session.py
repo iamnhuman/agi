@@ -8,7 +8,6 @@ import os
 import re
 import shutil
 import sys
-import time
 from http.cookiejar import LoadError, MozillaCookieJar
 from pathlib import Path
 from urllib.parse import unquote, urlparse
@@ -21,10 +20,10 @@ STATE_DIR = ROOT / ".local" / "instagram"
 SESSION_FILE = STATE_DIR / "session"
 ACCOUNT_FILE = STATE_DIR / "account.json"
 COOKIE_FILE = ROOT / "cookies.txt"
+# Only used to remove state left by the retired local cooldown.
 AVATAR_LIMIT_FILE = STATE_DIR / "avatar-api-limit.json"
 LOOKUP_ERRORS = (instaloader.exceptions.InstaloaderException, instaloader.exceptions.AbortDownloadException)
 AVATAR_LIMIT_NOTICE = "Instagram временно ограничил загрузку HD-аватарок. Доступна только уменьшенная версия; повторите позже."
-PROFILE_QUERY_ID = "27937681195819736"  # PolarisProfilePageContentQuery in Instaloader 4.15.3.
 
 
 def make_loader() -> instaloader.Instaloader:
@@ -114,10 +113,16 @@ def load_session() -> tuple[instaloader.Instaloader, str]:
 def status(check_online: bool) -> None:
     loader, username = load_session()
     if check_online:
-        current_username = loader.test_login()
-        if not current_username or (not COOKIE_FILE.exists() and current_username != username):
-            raise RuntimeError("Instagram не подтвердил вход. Замените cookies.txt свежим экспортом и повторите проверку.")
-        print(f"Instagram подключён: @{current_username}")
+        # The legacy test_login GraphQL query may be refused with a valid
+        # session. Check the same authenticated profile API used for avatars.
+        user_id = loader.context.user_id
+        if not user_id:
+            raise RuntimeError("В Instagram-сессии нет идентификатора аккаунта. Замените cookies.txt свежим экспортом.")
+        data = loader.context.get_iphone_json(f"api/v1/users/{user_id}/info/", {})
+        user = data.get("user") or {}
+        if str(user.get("pk") or user.get("id")) != str(user_id) or not user.get("username"):
+            raise RuntimeError("Instagram не подтвердил аккаунт текущей сессии.")
+        print(f"Instagram подключён: @{user['username']}")
     elif COOKIE_FILE.exists():
         print("Готовый cookies.txt подключён. Сайт читает его при каждом запросе Instagram.")
     else:
@@ -164,31 +169,6 @@ def avatar_lookup_error(error: Exception) -> str:
 def avatar_api_restricted(error: Exception) -> bool:
     return ("feedback_required" in str(error) or "429" in str(error)
             or isinstance(error, instaloader.exceptions.TooManyRequestsException))
-
-
-def avatar_api_cooling_down() -> bool:
-    try:
-        limit = json.loads(AVATAR_LIMIT_FILE.read_text())
-        # An earlier pause applied to the failing mobile API, not this query.
-        if limit.get("source") != "profile-query":
-            return False
-        if any(path.exists() and path.stat().st_mtime > AVATAR_LIMIT_FILE.stat().st_mtime
-               for path in (COOKIE_FILE, SESSION_FILE)):
-            return False
-        return float(limit["retryAfter"]) > time.time()
-    except (OSError, ValueError, KeyError, TypeError):
-        return False
-
-
-def pause_avatar_api() -> None:
-    # Persist the pause across helper processes; repeated button clicks must not
-    # keep sending requests to an endpoint that has already refused them.
-    try:
-        STATE_DIR.mkdir(parents=True, exist_ok=True)
-        AVATAR_LIMIT_FILE.write_text(json.dumps({"source": "profile-query", "retryAfter": time.time() + 600}) + "\n")
-        os.chmod(AVATAR_LIMIT_FILE, 0o600)
-    except OSError:
-        pass
 
 
 def public_avatar_data(html: str, username: str) -> tuple[str, list[dict]]:
@@ -251,30 +231,17 @@ def resolve_avatar(loader: instaloader.Instaloader, username: str) -> dict:
         raise RuntimeError(avatar_lookup_error(error)) from error
     notice = None
     if not any(candidate["hd"] for candidate in candidates):
-        if avatar_api_cooling_down():
-            notice = AVATAR_LIMIT_NOTICE
-        else:
-            try:
-                # Keep the working web profile query. The mobile users/info API
-                # can refuse the same valid browser session that this accepts.
-                # Call the query directly to avoid Instaloader's obsolete search
-                # fallback when a profile field is unavailable.
-                data = loader.context.doc_id_graphql_query(PROFILE_QUERY_ID, {
-                    "id": profile_id, "render_surface": "PROFILE",
-                    "__relay_internal__pv__PolarisCannesGuardianExperienceEnabledrelayprovider": True,
-                    "__relay_internal__pv__PolarisCASB976ProfileEnabledrelayprovider": False,
-                    "__relay_internal__pv__PolarisRepostsConsumptionEnabledrelayprovider": False,
-                    "__relay_internal__pv__PolarisWebSchoolsEnabledrelayprovider": False,
-                    "enable_integrity_filters": True,
-                })
-                user = (data.get("data") or {}).get("user") or {}
-                if str(user.get("pk") or user.get("id")) != profile_id:
-                    raise KeyError("profile id mismatch")
-                candidates.extend(profile_avatar_candidates(user, username))
-            except (*LOOKUP_ERRORS, KeyError) as error:
-                notice = avatar_lookup_error(error)
-                if avatar_api_restricted(error):
-                    pause_avatar_api()
+        try:
+            # Instaloader 4.16 authenticates this endpoint with a bearer token
+            # derived from the session cookies. Earlier versions sent cookies
+            # alone and the API refused them, even for valid web sessions.
+            data = loader.context.get_iphone_json(f"api/v1/users/{profile_id}/info/", {})
+            user = data.get("user") or {}
+            if str(user.get("pk") or user.get("id")) != profile_id:
+                raise KeyError("profile id mismatch")
+            candidates.extend(profile_avatar_candidates(user, username))
+        except (*LOOKUP_ERRORS, RequestException, KeyError) as error:
+            notice = avatar_lookup_error(error)
     if not candidates:
         raise RuntimeError(notice or "Instagram не отдал изображение аватарки.")
     best = max(candidates, key=lambda value: (value["hd"], value["preferred"] and not value["width"], value["width"] * value["height"]))

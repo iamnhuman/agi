@@ -7,8 +7,13 @@ import Admin from '@/app/admin/panel';
 import Videos from '@/app/videos';
 import {adminUrl,siteUrl,showLocalAdmin,catalogUrl} from './config';
 import {prepareWorkspace,type InitialCatalog} from './startup';
+
+function isVideoHash(hash:string){
+ return hash==='#videos'||hash==='#video-archive'||hash.startsWith('#year-');
+}
+
 export default function Workspace({admin=false}:{admin?:boolean}){
- const [video,setVideo]=useState(()=>location.hash==='#videos'||location.hash.startsWith('#year-'));
+ const [video,setVideo]=useState(()=>isVideoHash(location.hash));
  const [catalog,setCatalog]=useState<InitialCatalog|null>(null),[ready,setReady]=useState(false),[error,setError]=useState(''),[attempt,setAttempt]=useState(0);
  const [videoTotal,setVideoTotal]=useState(0);
  useEffect(()=>{
@@ -22,7 +27,7 @@ export default function Workspace({admin=false}:{admin?:boolean}){
  useEffect(()=>{
   function change(){
    const hash=location.hash;
-   const next=hash==='#videos'||hash.startsWith('#year-')?true:hash==='#catalog'||!hash?false:video;
+   const next=isVideoHash(hash)?true:hash==='#catalog'||!hash?false:video;
    if(next===video)return;
    setReady(false);setError('');setVideo(next);
   }
@@ -38,5 +43,5 @@ export default function Workspace({admin=false}:{admin?:boolean}){
   <a href="#videos" className="primary-nav-link is-active" aria-current="page">Видео · ИИ в творчестве</a>
   </nav>
   <div className="header-actions">{(admin||showLocalAdmin)&&<a className="admin-link curator-link" href={(admin?siteUrl:adminUrl)+'/#videos'}>{admin?'На сайт':'Кураторский штаб'}<ArrowUpRight size={16}/></a>}</div>
- </header>:<CommandDeck mode="videos" total={videoTotal}/>}<main className="videos-main"><Videos admin={admin} initial={catalog?.videos} onTotalChange={setVideoTotal}/></main><ToyotaFooter homeHref={admin?siteUrl+'/#catalog':'#catalog'}/></>;
+ </header>:<CommandDeck mode="videos" total={videoTotal}/>}<main className="videos-main" id="video-archive"><Videos admin={admin} initial={catalog?.videos} onTotalChange={setVideoTotal}/></main><ToyotaFooter homeHref={admin?siteUrl+'/#catalog':'#catalog'}/></>;
 }

@@ -158,7 +158,6 @@ const svg = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="600" hei
  <rect x="25" y="291" width="4" height="4" fill="#ef3c28"/>
  ${text('ONLINE',34,290,8,'#aabf98')}
  <path d="M92 288v12M508 288v12" stroke="#52675b"/>
- ${text('ОПЕРАЦИЯ: ВООБРАЖЕНИЕ',300,289,8,'#ffdf79','middle')}
  ${text('МИР/РУНЕТ',574,291,6,'#aabf98','end')}
 </svg>`);
 

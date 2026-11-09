@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useRef} from 'react';
-import {ArrowUpRight,RotateCw} from 'lucide-react';
+import {ArrowUpRight,ChevronsDown,RotateCw} from 'lucide-react';
 import AiConquerLogo from './ai-conquer-logo';
 import {adminUrl,showLocalAdmin} from './config';
 
@@ -79,26 +79,51 @@ export default function CommandDeck({mode,total}:{mode:'catalog'|'videos';total:
  const videos=mode==='videos';
  return <header className="command-deck" aria-label="Главное меню архива">
   <div className="command-monitor">
-   <div className="command-screen">
-    <img className="command-map" src="./radar-world-red.webp" alt="" aria-hidden="true" fetchPriority="high"/>
-    <div className="command-radar" aria-hidden="true"/>
-    <div className="command-scan" aria-hidden="true"/>
-    <div className="command-screen-content">
-     <span className="command-kicker">AI CULTURE // ARCHIVE SYSTEM</span>
-     <AiConquerLogo/>
-     <strong>{videos?'ТВОРЧЕСКИЙ ИИ':'ОПЕРАЦИЯ: ВООБРАЖЕНИЕ'}</strong>
-     <span className="command-screen-subtitle">{videos?'ХРОНОЛОГИЯ ПРИМЕНЕНИЯ ИИ В КЛИПАХ И МЕДИА':'ИИШНИКИ · ПРОЕКТЫ · МЕДИА'}</span>
+   <div className="command-screen-bezel">
+    <div className="command-screen">
+     <img className="command-map" src="./radar-world-red.webp" alt="" aria-hidden="true" fetchPriority="high"/>
+     <div className="command-sweep-field" aria-hidden="true">
+      <div className="command-battle-sweep">
+       <div className="command-battle-scene">
+        <img src="./radar-battlefield.webp" alt="" decoding="async" fetchPriority="low"/>
+        <img className="command-battle-landmarks" src="./radar-landmarks.webp" alt="" decoding="async"/>
+       </div>
+      </div>
+      <div className="command-scan"/>
+     </div>
+     <div className="command-radar" aria-hidden="true"/>
+     <div className="command-screen-content">
+      <AiConquerLogo/>
+      <strong className="command-screen-caption">{videos?'АРХИВ РАБОТ':'АРТИСТЫ · ПРОЕКТЫ · МЕДИА'}</strong>
+     </div>
+     <div className="command-screen-action">
+      <a href={videos?'#video-archive':'#catalog'}>
+       {videos?'К ЛЕНТЕ РАБОТ':'К КАТАЛОГУ'} <ChevronsDown size={16} aria-hidden="true"/>
+      </a>
+     </div>
     </div>
-    <div className="command-screen-readout"><span>● СИСТЕМА В СЕТИ</span><span>СЕКТОР 01 / ИИЗМ</span></div>
    </div>
-   <div className="command-monitor-base" aria-hidden="true"/>
+   <div className="command-monitor-base" aria-hidden="true">
+    {['left','right'].map(side=><div key={side} className={'command-vent-smoke command-vent-smoke--'+side}>
+     <i/><i/><i/><i/>
+    </div>)}
+   </div>
   </div>
   <aside className="command-console">
    <CommandSignalPanel/>
    <nav className="command-menu" aria-label="Разделы сайта">
-    <a className={!videos?'is-active':''} aria-label="ИИ-артисты и медиа" aria-current={!videos?'page':undefined} href="#catalog">АРТИСТЫ И МЕДИА <ArrowUpRight size={15}/></a>
-    <a className={videos?'is-active':''} aria-label="ИИ в творчестве" aria-current={videos?'page':undefined} href="#videos">ИИ В ТВОРЧЕСТВЕ <ArrowUpRight size={15}/></a>
-    {showLocalAdmin&&<a href={adminUrl} aria-label="Кураторский штаб" className="command-menu-admin">КУРАТОРСКАЯ <ArrowUpRight size={15}/></a>}
+    <a className={!videos?'is-active':''} aria-label="ИИ-артисты и медиа" aria-current={!videos?'page':undefined} href="#catalog">
+     <span className="command-menu-channel" aria-hidden="true">01</span>
+     <span className="command-menu-label">АРТИСТЫ И МЕДИА</span><ArrowUpRight size={14} aria-hidden="true"/>
+    </a>
+    <a className={videos?'is-active':''} aria-label="ИИ в творчестве" aria-current={videos?'page':undefined} href="#videos">
+     <span className="command-menu-channel" aria-hidden="true">02</span>
+     <span className="command-menu-label">ИИ В ТВОРЧЕСТВЕ</span><ArrowUpRight size={14} aria-hidden="true"/>
+    </a>
+    {showLocalAdmin&&<a href={adminUrl} aria-label="Кураторский штаб" className="command-menu-admin">
+     <span className="command-menu-channel" aria-hidden="true">03</span>
+     <span className="command-menu-label">КУРАТОРСКАЯ</span><ArrowUpRight size={14} aria-hidden="true"/>
+    </a>}
    </nav>
    <div className="command-console-readout">
     <span className="command-console-readout-label"><span className="command-console-readout-title">{videos?'КАНАЛ / 02':'АРХИВ / 01'}</span><span className="command-console-update"><RotateCw size={12} aria-hidden="true"/>ОБНОВЛЕНИЕ</span></span>

@@ -36,7 +36,10 @@ if (pages) {
     .replaceAll('href="./fonts/','href="./public/fonts/')
     .replaceAll('url(./fonts/','url(./public/fonts/')
     .replaceAll('url(./textures/','url(./public/textures/')
+    .replaceAll('./ai-conquer-ra2.webp','./public/ai-conquer-ra2.webp')
     .replaceAll('./radar-world-red.webp','./public/radar-world-red.webp')
+    .replaceAll('./radar-battlefield.webp','./public/radar-battlefield.webp')
+    .replaceAll('./radar-landmarks.webp','./public/radar-landmarks.webp')
     .replaceAll('./video-fallback.svg','./public/video-fallback.svg')
     .replaceAll('../cursor-','./public/cursor-');
   await writeFile('index.html',rootHtml);

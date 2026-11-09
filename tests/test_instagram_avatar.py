@@ -1,7 +1,7 @@
 """Avatar resolution regression tests; no network or session files are used."""
+from base64 import b64decode
 import importlib.util
 import json
-import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -18,17 +18,14 @@ HD = "https://scontent.cdninstagram.com/avatar-hd.jpg"
 
 class AvatarTests(unittest.TestCase):
     def resolve(self, user):
-        lookup = Mock(side_effect=user) if isinstance(user, Exception) else Mock(return_value={"data": {"user": {"pk": "123", **user}}})
-        context = SimpleNamespace(doc_id_graphql_query=lookup)
+        lookup = Mock(side_effect=user) if isinstance(user, Exception) else Mock(return_value={"user": {"pk": "123", **user}})
+        context = SimpleNamespace(get_iphone_json=lookup)
         small = helper.profile_avatar_candidates({"username": "artist", "profile_pic_url": SMALL}, "artist")
-        with patch.object(helper, "public_profile_avatar", return_value=("123", small)) as public, \
-                patch.object(helper, "avatar_api_cooling_down", return_value=False), \
-                patch.object(helper, "pause_avatar_api"):
+        with patch.object(helper, "public_profile_avatar", return_value=("123", small)) as public:
             result = helper.resolve_avatar(SimpleNamespace(context=context), "artist")
         public.assert_called_once_with(context, "artist")
         self.assertEqual(lookup.call_count, 1)
-        self.assertEqual(lookup.call_args.args[0], helper.PROFILE_QUERY_ID)
-        self.assertEqual(lookup.call_args.args[1]["id"], "123")
+        self.assertEqual(lookup.call_args.args, ("api/v1/users/123/info/", {}))
         self.assertEqual(context.max_connection_attempts, 1)
         return result
 
@@ -78,7 +75,7 @@ class AvatarTests(unittest.TestCase):
         candidate = helper.profile_avatar_candidates({"username": "artist", "profile_pic_url_hd": HD}, "artist")[0]
         self.assertEqual((candidate["width"], candidate["height"], candidate["hd"]), (0, 0, False))
 
-    def test_profile_query_abort_keeps_public_thumbnail(self):
+    def test_mobile_api_abort_keeps_public_thumbnail(self):
         result = self.resolve(helper.instaloader.exceptions.AbortDownloadException("400 Bad Request feedback_required"))
         self.assertEqual(result["url"], SMALL)
         self.assertIn("HD-аватарок", result["notice"])
@@ -110,34 +107,26 @@ class AvatarTests(unittest.TestCase):
 
     def test_public_hd_skips_authenticated_api(self):
         candidates = helper.profile_avatar_candidates({"username": "artist", "hd_profile_pic_url_info": {"url": HD, "width": 1080, "height": 1080}}, "artist")
-        context = SimpleNamespace(doc_id_graphql_query=Mock())
+        context = SimpleNamespace(get_iphone_json=Mock())
         with patch.object(helper, "public_profile_avatar", return_value=("123", candidates)):
             result = helper.resolve_avatar(SimpleNamespace(context=context), "artist")
         self.assertTrue(result["hd"])
-        context.doc_id_graphql_query.assert_not_called()
+        context.get_iphone_json.assert_not_called()
 
-    def test_api_pause_survives_helper_restart_and_expires(self):
-        with tempfile.TemporaryDirectory() as directory, \
-                patch.object(helper, "STATE_DIR", Path(directory)), \
-                patch.object(helper, "AVATAR_LIMIT_FILE", Path(directory) / "limits.json"), \
-                patch.object(helper, "SESSION_FILE", Path(directory) / "session"), \
-                patch.object(helper.time, "time", return_value=1000):
-            helper.pause_avatar_api()
-            self.assertTrue(helper.avatar_api_cooling_down())
-            with patch.object(helper.time, "time", return_value=1601):
-                self.assertFalse(helper.avatar_api_cooling_down())
-
-    def test_paused_api_is_not_called_again(self):
+    def test_previous_pause_does_not_block_explicit_retries(self):
         candidates = helper.profile_avatar_candidates({"username": "artist", "profile_pic_url": SMALL}, "artist")
-        context = SimpleNamespace(doc_id_graphql_query=Mock())
-        with patch.object(helper, "public_profile_avatar", return_value=("123", candidates)), \
-                patch.object(helper, "avatar_api_cooling_down", return_value=True):
-            result = helper.resolve_avatar(SimpleNamespace(context=context), "artist")
-        self.assertFalse(result["hd"])
-        self.assertIn("ограничил", result["notice"])
-        context.doc_id_graphql_query.assert_not_called()
+        context = SimpleNamespace(get_iphone_json=Mock(side_effect=helper.instaloader.exceptions.AbortDownloadException("feedback_required")))
+        with tempfile.TemporaryDirectory() as directory, \
+                patch.object(helper, "AVATAR_LIMIT_FILE", Path(directory) / "limits.json"), \
+                patch.object(helper, "public_profile_avatar", return_value=("123", candidates)):
+            helper.AVATAR_LIMIT_FILE.write_text(json.dumps({"source": "profile-query", "retryAfter": 4102444800}))
+            for _ in range(2):
+                result = helper.resolve_avatar(SimpleNamespace(context=context), "artist")
+                self.assertFalse(result["hd"])
+                self.assertIn("ограничил", result["notice"])
+        self.assertEqual(context.get_iphone_json.call_count, 2)
 
-    def test_429_connection_error_also_pauses_api(self):
+    def test_429_connection_error_has_restriction_message(self):
         error = helper.instaloader.exceptions.ConnectionException("JSON Query: 429 Too Many Requests")
         self.assertTrue(helper.avatar_api_restricted(error))
         self.assertIn("ограничил", helper.avatar_lookup_error(error))
@@ -157,23 +146,9 @@ class AvatarTests(unittest.TestCase):
                 patch.object(helper, "AVATAR_LIMIT_FILE", Path(directory) / "limits.json"), \
                 patch.object(helper, "ACCOUNT_FILE", Path(directory) / "account.json"), \
                 patch.object(helper, "SESSION_FILE", Path(directory) / "session"):
-            helper.pause_avatar_api()
+            helper.AVATAR_LIMIT_FILE.write_text("old pause")
             helper.save_account("artist")
             self.assertFalse(helper.AVATAR_LIMIT_FILE.exists())
-
-    def test_newer_session_and_old_mobile_pause_do_not_block_profile_query(self):
-        with tempfile.TemporaryDirectory() as directory, \
-                patch.object(helper, "STATE_DIR", Path(directory)), \
-                patch.object(helper, "AVATAR_LIMIT_FILE", Path(directory) / "limits.json"), \
-                patch.object(helper, "SESSION_FILE", Path(directory) / "session"):
-            helper.AVATAR_LIMIT_FILE.write_text(json.dumps({"retryAfter": helper.time.time()+600}))
-            self.assertFalse(helper.avatar_api_cooling_down())
-            helper.pause_avatar_api()
-            helper.SESSION_FILE.write_text("test-session")
-            os.utime(helper.AVATAR_LIMIT_FILE, (1000, 1000))
-            self.assertFalse(helper.avatar_api_cooling_down())
-
-
 class CookieFileTests(unittest.TestCase):
     def write_cookies(self, path, account="123", token="test-session", expiry="4102444800"):
         values = {"sessionid": token, "csrftoken": "test-csrf", "ds_user_id": account}
@@ -206,16 +181,42 @@ class CookieFileTests(unittest.TestCase):
                     helper.load_session()
                 old.assert_not_called()
 
-    def test_new_cookies_clear_previous_account_api_pause(self):
-        with tempfile.TemporaryDirectory() as directory:
-            path = Path(directory)
-            with patch.object(helper, "COOKIE_FILE", path / "cookies.txt"), \
-                    patch.object(helper, "AVATAR_LIMIT_FILE", path / "limits.json"), \
-                    patch.object(helper, "SESSION_FILE", path / "session"):
-                helper.AVATAR_LIMIT_FILE.write_text(json.dumps({"source": "profile-query", "retryAfter": helper.time.time()+600}))
-                os.utime(helper.AVATAR_LIMIT_FILE, (1000, 1000))
-                self.write_cookies(helper.COOKIE_FILE)
-                self.assertFalse(helper.avatar_api_cooling_down())
+    def test_mobile_request_authenticates_cookie_session(self):
+        loader = helper.make_loader()
+        self.addCleanup(loader.close)
+        loader.load_session("123", {"ds_user_id": "123", "sessionid": "test-session", "csrftoken": "test-csrf"})
+        with patch.object(loader.context, "get_json", return_value={"user": {"pk": "456"}}) as request:
+            loader.context.get_iphone_json("api/v1/users/456/info/", {})
+        session = request.call_args.args[3]
+        authorization = session.headers.get("authorization", "")
+        self.assertTrue(authorization.startswith("Bearer IGT:2:"), "The mobile API requires bearer auth, not cookies alone")
+        token = json.loads(b64decode(authorization.removeprefix("Bearer IGT:2:")))
+        self.assertEqual(token, {"ds_user_id": "123", "sessionid": "test-session"})
+        self.assertFalse(session.cookies)
+
+    def test_online_status_checks_the_authenticated_profile_api(self):
+        context = SimpleNamespace(user_id="123", get_iphone_json=Mock(return_value={"user": {"pk": "123", "username": "account"}}))
+        loader = SimpleNamespace(context=context)
+        with patch.object(helper, "load_session", return_value=(loader, "123")), patch("builtins.print") as output:
+            helper.status(True)
+        context.get_iphone_json.assert_called_once_with("api/v1/users/123/info/", {})
+        self.assertIn("@account", output.call_args.args[0])
+
+
+class AvatarCommandTests(unittest.TestCase):
+    def test_command_uses_hd_api_without_legacy_search(self):
+        small = helper.profile_avatar_candidates({"username": "artist", "profile_pic_url": SMALL}, "artist")
+        context = SimpleNamespace(get_iphone_json=Mock(return_value={"user": {
+            "pk": "123", "username": "artist", "hd_profile_pic_url_info": {"url": HD, "width": 1080, "height": 1080}}}))
+        loader = SimpleNamespace(context=context)
+        with patch.object(helper, "load_session", return_value=(loader, "account")), \
+                patch.object(helper, "public_profile_avatar", return_value=("123", small)), \
+                patch.object(helper.instaloader.Profile, "from_username", side_effect=AssertionError("Legacy lookup must not run")), \
+                patch("builtins.print") as output:
+            helper.avatar("artist")
+        result = json.loads(output.call_args.args[0])
+        self.assertEqual((result["username"], result["url"], result["width"], result["height"], result["hd"]), ("artist", HD, 1080, 1080, True))
+        context.get_iphone_json.assert_called_once_with("api/v1/users/123/info/", {})
 
 
 if __name__ == "__main__":

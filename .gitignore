@@ -48,7 +48,7 @@ next-env.d.ts
 /.local/instagram/
 /.local-instagram-profile/
 /cookies.txt
-/www.instagram.com_cookies.txt
+/www.instagram.com_cookies*.txt
 /instagram-cookies.txt
 __pycache__/
 

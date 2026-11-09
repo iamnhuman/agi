@@ -1,2 +1,2 @@
-instaloader==4.15.3
+instaloader==4.16
 browser-cookie3==0.20.1

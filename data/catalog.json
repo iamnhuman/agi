@@ -1,6 +1,94 @@
 {
   "artists": [
     {
+      "id": "e6a252e4-35cb-4a4b-9662-744a4fb5e988",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "specialbenedict1",
+      "url": "https://www.instagram.com/specialbenedict1",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./avatars/upload-718d7b2e64161f51.webp",
+      "tags": ""
+    },
+    {
+      "id": "712b93d0-209c-4dea-9a39-4b7cdc7b7e78",
+      "kind": "artist",
+      "rating": "A",
+      "name": "ruslan.neiro",
+      "url": "https://www.instagram.com/ruslan.neiro",
+      "platform": "Instagram",
+      "section": "runet",
+      "image": "./avatars/upload-a7e285d0ea165107.webp",
+      "tags": ""
+    },
+    {
+      "id": "764ee1b0-c890-4ee1-bb1a-4af168ecab14",
+      "kind": "media",
+      "rating": "AAA",
+      "name": "denoisemag",
+      "url": "https://www.instagram.com/denoisemag",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./avatars/upload-8e76b8c950a94c32.webp",
+      "tags": ""
+    },
+    {
+      "id": "1087ad7a-6fb7-4c8c-88e3-e7463891032a",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "silasehrazatyucel",
+      "url": "https://www.instagram.com/silasehrazatyucel",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./avatars/upload-590fbe566134e816.webp",
+      "tags": ""
+    },
+    {
+      "id": "16bffca4-c83b-44dd-a0c0-caab6f57b702",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "_aizuki_",
+      "url": "https://www.instagram.com/_aizuki_",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./avatars/upload-8358926400a7df65.webp",
+      "tags": ""
+    },
+    {
+      "id": "75f8c27b-ef03-404e-bf12-6358b7f16b28",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "rawdantz",
+      "url": "https://www.instagram.com/rawdantz",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./avatars/upload-770477cdca8c2dc9.webp",
+      "tags": ""
+    },
+    {
+      "id": "dba64a23-a96b-4625-90ab-7a1abb01ba0e",
+      "kind": "artist",
+      "rating": "AA",
+      "name": "solizone_",
+      "url": "https://www.instagram.com/solizone_",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./avatars/upload-e8e8db36d78dd059.webp",
+      "tags": ""
+    },
+    {
+      "id": "4b07ef73-8948-4b6f-8c04-a11a5557e35d",
+      "kind": "artist",
+      "rating": "AAA",
+      "name": "buddhastears_",
+      "url": "https://www.instagram.com/buddhastears_",
+      "platform": "Instagram",
+      "section": "world",
+      "image": "./avatars/upload-23728970878cd1d9.webp",
+      "tags": ""
+    },
+    {
       "id": "b322d3d9-7ffc-4fff-9f74-1831569ceb61",
       "kind": "artist",
       "rating": "AA",
